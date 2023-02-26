@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest run"
   },
   "dependencies": {
     "firebase": "^9.17.1",
@@ -34,6 +35,7 @@
     "eslint": "^8.34.0",
     "eslint-plugin-react": "^7.32.2",
     "typescript": "^4.9.3",
-    "vite": "^4.1.0"
+    "vite": "^4.1.0",
+    "vitest": "^0.29.1"
   }
 }
