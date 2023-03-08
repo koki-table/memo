@@ -20,6 +20,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: install
+        run: |
+          npm install
       - name: lint and test
         run: |
           npm run lint
