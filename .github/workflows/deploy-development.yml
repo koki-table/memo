@@ -11,14 +11,14 @@ name: Deploy to Firebase Hosting on PR
       - 'develop'
 jobs:
   test:
-      name: Execute React Test
-      if: ${{ github.event_name == 'pull_request' }}
-      runs-on: ubuntu-latest
-      steps: 
-        - name: lint and test
-          run: |
-            npm run lint
-            npm run test
+    name: Execute React Test
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps: 
+      - name: lint and test
+        run: |
+          npm run lint
+          npm run test
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
