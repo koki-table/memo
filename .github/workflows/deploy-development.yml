@@ -6,8 +6,6 @@ name: Deploy to Firebase Hosting on PR
     branches:
       - develop
   pull_request:
-    types:
-      - "ready_for_review"
     branches:
       - 'main'
       - 'develop'
