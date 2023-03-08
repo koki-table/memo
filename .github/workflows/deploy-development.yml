@@ -5,7 +5,22 @@ name: Deploy to Firebase Hosting on PR
   push:
     branches:
       - develop
+  pull_request:
+    types:
+      - "ready_for_review"
+    branches:
+      - 'main'
+      - 'develop'
 jobs:
+  test:
+      name: Execute React Test
+      if: ${{ github.event_name == 'pull_request' }}
+      runs-on: ubuntu-latest
+      steps: 
+        - name: lint and test
+          run: |
+            npm run lint
+            npm run test
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
@@ -18,10 +33,6 @@ jobs:
         run: |
           npm install
           npm install -g firebase-tools
-      - name: lint and test
-        run: |
-          npm run lint
-          npm run test
       - run: yarn build:dev
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
