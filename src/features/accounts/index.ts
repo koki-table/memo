@@ -1,0 +1,1 @@
+export * from './routes/AccountRegister';

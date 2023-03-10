@@ -1,8 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
 import "./index.css";
 import { initializeApp } from "firebase/app";
+import { getAuth } from 'firebase/auth'
+import { ChakraProvider } from '@chakra-ui/react'
+import { AppRoutes } from '@/routes'
+import { BrowserRouter as Router } from 'react-router-dom'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -16,8 +19,14 @@ const firebaseConfig = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = initializeApp(firebaseConfig);
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+export const auth = getAuth(app)
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <ChakraProvider>
+    <React.StrictMode>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </React.StrictMode>
+  </ChakraProvider>
+)
