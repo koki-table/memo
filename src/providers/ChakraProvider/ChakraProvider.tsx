@@ -2,6 +2,7 @@ import { ChakraProvider as _ChakraProvider } from '@chakra-ui/react'
 import { FC, ReactNode } from 'react'
 
 import { theme } from '@/providers/ChakraProvider/theme'
+import '@/assets/index.css'
 
 type ChakraProviderProps = {
   children: ReactNode
