@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react'
 
+import { AuthProvider } from '@/features/auth'
 import { ChakraProvider, ErrorBoundary, Suspense } from '@/providers'
 
 type AppProviderProps = {
@@ -12,7 +13,9 @@ export const AppProvider: FC<AppProviderProps> = (props) => {
   return (
     <ChakraProvider>
       <Suspense>
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <ErrorBoundary>
+          <AuthProvider>{children}</AuthProvider>
+        </ErrorBoundary>
       </Suspense>
     </ChakraProvider>
   )
