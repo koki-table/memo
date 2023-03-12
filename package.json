@@ -9,7 +9,7 @@
     "build:prod": "tsc && vite build --mode production",
     "build:dev": "tsc && vite build --mode development",
     "preview": "vite preview",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test": "firebase emulators:exec --only firestore 'vitest run'",
     "format": "prettier --write \"**/*.+(js|json|yml|ts|tsx|css)\" --ignore-path .prettierignore",
@@ -72,7 +72,6 @@
     "openapi2aspida": "^0.21.0",
     "postcss-syntax": "^0.36.2",
     "prettier": "^2.7.1",
-    "react-router-dom": "^6.4.2",
     "rimraf": "^3.0.2",
     "stylelint": "^14.14.0",
     "stylelint-config-prettier": "^9.0.3",
@@ -81,7 +80,6 @@
     "stylelint-prettier": "^2.0.0",
     "typescript": "^4.8.4",
     "vite": "^3.1.0",
-    "vite-tsconfig-paths": "^3.5.2",
     "vitest": "^0.24.3"
   },
   "husky": {

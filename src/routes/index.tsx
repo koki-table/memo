@@ -1,20 +1,18 @@
 import { Routes, Route } from 'react-router-dom'
 
-import { lazyImport } from '@/utils/lazyImport'
 import { NotFound } from '@/features/misc'
+import { lazyImport } from '@/utils/lazyImport'
 
-const { AccountRegister } = lazyImport(
-  async () => await import('@/features/accounts'),
-  'AccountRegister'
-)
+const { AuthRoutes } = lazyImport(async () => await import('@/features/auth'), 'AuthRoutes')
+const { App } = lazyImport(async () => await import('@/App'), 'App')
 
 export const AppRoutes = () => {
-
   return (
     <Routes>
       <Route path="/">
-        <Route index element={<AccountRegister />} />
+        <Route index element={<App />} />
       </Route>
+      <Route path="/auth/*" element={<AuthRoutes />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

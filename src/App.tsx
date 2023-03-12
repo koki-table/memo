@@ -1,10 +1,7 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export const App = () => {
   return (
     <div className="App">
       <div>
@@ -16,9 +13,6 @@ function App() {
         </a>
       </div>
       <h1>Vite + React ({import.meta.env.MODE})</h1>
-      
     </div>
   )
 }
-
-export default App

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   Box,
   Button,
@@ -12,11 +13,11 @@ import {
   Spacer,
   useToast,
 } from '@chakra-ui/react'
-import { FormEvent, useState } from 'react'
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth'
+import { FormEvent, useState } from 'react'
 
-export const AccountRegister = () => {
+export const RegisterForm = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -92,4 +93,4 @@ export const AccountRegister = () => {
   )
 }
 
-export default AccountRegister
+export default RegisterForm
