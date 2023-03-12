@@ -60,7 +60,6 @@ a:focus {
 body {
   display: flex;
   place-items: center;
-  min-width: var(--min-screen-width);
   min-height: 100vh;
   margin: 0;
 }
