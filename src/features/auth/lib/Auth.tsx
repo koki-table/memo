@@ -1,6 +1,6 @@
 import type { User } from '@firebase/auth'
 import { getAuth, onAuthStateChanged } from '@firebase/auth'
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useState, FC } from 'react'
 
 export type UseAuth = {
   user: User | null | undefined
@@ -12,7 +12,14 @@ const AuthContext = createContext<UseAuth>(initialState)
 
 type Props = { children: ReactNode }
 
-export const AuthProvider = ({ children }: Props) => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }: Props) => {
+  const auth = useAuthProvider()
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
+}
+
+export const useAuthContext = () => useContext(AuthContext)
+
+const useAuthProvider = (): UseAuth => {
   const [user, setUser] = useState<UseAuth>(initialState)
 
   useEffect(() => {
@@ -27,10 +34,7 @@ export const AuthProvider = ({ children }: Props) => {
       setUser(initialState)
       throw error
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>
+  return user
 }
-
-export const useAuthContext = () => useContext(AuthContext)
