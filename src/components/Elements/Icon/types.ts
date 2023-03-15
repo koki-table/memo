@@ -45,4 +45,4 @@ export const iconType = [
   'plus--default',
   'qr--primary',
 ] as const
-export type IconType = typeof iconType[number]
+export type IconType = (typeof iconType)[number]
