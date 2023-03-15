@@ -21,7 +21,7 @@ jobs:
       - name: install
         run: |
           yarn
-          yarn add -g firebase-tools
+          yarn add firebase-tools
       - name: lint and test
         run: |
           yarn run lint
@@ -37,7 +37,7 @@ jobs:
       - name: install
         run: |
           yarn
-          yarn add -g firebase-tools
+          yarn add firebase-tools
       - run: yarn build:dev
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
