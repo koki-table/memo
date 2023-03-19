@@ -34,7 +34,7 @@ const useAuthProvider = (): UseAuth => {
       console.log('error', error)
 
       setUser(initialState)
-      throw error
+      // throw error
     }
   }, [])
 
