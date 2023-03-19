@@ -31,6 +31,8 @@ const useAuthProvider = (): UseAuth => {
         })
       })
     } catch (error) {
+      console.log('error', error)
+
       setUser(initialState)
       throw error
     }
