@@ -1,0 +1,83 @@
+:root {
+  /* variables */
+  --white: #ffffff;
+  --background-color-main: #f7f8f9;
+  --background-color-base: #f0f2f5;
+  --background-color-gray: #607079;
+  --background-color-grayout: #f7f9fb;
+  --border-color-main: #e2e8f0;
+  --error-color-main: #e31b0c;
+  --error-color-light: #fff5f4;
+  --error-color-dark: #ab2f26;
+  --warning-color-main: #df851c;
+  --warning-color-light: #fff9f1;
+  --hover-color-primary: #f5fbfa;
+  --line-color-main: #d3dadd;
+  --line-color-light: #f2f4f4;
+  --primary-color-main: #54b8b2;
+  --primary-color-dark: #22c9bf;
+  --primary-color-heavy: #239c95;
+  --primary-color-light: #f5fbfa;
+  --primary-color-ghost: rgba(255, 255, 255, 0.15);
+  --primary-color-gradation: linear-gradient(to right, #22c9bf, #22b5c9);
+  --secondary-color-main: #6e54b8;
+  --success-color-main: #388e3c;
+  --success-color-light: #edf7ed;
+  --accent-color-main: #4375d2;
+  --accent-color-light: #ebf5ff;
+  --shadow-main: 0px 5px 5px rgba(0, 0, 0, 0.02);
+  --text-color-main: #51605e;
+  --text-color-secondary: #77837f;
+  --text-color-sub: #656565;
+  --text-color-placeholder: #b3b9bd;
+  --text-color-link: #0095d8;
+  --text-color-pagination: #40524f;
+  --badge-color-red: #d63f3f;
+  --transition-ease-in: 0.2s cubic-bezier(0.45, 0, 0.55, 1);
+  --min-screen-width: 1280px;
+  /* globals */
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  font-synthesis: none;
+  text-rendering: optimizelegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+a {
+  font-weight: 500;
+  text-decoration: inherit;
+}
+
+a:hover,
+a:focus {
+  color: var(--primary-color-dark);
+}
+
+body {
+  display: flex;
+  place-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+select.hasValue {
+  color: var(--text-color-main);
+}
+
+input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+}
