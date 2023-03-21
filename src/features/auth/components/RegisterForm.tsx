@@ -11,50 +11,17 @@ import {
   Heading,
   Input,
   Spacer,
-  useToast,
 } from '@chakra-ui/react'
-import { FirebaseError } from '@firebase/util'
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth'
-import { FormEvent, useState } from 'react'
+
+import { useAuth } from '@/features/auth/'
 
 export const RegisterForm = () => {
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const toast = useToast()
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    setIsLoading(true)
-    e.preventDefault()
-    try {
-      const auth = getAuth()
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      await sendEmailVerification(userCredential.user)
-      setEmail('')
-      setPassword('')
-      toast({
-        title: '確認メールを送信しました。',
-        status: 'success',
-        position: 'top',
-      })
-    } catch (e) {
-      toast({
-        title: 'エラーが発生しました。',
-        status: 'error',
-        position: 'top',
-      })
-      if (e instanceof FirebaseError) {
-        console.log(e)
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { signUp, isLoading, email, setEmail, password, setPassword } = useAuth()
 
   return (
     <Container py={14}>
       <Heading>サインアップ</Heading>
-      <chakra.form onSubmit={handleSubmit}>
+      <chakra.form onSubmit={signUp}>
         <Spacer height={8} aria-hidden />
         <Grid gap={4}>
           <Box display={'contents'}>
