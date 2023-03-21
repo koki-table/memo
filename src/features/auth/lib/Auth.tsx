@@ -49,7 +49,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }: Props) =
 }
 
 const useAuthProvider = (): UseAuth => {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null | undefined>(undefined)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const toast = useToast()
   const [email, setEmail] = useState<string>('')
