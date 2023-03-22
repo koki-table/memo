@@ -18,11 +18,16 @@ import {
   useCallback,
 } from 'react'
 
+export type AuthResponse = {
+  success: boolean
+  message: string
+}
+
 export type UseAuth = {
   user: User | null | undefined
   isLoading: boolean
   signUp: (e: FormEvent<HTMLFormElement>) => Promise<void>
-  signIn: (e: FormEvent<HTMLFormElement>) => Promise<void>
+  signIn: (e: FormEvent<HTMLFormElement>) => Promise<AuthResponse>
   signOut: () => Promise<void>
   email: string
   setEmail: (email: string) => void
@@ -115,6 +120,8 @@ const useAuthProvider = (): UseAuth => {
           status: 'success',
           position: 'top',
         })
+        return { success: true, message: '' }
+        // TODO: ログイン後のページに遷移の処理を書く
       } catch (e) {
         toast({
           title: 'エラーが発生しました。',
@@ -124,6 +131,7 @@ const useAuthProvider = (): UseAuth => {
         if (e instanceof FirebaseError) {
           console.log(e)
         }
+        return { success: true, message: 'エラーが発生しました' }
       } finally {
         setIsLoading(false)
       }
