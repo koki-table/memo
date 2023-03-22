@@ -1,23 +1,60 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Button, chakra, Container, Heading } from '@chakra-ui/react'
+import {
+  Avatar,
+  Button,
+  chakra,
+  Container,
+  Flex,
+  Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spacer,
+} from '@chakra-ui/react'
 
+import { Heading } from '@/components/Elements/'
 import { useAuth } from '@/features/auth'
 
 export const Header = () => {
-  const { user, isLoading, signOut } = useAuth()
+  const { user, signOut } = useAuth()
+
+  const onSubmit (e: FormEvent<HTMLFormElement>) => {
+    const { success, message } = await signOut(e)
 
   return (
     <chakra.header py={4} bgColor={'blue.600'}>
       <Container maxW={'container.lg'}>
-        <Heading color={'white'}>
+        <Flex>
+          <Link href={'/'}>
+            <chakra.a
+              _hover={{
+                opacity: 0.8,
+              }}
+            >
+              <Heading variant="h3" color={'white'}>
+                memo
+              </Heading>
+            </chakra.a>
+          </Link>
+          <Spacer aria-hidden />
           {user ? (
-            <Button colorScheme={'teal'} onClick={signOut} isLoading={isLoading}>
-              サインアウト
-            </Button>
+            <Menu>
+              <MenuButton>
+                <Avatar flexShrink={0} width={10} height={10} />
+              </MenuButton>
+              <MenuList py={0}>
+                <MenuItem onClick={signOut}>サインアウト</MenuItem>
+              </MenuList>
+            </Menu>
           ) : (
-            'ログアウト中'
+            <Link href={'/auth/register'}>
+              <Button as={'a'} colorScheme={'teal'}>
+                サインイン
+              </Button>
+            </Link>
           )}
-        </Heading>
+        </Flex>
       </Container>
     </chakra.header>
   )

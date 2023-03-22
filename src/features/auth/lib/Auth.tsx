@@ -115,7 +115,6 @@ const useAuthProvider = (): UseAuth => {
           status: 'success',
           position: 'top',
         })
-        // TODO: ログイン後のページに遷移の処理を書く
       } catch (e) {
         toast({
           title: 'エラーが発生しました。',
