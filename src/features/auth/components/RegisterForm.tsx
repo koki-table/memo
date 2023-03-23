@@ -12,16 +12,26 @@ import {
   Input,
   Spacer,
 } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '@/features/auth/'
 
 export const RegisterForm = () => {
+  const navigate = useNavigate()
   const { signUp, isLoading, email, setEmail, password, setPassword } = useAuth()
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const { success } = await signUp(e)
+    if (success) {
+      navigate('/auth/login')
+    }
+  }
 
   return (
     <Container py={14}>
-      <Heading>サインアップ</Heading>
-      <chakra.form onSubmit={signUp}>
+      <Heading>アカウント登録</Heading>
+      <chakra.form onSubmit={onSubmit}>
         <Spacer height={8} aria-hidden />
         <Grid gap={4}>
           <Box display={'contents'}>
