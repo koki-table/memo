@@ -10,7 +10,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Spacer,
 } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 
@@ -30,21 +29,18 @@ export const Header = () => {
   }
 
   return (
-    <chakra.header py={4} bgColor={'blue.600'}>
+    <chakra.header py={6} bgColor={'var(--white)'}>
       <Container maxW={'container.lg'}>
-        <Flex>
+        <Flex justifyContent="space-between">
           <Link href={'/'}>
             <chakra.a
               _hover={{
                 opacity: 0.8,
               }}
             >
-              <Heading variant="h3" color={'white'}>
-                memo
-              </Heading>
+              <Heading variant="h3">memo</Heading>
             </chakra.a>
           </Link>
-          <Spacer aria-hidden />
           {user ? (
             <Menu>
               <MenuButton>
