@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import { AppProvider } from '@/providers/AppProvider'

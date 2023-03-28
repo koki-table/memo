@@ -1,6 +1,7 @@
 :root {
   /* variables */
   --white: #ffffff;
+  --black: #333;
   --background-color-main: #f7f8f9;
   --background-color-base: #f0f2f5;
   --background-color-gray: #607079;
@@ -14,16 +15,15 @@
   --hover-color-primary: #f5fbfa;
   --line-color-main: #d3dadd;
   --line-color-light: #f2f4f4;
-  --primary-color-main: #54b8b2;
-  --primary-color-dark: #22c9bf;
-  --primary-color-heavy: #239c95;
-  --primary-color-light: #f5fbfa;
+  --primary-color-main: #7FBCD2;
+  --primary-color-dark: #4375d2;
+  --primary-color-heavy: #A5F1E9;
+  --primary-color-light: #E1FFEE;
   --primary-color-ghost: rgba(255, 255, 255, 0.15);
   --primary-color-gradation: linear-gradient(to right, #22c9bf, #22b5c9);
-  --secondary-color-main: #6e54b8;
+  --secondary-color-main: #FFEEAF;
   --success-color-main: #388e3c;
   --success-color-light: #edf7ed;
-  --accent-color-main: #4375d2;
   --accent-color-light: #ebf5ff;
   --shadow-main: 0px 5px 5px rgba(0, 0, 0, 0.02);
   --text-color-main: #51605e;
@@ -47,6 +47,12 @@
   text-size-adjust: 100%;
 }
 
+#root {
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+}
+
 a {
   font-weight: 500;
   text-decoration: inherit;
@@ -54,7 +60,7 @@ a {
 
 a:hover,
 a:focus {
-  color: var(--primary-color-dark);
+  color: var(--primary-color-heavy);
 }
 
 body {

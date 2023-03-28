@@ -14,7 +14,10 @@ const baseStyle = {
   fontWeight: 'Medium',
   fontSize: '14px',
   _hover: {
-    background: 'var(--primary-color-dark)',
+    background: 'var(--primary-color-heavy)',
+  },
+  _disabled: {
+    background: 'var(--primary-color-main)',
   },
 }
 
