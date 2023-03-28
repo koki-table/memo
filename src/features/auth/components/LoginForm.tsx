@@ -23,7 +23,8 @@ export const LoginForm = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      w="100%"
+      maxW={['80%', '400px']}
+      margin="0 auto"
       padding={5}
       minH="100vh"
     >
@@ -31,7 +32,7 @@ export const LoginForm = () => {
       <chakra.form onSubmit={onSubmit} w="100%">
         <VStack spacing={5} mt="6">
           <FormControl>
-            <FormLabel>メールアドレス</FormLabel>
+            <FormLabel fontSize="xs">メールアドレス</FormLabel>
             <Input
               type={'email'}
               name={'email'}
@@ -42,7 +43,7 @@ export const LoginForm = () => {
             />
           </FormControl>
           <FormControl>
-            <FormLabel>パスワード</FormLabel>
+            <FormLabel fontSize="xs">パスワード</FormLabel>
             <Input
               type={'password'}
               name={'password'}
@@ -53,7 +54,7 @@ export const LoginForm = () => {
             />
           </FormControl>
         </VStack>
-        <Center mt="8">
+        <Center mt="10">
           <Button type={'submit'} variant="primary">
             <Text fontSize={'sm'} fontWeight="700">
               ログイン
