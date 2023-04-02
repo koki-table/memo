@@ -18,6 +18,10 @@ const ProtectedLayout = () => {
 }
 
 const { AuthRoutes } = lazyImport(async () => await import('@/features/auth'), 'AuthRoutes')
+const { CalendarRoutes } = lazyImport(
+  async () => await import('@/features/calendar'),
+  'CalendarRoutes'
+)
 const { App } = lazyImport(async () => await import('@/App'), 'App')
 
 export const AppRoutes = () => {
@@ -34,6 +38,7 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/" element={handleAuth()}>
         <Route index element={<App />} />
+        <Route path="/calendar/*" element={<CalendarRoutes />} />
       </Route>
       <Route path="/auth/*" element={<AuthRoutes />} />
       <Route path="*" element={<NotFound />} />
