@@ -19,6 +19,7 @@
     "@chakra-ui/react": "^2.5.1",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "dayjs": "^1.11.7",
     "eslint-plugin-prettier": "^4.2.1",
     "firebase": "^9.17.1",
     "framer-motion": "^10.2.4",
