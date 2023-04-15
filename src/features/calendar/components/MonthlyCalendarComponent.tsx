@@ -3,52 +3,19 @@
 import { VStack, Flex } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import ja from 'dayjs/locale/ja'
-import { useReducer } from 'react'
 
 import { getMonth } from '@/utils/getMonth'
 
+import { useCalendar } from '../lib'
+
+import { CalendarHeader } from './CalendarHeader'
 import { Day } from './Day'
 
 export const MonthlyCalendarComponent = () => {
   dayjs.locale(ja)
-  const month = dayjs().month()
-
-  type Action = {
-    type: 'increment' | 'decrement'
-  }
-  type State = {
-    currentMonth: number
-  }
-
-  const initialState: State = {
-    currentMonth: month,
-  } as const
-
-  const reducer = (state: State, action: Action): State => {
-    switch (action.type) {
-      case 'increment': {
-        return {
-          ...state,
-          currentMonth: state.currentMonth + 1,
-        }
-      }
-      case 'decrement': {
-        return {
-          ...state,
-          currentMonth: state.currentMonth - 1,
-        }
-      }
-      default: {
-        return state
-      }
-    }
-  }
-
-  const [{ currentMonth }, dispatch] = useReducer(reducer, initialState)
+  const { currentMonth } = useCalendar()
 
   const currentMonthData = getMonth(currentMonth)
-
-  console.log(currentMonthData)
 
   return (
     <VStack
@@ -58,9 +25,10 @@ export const MonthlyCalendarComponent = () => {
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
-      minH={`calc(100vh - 88px)`}
+      minH={`calc(100vh)`}
     >
-      <Flex flexWrap="wrap" justifyContent="center">
+      <CalendarHeader />
+      <Flex flexWrap="wrap" justifyContent="center" position="absolute" top="140px">
         {currentMonthData.map((row, i) => (
           <Flex
             key={i}

@@ -18,7 +18,7 @@ export const Day: FC<DayProps> = (props) => {
 
   return (
     <Box borderRight={'solid 1px var(--line-color-light)'}>
-      <Text minW={dayViewWidth} display="grid" placeItems="center">
+      <Text minW={`${dayViewWidth}px`} display="grid" placeItems="center">
         {/* 1行目に曜日を表示 */}
         {rowIndex === 0 && (
           <Text
