@@ -62,7 +62,13 @@ export const MonthlyCalendarComponent = () => {
     >
       <Flex flexWrap="wrap" justifyContent="center">
         {currentMonthData.map((row, i) => (
-          <Flex key={i} flexWrap="wrap">
+          <Flex
+            key={i}
+            flexWrap="wrap"
+            borderTop={'solid 1px var(--line-color-light)'}
+            borderLeft={'solid 1px var(--line-color-light)'}
+            _last={{ borderBottom: 'solid 1px var(--line-color-light)' }}
+          >
             {row.map((day, idx) => (
               <Day day={day} key={idx} rowIndex={i} />
             ))}

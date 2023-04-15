@@ -14,15 +14,28 @@ export const Day: FC<DayProps> = (props) => {
   const getTodayStyle =
     day.format('D-MM-YY') === dayjs().format('D-MM-YY') ? 'var(--primary-color-light)' : ''
 
-  const viewWidth = (window.innerWidth - 40) / 7
+  const dayViewWidth = (window.innerWidth - 40) / 7
 
   return (
-    <Box>
-      <Text minW={viewWidth} display="grid" placeItems="center">
+    <Box borderRight={'solid 1px var(--line-color-light)'}>
+      <Text minW={dayViewWidth} display="grid" placeItems="center">
         {/* 1行目に曜日を表示 */}
-        {rowIndex === 0 && <Text>{day.format('ddd')}</Text>}
+        {rowIndex === 0 && (
+          <Text
+            as="span"
+            borderBottom={'solid 1px var(--line-color-light)'}
+            display="grid"
+            placeItems="center"
+            w="100%"
+            paddingY={2}
+            fontSize="xs"
+          >
+            {day.format('ddd')}
+          </Text>
+        )}
         <Text
-          paddingY="4"
+          as="span"
+          paddingY="5"
           zIndex={2}
           position="relative"
           _before={{
