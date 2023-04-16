@@ -26,15 +26,6 @@ jobs:
         run: |
           yarn run lint
           yarn run test
-
-  create_env_develop:
-    name: Create dot env file
-    runs-on: ubuntu-latest
-    steps:
-      - shell: bash
-        run: |
-          touch .env
-          echo "ENV_DEVELOP=${{ secrets.ENV_DEVELOP }}" >> .env
       
   build_and_deploy:
     runs-on: ubuntu-latest
