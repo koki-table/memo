@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "memo-3c2c7"
-  }
+    "default": "memo-3c2c7",
+    "dev": "memo-develop",
+    "prod": "memo-3c2c7"
+  },
+  "targets": {},
+  "etags": {}
 }
