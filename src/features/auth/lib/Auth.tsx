@@ -109,7 +109,6 @@ const useAuthProvider = (): UseAuth => {
 
   const signIn = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
-      console.log({ email, password })
       setIsLoading(true)
       e.preventDefault()
       try {

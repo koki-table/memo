@@ -29,6 +29,7 @@ export const LoginForm = () => {
       minH="100vh"
     >
       <Heading variant={'h3'}>ログイン</Heading>
+      <h1>Vite + React ({import.meta.env.MODE})</h1>
       <chakra.form onSubmit={onSubmit} w="100%">
         <VStack spacing={5} mt="6">
           <FormControl>
