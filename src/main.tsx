@@ -7,15 +7,13 @@ import { AppProvider } from '@/providers/AppProvider'
 import { AppRoutes } from '@/routes'
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_APP_ID,
+  apiKey: 'AIzaSyArqSPXTTvE0ucTyPLLJUds1k2Li5olMAY',
+  authDomain: 'memo-develop.firebaseapp.com',
+  projectId: 'memo-develop',
+  storageBucket: 'memo-develop.appspot.com',
+  messagingSenderId: '875918691543"',
+  appId: '1:875918691543:web:c10c9302db9e81677c7492',
 }
-
-console.log(firebaseConfig)
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = initializeApp(firebaseConfig)
