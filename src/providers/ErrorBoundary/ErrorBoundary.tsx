@@ -7,7 +7,7 @@ import { Button, Heading } from '@/components/Elements'
 const ErrorFallback = () => {
   return (
     <Center h="100vh" w="100vw" flexDirection="column" gap={8}>
-      <Heading>エラーが発生しました</Heading>
+      <Heading variant={'h4'}>エラーが発生しました</Heading>
       <Button onClick={() => window.location.assign(window.location.origin)}>トップへ戻る</Button>
     </Center>
   )

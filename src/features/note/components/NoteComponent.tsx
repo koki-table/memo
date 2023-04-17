@@ -1,21 +1,20 @@
 import { Text, HStack } from '@chakra-ui/react'
 import { FC } from 'react'
+import { useParams } from 'react-router-dom'
 
-import { Button } from '@/components/Elements'
+// import { Button } from '@/components/Elements'
 
-import { useNote } from '../lib'
+// import { useNote } from '../lib'
 
 export const NoteComponent: FC = () => {
-  const { dispatch } = useNote()
+  // const { dispatch } = useNote()
+  const { id } = useParams()
+
+  console.log(id)
 
   return (
     <HStack spacing={1}>
-      <Button variant="circle" onClick={() => dispatch({ type: 'decrement' })} minWidth="40px">
-        <Text fontSize="xs">前月</Text>
-      </Button>
-      <Button variant="circle" onClick={() => dispatch({ type: 'increment' })} minWidth="40px">
-        <Text fontSize="xs">翌月</Text>
-      </Button>
+      <Text>{id}</Text>
     </HStack>
   )
 }

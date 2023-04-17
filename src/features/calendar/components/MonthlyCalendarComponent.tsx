@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-// import { useNavigate } from 'react-router-dom'
 import { VStack, Flex } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import ja from 'dayjs/locale/ja'
