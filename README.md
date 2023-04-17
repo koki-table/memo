@@ -10,3 +10,6 @@ firebaseにて、stagingとprod環境を用意している。
 [memo・・・production](https://console.firebase.google.com/project/memo-3c2c7/overview?consoleUI=FIREBASE&hl=ja)
 
 `main.tsx`の firebaseConfig は dev と prod で切り替える必要がある。
+
+# 公開ページ
+https://memo-develop.web.app/auth/login
