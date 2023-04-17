@@ -27,9 +27,9 @@ export const LoginForm = () => {
       margin="0 auto"
       padding={5}
       minH="100vh"
+      spacing={7}
     >
-      <Heading variant={'h3'}>ログイン</Heading>
-      <h1>Vite + React ({import.meta.env.MODE})</h1>
+      <Heading variant={'h4'}>ログイン</Heading>
       <chakra.form onSubmit={onSubmit} w="100%">
         <VStack spacing={5} mt="6">
           <FormControl>
@@ -63,6 +63,20 @@ export const LoginForm = () => {
           </Button>
         </Center>
       </chakra.form>
+      <VStack spacing={2} textAlign={'center'}>
+        <Text
+          as={'a'}
+          fontSize={'sm'}
+          borderBottom={'solid 1px var(--text-color-link)'}
+          letterSpacing={'2.3'}
+          onClick={() => {
+            navigate('/auth/register')
+          }}
+        >
+          アカウント登録はこちら
+        </Text>
+        <Text fontSize={'xs'}>※初回はアカウント登録が必要です</Text>
+      </VStack>
     </VStack>
   )
 }
