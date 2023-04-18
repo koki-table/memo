@@ -1,4 +1,4 @@
-import { Input as ChakraInput, Box, Image, Text } from '@chakra-ui/react'
+import { Input as ChakraInput, Box, Image, Text, Flex } from '@chakra-ui/react'
 import { FC, useRef, useState } from 'react'
 
 import { Button } from '@/components/Elements'
@@ -21,7 +21,7 @@ export const ImgInput: FC = () => {
   }
 
   return (
-    <Box>
+    <Flex justifyContent={'center'} alignItems={'center'} flexWrap={'wrap'} m={'0 auto'}>
       <ChakraInput
         display={'none'}
         ref={inputRef}
@@ -29,10 +29,10 @@ export const ImgInput: FC = () => {
         accept={'image/*'}
         onChange={onFileInputChange}
       />
+      <Box mb="6">{fileImg && <Image src={fileImg} />}</Box>
       <Button variant={'primary'} onClick={onProfileButtonClick}>
         <Text>画像を選択</Text>
       </Button>
-      {fileImg && <Image src={fileImg} />}
-    </Box>
+    </Flex>
   )
 }

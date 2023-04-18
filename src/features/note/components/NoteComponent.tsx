@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Text, HStack } from '@chakra-ui/react'
 import { FC } from 'react'
 import { useParams } from 'react-router-dom'
@@ -16,8 +17,8 @@ export const NoteComponent: FC = () => {
 
   return (
     <HStack spacing={1}>
+      {/* <Text>{id}</Text> */}
       <ImgInput />
-      <Text>{id}</Text>
     </HStack>
   )
 }
