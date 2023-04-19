@@ -14,10 +14,11 @@ export const NoteComponent: FC = () => {
   // const { dispatch } = useNote()
   const { id } = useParams()
 
-  console.log(id)
+  const formattedDate = `${id!.slice(0, 4)}/${id!.slice(4, 6)}/${id!.slice(6)}`
 
   return (
     <VStack
+      px={'4'}
       pb={8}
       display="flex"
       justifyContent="center"
@@ -27,11 +28,13 @@ export const NoteComponent: FC = () => {
       minH={`calc(100vh)`}
       spacing={6}
     >
-      <Box minW={'80%'}>
+      <Text w={'100%'} fontSize={'sm'} fontWeight="700">
+        {formattedDate}
+      </Text>
+      <ImgInput />
+      <Box minW={'100%'}>
         <Textarea placeholder="メモしたいことを記載" minH={'180px'} />
       </Box>
-      {/* <Text>{id}</Text> */}
-      <ImgInput />
     </VStack>
   )
 }

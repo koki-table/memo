@@ -8,12 +8,12 @@ export const Textarea = (props: TextareaFieldProps) => {
   return (
     <ChakraTextArea
       defaultValue={defaultValue}
-      borderRadius="2px"
       _placeholder={{ color: 'var(--text-color-placeholder)' }}
       placeholder={placeholder}
       bg="var(--white)"
       minH={minH}
       as={ResizeTextarea}
+      borderRadius={'md'}
     />
   )
 }
