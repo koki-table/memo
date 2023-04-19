@@ -51,6 +51,17 @@ export const ImgInput: FC = () => {
           border={'1px solid var(--line-color-light)'}
         >
           {!fileImg && <Image src={gyoza} />}
+          {!fileImg && (
+            <Box
+              position={'absolute'}
+              minH={'20px'}
+              minW={'100px'}
+              bottom={'90px'}
+              left={'50%'}
+              transform={'translate(-50%,0)'}
+              background={'var(--white)'}
+            />
+          )}
         </ChakraButton>
       </Box>
     </Flex>
