@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Text, chakra, VStack, Box } from '@chakra-ui/react'
+import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
 import { FC } from 'react'
 import { useForm, FieldValues } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
@@ -34,9 +34,14 @@ export const NoteComponent: FC = () => {
             {formattedDate}
           </Text>
           <ImgInput registration={register('img')} />
+          <Input
+            {...register('title')}
+            placeholder={'料理名'}
+            _placeholder={{ color: 'var(--text-color-placeholder)' }}
+          />
           <Box minW={'100%'}>
             <Textarea
-              placeholder="メモしたいことを記載"
+              placeholder="メモしたいこと"
               minH={'180px'}
               registration={register('textarea')}
             />
