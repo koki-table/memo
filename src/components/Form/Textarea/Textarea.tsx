@@ -4,7 +4,7 @@ import ResizeTextarea from 'react-textarea-autosize'
 import { TextareaFieldProps } from './types'
 
 export const Textarea = (props: TextareaFieldProps) => {
-  const { defaultValue, placeholder, minH } = props
+  const { defaultValue, placeholder, minH, registration } = props
   return (
     <ChakraTextArea
       defaultValue={defaultValue}
@@ -15,6 +15,7 @@ export const Textarea = (props: TextareaFieldProps) => {
       as={ResizeTextarea}
       borderRadius={'md'}
       border={'1px solid var(--line-color-light)'}
+      {...registration}
     />
   )
 }

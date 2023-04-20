@@ -3,7 +3,9 @@ import { FC, useRef, useState } from 'react'
 
 import gyoza from '@/assets/gyoza.png'
 
-export const ImgInput: FC = () => {
+import { ImgInputProps } from './types'
+
+export const ImgInput: FC<ImgInputProps> = ({ registration }) => {
   const [fileImg, setFileImg] = useState('')
   const inputRef = useRef<HTMLInputElement>(null!)
 
@@ -25,10 +27,11 @@ export const ImgInput: FC = () => {
     <Flex justifyContent={'center'} alignItems={'center'} flexWrap={'wrap'} m={'0 auto'}>
       <ChakraInput
         display={'none'}
-        ref={inputRef}
         type={'file'}
         accept={'image/*'}
         onChange={onFileInputChange}
+        {...registration}
+        ref={inputRef}
       />
       <Box
         w={'100%'}
