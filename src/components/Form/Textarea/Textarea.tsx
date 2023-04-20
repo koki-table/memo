@@ -14,6 +14,7 @@ export const Textarea = (props: TextareaFieldProps) => {
       minH={minH}
       as={ResizeTextarea}
       borderRadius={'md'}
+      border={'1px solid var(--line-color-light)'}
     />
   )
 }
