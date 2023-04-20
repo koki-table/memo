@@ -10,10 +10,12 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Image,
+  Box,
 } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 
-import { Heading } from '@/components/Elements/'
+import gyoza from '@/assets/gyoza.png'
 import { useAuth } from '@/features/auth'
 
 export const Header = () => {
@@ -38,7 +40,9 @@ export const Header = () => {
                 opacity: 0.8,
               }}
             >
-              <Heading variant="h3">memo</Heading>
+              <Box w={'60px'}>
+                <Image src={gyoza} />
+              </Box>
             </chakra.a>
           </Link>
           {user ? (

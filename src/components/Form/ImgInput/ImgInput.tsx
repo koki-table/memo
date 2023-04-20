@@ -3,11 +3,12 @@ import { FC, useRef, useState } from 'react'
 
 import gyoza from '@/assets/gyoza.png'
 
-export const ImgInput: FC = () => {
+import { ImgInputProps } from './types'
+
+export const ImgInput: FC<ImgInputProps> = ({ registration }) => {
   const [fileImg, setFileImg] = useState('')
   const inputRef = useRef<HTMLInputElement>(null!)
 
-  // 追加
   const onProfileButtonClick = () => {
     // useRef<HTMLInputElement>のcurrent要素を呼び出し、ファイル選択画面を表示
     inputRef.current.click()
@@ -26,10 +27,11 @@ export const ImgInput: FC = () => {
     <Flex justifyContent={'center'} alignItems={'center'} flexWrap={'wrap'} m={'0 auto'}>
       <ChakraInput
         display={'none'}
-        ref={inputRef}
         type={'file'}
         accept={'image/*'}
         onChange={onFileInputChange}
+        {...registration}
+        ref={inputRef}
       />
       <Box
         w={'100%'}
@@ -49,19 +51,9 @@ export const ImgInput: FC = () => {
           onClick={onProfileButtonClick}
           opacity={fileImg ? 0 : 1}
           border={'1px solid var(--line-color-light)'}
+          background={'var(--white)'}
         >
           {!fileImg && <Image src={gyoza} />}
-          {!fileImg && (
-            <Box
-              position={'absolute'}
-              minH={'20px'}
-              minW={'100px'}
-              bottom={'90px'}
-              left={'50%'}
-              transform={'translate(-50%,0)'}
-              background={'var(--white)'}
-            />
-          )}
         </ChakraButton>
       </Box>
     </Flex>
