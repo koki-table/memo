@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
 import { FC } from 'react'
-import { useForm, FieldValues } from 'react-hook-form'
+import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
+import CreatableSelect from 'react-select/creatable'
 
 import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
@@ -15,7 +16,17 @@ export const NoteComponent: FC = () => {
 
   const onSubmit = (data: FieldValues) => console.log(data)
 
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit, control } = useForm()
+
+  const defaultValue = 1
+
+  const viewWidth = window.innerWidth - 32
+
+  const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' },
+  ]
 
   return (
     <VStack
@@ -38,6 +49,38 @@ export const NoteComponent: FC = () => {
             {...register('title')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
+          />
+          {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
+          <Controller
+            control={control}
+            defaultValue={defaultValue}
+            name="multipleSelect"
+            render={({ field }) => (
+              <CreatableSelect
+                {...field}
+                placeholder={'ラベル'}
+                options={options}
+                styles={{
+                  control: (baseStyles) => ({
+                    ...baseStyles,
+                    borderColor: 'var(--line-color-light)',
+                    minWidth: viewWidth,
+                  }),
+                  placeholder: (baseStyles) => ({
+                    ...baseStyles,
+                    color: 'var(--text-color-placeholder)',
+                  }),
+                  indicatorSeparator: (baseStyles) => ({
+                    ...baseStyles,
+                    display: 'none',
+                  }),
+                  singleValue: (baseStyles) => ({
+                    ...baseStyles,
+                    color: 'var(--text-color)',
+                  }),
+                }}
+              />
+            )}
           />
           <Box minW={'100%'}>
             <Textarea
