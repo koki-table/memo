@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
-import { FC } from 'react'
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore'
+import { FC, useEffect } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
@@ -8,13 +10,16 @@ import CreatableSelect from 'react-select/creatable'
 import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
+import { useAuth } from '@/features/auth'
+import { firestore, usersCol } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
   const { id } = useParams()
+  const { user } = useAuth()
 
   const formattedDate = `${id!.slice(0, 4)}/${id!.slice(4, 6)}/${id!.slice(6)}`
 
-  const onSubmit = (data: FieldValues) => console.log(data)
+  const onSubmit = async (data: FieldValues) => await setUser()
 
   const { register, handleSubmit, control } = useForm()
 
@@ -27,6 +32,37 @@ export const NoteComponent: FC = () => {
     { value: 'strawberry', label: 'Strawberry' },
     { value: 'vanilla', label: 'Vanilla' },
   ]
+
+  const userRef = doc(usersCol, user?.uid)
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const res = await getDoc(userRef)
+        console.log(res.data())
+
+        // const q = query(collection(firestore, 'cities'), where('SF', '==', true))
+        // console.log(q)
+
+        // const querySnapshot = await getDocs(q)
+        // console.log(querySnapshot.docs.map((doc) => doc.data()))
+      } catch (e: any) {
+        console.log(e.message)
+      }
+    }
+    fetchAccount()
+  }, [user, userRef])
+
+  const setUser = async () => {
+    await setDoc(userRef, {
+      age: 300,
+      firstName: 'Jamie',
+    })
+  }
+
+  // const getUser = () => {
+  //   query(userRef, where('age', '==', 300))
+  // }
 
   return (
     <VStack

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { getFirestore, CollectionReference, collection, DocumentData } from 'firebase/firestore'
 
+import { User } from '@/types/User'
+
 // Import all your model types
-// import { User } from 'src/types/User'
 // import { Author } from 'src/types/Author'
 // import { Book } from 'src/types/Book'
 
@@ -15,6 +16,6 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 }
 
 // export all your collections
-// export const usersCol = createCollection<User>('users')
+export const usersCol = createCollection<User>('users')
 // export const authorsCol = createCollection<Author>('authors')
 // export const booksCol = createCollection<Book>('books')
