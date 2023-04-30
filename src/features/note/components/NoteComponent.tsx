@@ -11,7 +11,7 @@ import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
-import { firestore, usersCol } from '@/utils/database'
+import { notesCol } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
   const { id } = useParams()
@@ -19,7 +19,7 @@ export const NoteComponent: FC = () => {
 
   const formattedDate = `${id!.slice(0, 4)}/${id!.slice(4, 6)}/${id!.slice(6)}`
 
-  const onSubmit = async (data: FieldValues) => await setUser()
+  const onSubmit = async (data: FieldValues) => await setUser(data)
 
   const { register, handleSubmit, control } = useForm()
 
@@ -27,42 +27,38 @@ export const NoteComponent: FC = () => {
 
   const viewWidth = window.innerWidth - 32
 
+  // TODO:カテゴリの内容を動的にする
   const options = [
     { value: 'chocolate', label: 'Chocolate' },
     { value: 'strawberry', label: 'Strawberry' },
     { value: 'vanilla', label: 'Vanilla' },
   ]
 
-  const userRef = doc(usersCol, user?.uid)
+  const noteRef = doc(notesCol, user?.uid)
 
   useEffect(() => {
     const fetchAccount = async () => {
       try {
-        const res = await getDoc(userRef)
-        console.log(res.data())
-
-        // const q = query(collection(firestore, 'cities'), where('SF', '==', true))
-        // console.log(q)
-
-        // const querySnapshot = await getDocs(q)
-        // console.log(querySnapshot.docs.map((doc) => doc.data()))
+        // TODO: 該当dateで過去のデータがある場合は、stateに登録してフォームにセットする
+        // const res = await getDoc(userRef)
+        // console.log(res.data())
       } catch (e: any) {
         console.log(e.message)
       }
     }
     fetchAccount()
-  }, [user, userRef])
+  }, [user])
 
-  const setUser = async () => {
-    await setDoc(userRef, {
-      age: 300,
-      firstName: 'Jamie',
+  const setUser = async (data: FieldValues) => {
+    // TODO: imgのアップロード処理を調整（現状はdataにundefinedが入ってしまう）
+    await setDoc(noteRef, {
+      date: id,
+      // img: data.img,
+      name: data.name,
+      memo: data.memo,
+      category: data.category.value,
     })
   }
-
-  // const getUser = () => {
-  //   query(userRef, where('age', '==', 300))
-  // }
 
   return (
     <VStack
@@ -80,9 +76,9 @@ export const NoteComponent: FC = () => {
           <Text w={'100%'} fontSize={'sm'} fontWeight="700">
             {formattedDate}
           </Text>
-          <ImgInput registration={register('img')} />
+          {/* <ImgInput registration={register('img')} /> */}
           <Input
-            {...register('title')}
+            {...register('name')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
           />
@@ -90,11 +86,11 @@ export const NoteComponent: FC = () => {
           <Controller
             control={control}
             defaultValue={defaultValue}
-            name="multipleSelect"
+            name="category"
             render={({ field }) => (
               <CreatableSelect
                 {...field}
-                placeholder={'ラベル'}
+                placeholder={'カテゴリ'}
                 options={options}
                 styles={{
                   control: (baseStyles) => ({
@@ -119,11 +115,7 @@ export const NoteComponent: FC = () => {
             )}
           />
           <Box minW={'100%'}>
-            <Textarea
-              placeholder="メモしたいこと"
-              minH={'180px'}
-              registration={register('textarea')}
-            />
+            <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
           <Button type={'submit'}>
             <Text fontSize={'sm'} fontWeight="700">
