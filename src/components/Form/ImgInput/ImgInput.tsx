@@ -29,8 +29,8 @@ export const ImgInput: FC<ImgInputProps> = ({ registration }) => {
         display={'none'}
         type={'file'}
         accept={'image/*'}
-        onChange={onFileInputChange}
         {...registration}
+        onChange={onFileInputChange}
         ref={inputRef}
       />
       <Box
