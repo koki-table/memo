@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { getStorage } from 'firebase/storage'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router } from 'react-router-dom'
@@ -15,8 +16,10 @@ const firebaseConfig = {
   appId: '1:875918691543:web:c10c9302db9e81677c7492',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = initializeApp(firebaseConfig)
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const storage = getStorage(app)
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
