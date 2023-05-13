@@ -43,7 +43,6 @@ export const NoteComponent: FC = () => {
       try {
         // TODO: 該当dateで過去のデータがある場合は、stateに登録してフォームにセットする
         // const res = await getDoc(userRef)
-        // console.log(res.data())
       } catch (e: any) {
         console.log(e.message)
       }
