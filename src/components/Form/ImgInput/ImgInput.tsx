@@ -1,24 +1,16 @@
 import { Input as ChakraInput, Box, Image, Flex, Button as ChakraButton } from '@chakra-ui/react'
-import { FC, useRef, useState } from 'react'
+import { FC, useRef } from 'react'
 
 import gyoza from '@/assets/gyoza.png'
 
 import { ImgInputProps } from './types'
 
-export const ImgInput: FC<ImgInputProps> = ({ registration }) => {
-  const [fileImg, setFileImg] = useState('')
+export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg }) => {
   const inputRef = useRef<HTMLInputElement>(null!)
 
   const onProfileButtonClick = () => {
     // useRef<HTMLInputElement>のcurrent要素を呼び出し、ファイル選択画面を表示
     inputRef.current.click()
-  }
-
-  const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
-
-    const fileObject = e.target.files[0]
-    setFileImg(window.URL.createObjectURL(fileObject))
   }
 
   const viewWidth = window.innerWidth - 32
@@ -30,7 +22,7 @@ export const ImgInput: FC<ImgInputProps> = ({ registration }) => {
         type={'file'}
         accept={'image/*'}
         {...registration}
-        onChange={onFileInputChange}
+        onChange={onChange}
         ref={inputRef}
       />
       <Box

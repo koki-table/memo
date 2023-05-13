@@ -27,7 +27,6 @@ const { App } = lazyImport(async () => await import('@/App'), 'App')
 
 export const AppRoutes = () => {
   const { user } = useAuth()
-  console.log(user)
 
   const handleAuth = () => {
     if (typeof user === 'undefined') return <Spinner variants="full" />

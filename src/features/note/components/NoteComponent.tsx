@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore'
-import { FC, useEffect } from 'react'
+import { doc, setDoc } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { FC, useEffect, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
@@ -11,6 +12,7 @@ import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
+import { storage } from '@/main'
 import { notesCol } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
@@ -19,7 +21,7 @@ export const NoteComponent: FC = () => {
 
   const formattedDate = `${id!.slice(0, 4)}/${id!.slice(4, 6)}/${id!.slice(6)}`
 
-  const onSubmit = async (data: FieldValues) => await setUser(data)
+  const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
   const { register, handleSubmit, control } = useForm()
 
@@ -41,7 +43,6 @@ export const NoteComponent: FC = () => {
       try {
         // TODO: 該当dateで過去のデータがある場合は、stateに登録してフォームにセットする
         // const res = await getDoc(userRef)
-        // console.log(res.data())
       } catch (e: any) {
         console.log(e.message)
       }
@@ -49,11 +50,31 @@ export const NoteComponent: FC = () => {
     fetchAccount()
   }, [user])
 
-  const setUser = async (data: FieldValues) => {
-    // TODO: imgのアップロード処理を調整（現状はdataにundefinedが入ってしまう）
+  const [fileObject, setFileObject] = useState<Blob>()
+
+  const fileImg = fileObject ? window.URL.createObjectURL(fileObject) : null
+
+  const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+
+    const fileObject = e.target.files[0]
+    setFileObject(fileObject)
+  }
+
+  const uploadNote = async (data: FieldValues) => {
+    // 画像をstorageにアップロード処理
+    const dop = ref(storage, fileObject!.name)
+    const imgData = await uploadBytes(dop, fileObject!)
+
+    // アップロードした画像のURLを取得
+    const downloadURL = await getDownloadURL(imgData.ref)
+
+    // firestoreにデータを登録
+    // TODO: dateを別階層にして、日付別で登録出来るようにする
+    // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
     await setDoc(noteRef, {
       date: id,
-      // img: data.img,
+      img: downloadURL,
       name: data.name,
       memo: data.memo,
       category: data.category.value,
@@ -76,7 +97,11 @@ export const NoteComponent: FC = () => {
           <Text w={'100%'} fontSize={'sm'} fontWeight="700">
             {formattedDate}
           </Text>
-          {/* <ImgInput registration={register('img')} /> */}
+          <ImgInput
+            registration={register('img')}
+            onChange={onFileInputChange}
+            fileImg={fileImg!}
+          />
           <Input
             {...register('name')}
             placeholder={'料理名'}
