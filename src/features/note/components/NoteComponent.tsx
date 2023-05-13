@@ -70,6 +70,8 @@ export const NoteComponent: FC = () => {
     const downloadURL = await getDownloadURL(imgData.ref)
 
     // firestoreにデータを登録
+    // TODO: dateを別階層にして、日付別で登録出来るようにする
+    // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
     await setDoc(noteRef, {
       date: id,
       img: downloadURL,
