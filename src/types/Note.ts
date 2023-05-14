@@ -3,4 +3,5 @@ export type Note = {
   name: string
   memo: string
   category: number
+  date: string
 }

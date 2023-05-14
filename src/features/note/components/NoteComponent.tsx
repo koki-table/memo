@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
@@ -13,6 +13,7 @@ import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
+import { Note } from '@/types/Note'
 import { createCollection } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
@@ -23,7 +24,23 @@ export const NoteComponent: FC = () => {
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
-  const { register, handleSubmit, control } = useForm()
+  const [noteData, setNoteData] = useState<Note>({
+    img: '',
+    name: '',
+    memo: '',
+    category: 0,
+    date: '',
+  })
+
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      name: noteData.name,
+      memo: noteData.memo,
+      category: noteData.category,
+      date: noteData.date,
+      img: noteData.img,
+    },
+  })
 
   const defaultValue = 1
 
@@ -36,17 +53,30 @@ export const NoteComponent: FC = () => {
     { value: 'vanilla', label: 'Vanilla' },
   ]
 
+  console.log(noteData)
+
   useEffect(() => {
     const fetchAccount = async () => {
       try {
         // TODO: 該当dateで過去のデータがある場合は、stateに登録してフォームにセットする
         // const res = await getDoc(userRef)
+
+        const noteCol = createCollection('notes', user)
+        const stateQuery = query(noteCol, where('date', '==', `${date!}`))
+
+        if (stateQuery === null) return
+        const querySnapshot = await getDocs(stateQuery)
+        querySnapshot.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(doc.id, ' => ', doc.data())
+          setNoteData(doc.data() as Note)
+        })
       } catch (e: any) {
         console.log(e.message)
       }
     }
     fetchAccount()
-  }, [user])
+  }, [date, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
 
@@ -67,15 +97,18 @@ export const NoteComponent: FC = () => {
     // アップロードした画像のURLを取得
     const downloadURL = await getDownloadURL(imgData.ref)
 
-    const noteRef = doc(createCollection('notes', user), date)
+    const noteDoc = doc(createCollection('notes', user), date)
+
+    console.log(data)
 
     // dbにデータを登録
     // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
-    await setDoc(noteRef, {
+    await setDoc(noteDoc, {
       img: downloadURL,
       name: data.name,
       memo: data.memo,
       category: data.category.value,
+      date,
     })
   }
 
@@ -104,6 +137,7 @@ export const NoteComponent: FC = () => {
             {...register('name')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
+            defaultValue={noteData.name}
           />
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
@@ -115,6 +149,8 @@ export const NoteComponent: FC = () => {
                 {...field}
                 placeholder={'カテゴリ'}
                 options={options}
+                defaultValue={{ label: 'Select Dept', value: 0 }}
+                value={{ value: 'one', label: 'One' }}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,
@@ -138,7 +174,12 @@ export const NoteComponent: FC = () => {
             )}
           />
           <Box minW={'100%'}>
-            <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
+            <Textarea
+              placeholder="メモしたいこと"
+              minH={'180px'}
+              registration={register('memo')}
+              defaultValue={noteData.memo}
+            />
           </Box>
           <Button type={'submit'}>
             <Text fontSize={'sm'} fontWeight="700">
