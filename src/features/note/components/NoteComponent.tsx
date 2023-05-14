@@ -3,7 +3,7 @@
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
 import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { FC, useEffect, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
@@ -17,9 +17,9 @@ import { Note } from '@/types/Note'
 import { createCollection } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
+  const viewWidth = window.innerWidth - 32
   const { date } = useParams()
   const { user } = useAuth()
-
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
@@ -32,19 +32,15 @@ export const NoteComponent: FC = () => {
     date: '',
   })
 
-  const { register, handleSubmit, control } = useForm({
-    defaultValues: {
-      name: noteData.name,
-      memo: noteData.memo,
-      category: noteData.category,
-      date: noteData.date,
-      img: noteData.img,
-    },
+  const defaultValues = useMemo(() => {
+    return noteData
+  }, [noteData])
+
+  const { register, handleSubmit, control, reset } = useForm({
+    defaultValues,
   })
 
   const defaultValue = 1
-
-  const viewWidth = window.innerWidth - 32
 
   // TODO:カテゴリの内容を動的にする
   const options = [
@@ -58,25 +54,24 @@ export const NoteComponent: FC = () => {
   useEffect(() => {
     const fetchAccount = async () => {
       try {
-        // TODO: 該当dateで過去のデータがある場合は、stateに登録してフォームにセットする
-        // const res = await getDoc(userRef)
-
         const noteCol = createCollection('notes', user)
         const stateQuery = query(noteCol, where('date', '==', `${date!}`))
 
         if (stateQuery === null) return
         const querySnapshot = await getDocs(stateQuery)
+
         querySnapshot.forEach((doc) => {
-          // doc.data() is never undefined for query doc snapshots
-          console.log(doc.id, ' => ', doc.data())
           setNoteData(doc.data() as Note)
+
+          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
+          reset(doc.data() as Note)
         })
       } catch (e: any) {
         console.log(e.message)
       }
     }
     fetchAccount()
-  }, [date, user])
+  }, [date, reset, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
 
@@ -137,7 +132,6 @@ export const NoteComponent: FC = () => {
             {...register('name')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
-            defaultValue={noteData.name}
           />
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
@@ -149,7 +143,6 @@ export const NoteComponent: FC = () => {
                 {...field}
                 placeholder={'カテゴリ'}
                 options={options}
-                defaultValue={{ label: 'Select Dept', value: 0 }}
                 value={{ value: 'one', label: 'One' }}
                 styles={{
                   control: (baseStyles) => ({
@@ -174,12 +167,7 @@ export const NoteComponent: FC = () => {
             )}
           />
           <Box minW={'100%'}>
-            <Textarea
-              placeholder="メモしたいこと"
-              minH={'180px'}
-              registration={register('memo')}
-              defaultValue={noteData.memo}
-            />
+            <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
           <Button type={'submit'}>
             <Text fontSize={'sm'} fontWeight="700">
