@@ -3,7 +3,7 @@
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
 import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
@@ -28,7 +28,7 @@ export const NoteComponent: FC = () => {
     img: '',
     name: '',
     memo: '',
-    category: 0,
+    category: '',
     date: '',
   })
 
@@ -40,16 +40,12 @@ export const NoteComponent: FC = () => {
     defaultValues,
   })
 
-  const defaultValue = 1
-
   // TODO:カテゴリの内容を動的にする
   const options = [
     { value: 'chocolate', label: 'Chocolate' },
     { value: 'strawberry', label: 'Strawberry' },
     { value: 'vanilla', label: 'Vanilla' },
   ]
-
-  console.log(noteData)
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -94,15 +90,13 @@ export const NoteComponent: FC = () => {
 
     const noteDoc = doc(createCollection('notes', user), date)
 
-    console.log(data)
-
     // dbにデータを登録
     // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
     await setDoc(noteDoc, {
       img: downloadURL,
       name: data.name,
       memo: data.memo,
-      category: data.category.value,
+      category: data.category,
       date,
     })
   }
@@ -136,14 +130,13 @@ export const NoteComponent: FC = () => {
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
             control={control}
-            defaultValue={defaultValue}
             name="category"
             render={({ field }) => (
               <CreatableSelect
                 {...field}
                 placeholder={'カテゴリ'}
                 options={options}
-                value={{ value: 'one', label: 'One' }}
+                value={options.find((v) => v.value === field.value)}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,
