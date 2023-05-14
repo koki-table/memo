@@ -12,7 +12,7 @@ export const NoteRoutes = () => {
     <NoteProvider>
       <Suspense>
         <Routes>
-          <Route path="/:id" element={<Note />} />
+          <Route path="/:date" element={<Note />} />
         </Routes>
       </Suspense>
     </NoteProvider>
