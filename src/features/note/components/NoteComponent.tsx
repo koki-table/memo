@@ -13,13 +13,13 @@ import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
-import { notesCol } from '@/utils/database'
+import { createCollection } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
-  const { id } = useParams()
+  const { date } = useParams()
   const { user } = useAuth()
 
-  const formattedDate = `${id!.slice(0, 4)}/${id!.slice(4, 6)}/${id!.slice(6)}`
+  const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
@@ -35,8 +35,6 @@ export const NoteComponent: FC = () => {
     { value: 'strawberry', label: 'Strawberry' },
     { value: 'vanilla', label: 'Vanilla' },
   ]
-
-  const noteRef = doc(notesCol, user?.uid)
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -63,17 +61,17 @@ export const NoteComponent: FC = () => {
 
   const uploadNote = async (data: FieldValues) => {
     // 画像をstorageにアップロード処理
-    const dop = ref(storage, fileObject!.name)
-    const imgData = await uploadBytes(dop, fileObject!)
+    const uploadStorage = ref(storage, fileObject!.name)
+    const imgData = await uploadBytes(uploadStorage, fileObject!)
 
     // アップロードした画像のURLを取得
     const downloadURL = await getDownloadURL(imgData.ref)
 
-    // firestoreにデータを登録
-    // TODO: dateを別階層にして、日付別で登録出来るようにする
+    const noteRef = doc(createCollection('notes', user), date)
+
+    // dbにデータを登録
     // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
     await setDoc(noteRef, {
-      date: id,
       img: downloadURL,
       name: data.name,
       memo: data.memo,
