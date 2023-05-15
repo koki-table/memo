@@ -32,6 +32,8 @@ export const NoteComponent: FC = () => {
     date: '',
   })
 
+  console.log(noteData)
+
   const defaultValues = useMemo(() => {
     return noteData
   }, [noteData])
@@ -71,7 +73,13 @@ export const NoteComponent: FC = () => {
 
   const [fileObject, setFileObject] = useState<Blob>()
 
-  const fileImg = fileObject ? window.URL.createObjectURL(fileObject) : null
+  // const fileImg = fileObject ? window.URL.createObjectURL(fileObject) : null
+
+  const fileImg = () => {
+    if (noteData.img) return noteData.img
+    if (fileObject) return window.URL.createObjectURL(fileObject)
+    return null
+  }
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -120,7 +128,7 @@ export const NoteComponent: FC = () => {
           <ImgInput
             registration={register('img')}
             onChange={onFileInputChange}
-            fileImg={fileImg!}
+            fileImg={fileImg()}
           />
           <Input
             {...register('name')}

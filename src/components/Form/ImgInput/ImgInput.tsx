@@ -13,7 +13,7 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg })
     inputRef.current.click()
   }
 
-  const viewWidth = window.innerWidth - 32
+  const size = window.innerWidth - 32
 
   return (
     <Flex justifyContent={'center'} alignItems={'center'} flexWrap={'wrap'} m={'0 auto'}>
@@ -26,14 +26,14 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg })
         ref={inputRef}
       />
       <Box
-        w={'100%'}
+        w={size}
+        h={size}
         position={'relative'}
-        borderRadius={fileImg && 'md'}
-        border={fileImg && '1px solid var(--line-color-light)'}
-        p={fileImg && '6'}
+        borderRadius={'md'}
+        border={'1px solid var(--line-color-light)'}
+        p={'6'}
       >
-        {fileImg && <Image src={fileImg} w={viewWidth} />}
-        {!fileImg && <Box minW={viewWidth} minH={viewWidth} />}
+        {fileImg ? <Image src={fileImg} w={size} /> : <Box minW={size} minH={size} />}
         <ChakraButton
           position={'absolute'}
           top={0}
