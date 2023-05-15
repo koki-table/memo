@@ -1,33 +1,44 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
 
-import { Button } from '@/components/Elements'
+import { Button, Spinner } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
+import { Note } from '@/types/Note'
 import { createCollection } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
+  const viewWidth = window.innerWidth - 32
   const { date } = useParams()
   const { user } = useAuth()
-
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
-  const { register, handleSubmit, control } = useForm()
+  const [noteData, setNoteData] = useState<Note>({
+    img: '',
+    name: '',
+    memo: '',
+    category: '',
+    date: '',
+  })
 
-  const defaultValue = 1
+  const defaultValues = useMemo(() => {
+    return noteData
+  }, [noteData])
 
-  const viewWidth = window.innerWidth - 32
+  const { register, handleSubmit, control, reset } = useForm({
+    defaultValues,
+  })
 
   // TODO:カテゴリの内容を動的にする
   const options = [
@@ -36,27 +47,46 @@ export const NoteComponent: FC = () => {
     { value: 'vanilla', label: 'Vanilla' },
   ]
 
+  const [isLoading, setIsLoading] = useState(false)
+
   useEffect(() => {
     const fetchAccount = async () => {
       try {
-        // TODO: 該当dateで過去のデータがある場合は、stateに登録してフォームにセットする
-        // const res = await getDoc(userRef)
+        const noteCol = createCollection('notes', user)
+        const stateQuery = query(noteCol, where('date', '==', `${date!}`))
+
+        if (stateQuery === null) return
+
+        setIsLoading(true)
+        const querySnapshot = await getDocs(stateQuery)
+        setIsLoading(false)
+
+        querySnapshot.forEach((doc) => {
+          setNoteData(doc.data() as Note)
+
+          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
+          reset(doc.data() as Note)
+        })
       } catch (e: any) {
         console.log(e.message)
       }
     }
     fetchAccount()
-  }, [user])
+  }, [date, reset, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
 
-  const fileImg = fileObject ? window.URL.createObjectURL(fileObject) : null
+  const fileImg = () => {
+    if (noteData.img) return noteData.img
+    if (fileObject) return window.URL.createObjectURL(fileObject)
+    return null
+  }
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
 
-    const fileObject = e.target.files[0]
-    setFileObject(fileObject)
+    const fileData = e.target.files[0]
+    setFileObject(fileData)
   }
 
   const uploadNote = async (data: FieldValues) => {
@@ -67,17 +97,20 @@ export const NoteComponent: FC = () => {
     // アップロードした画像のURLを取得
     const downloadURL = await getDownloadURL(imgData.ref)
 
-    const noteRef = doc(createCollection('notes', user), date)
+    const noteDoc = doc(createCollection('notes', user), date)
 
     // dbにデータを登録
     // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
-    await setDoc(noteRef, {
+    await setDoc(noteDoc, {
       img: downloadURL,
       name: data.name,
       memo: data.memo,
-      category: data.category.value,
+      category: data.category,
+      date,
     })
   }
+
+  if (isLoading) return <Spinner variants="full" />
 
   return (
     <VStack
@@ -98,7 +131,7 @@ export const NoteComponent: FC = () => {
           <ImgInput
             registration={register('img')}
             onChange={onFileInputChange}
-            fileImg={fileImg!}
+            fileImg={fileImg()}
           />
           <Input
             {...register('name')}
@@ -108,13 +141,13 @@ export const NoteComponent: FC = () => {
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
             control={control}
-            defaultValue={defaultValue}
             name="category"
             render={({ field }) => (
               <CreatableSelect
                 {...field}
                 placeholder={'カテゴリ'}
                 options={options}
+                value={options.find((v) => v.value === field.value)}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,
