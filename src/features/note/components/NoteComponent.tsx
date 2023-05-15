@@ -8,7 +8,7 @@ import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
 
-import { Button } from '@/components/Elements'
+import { Button, Spinner } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
@@ -47,6 +47,8 @@ export const NoteComponent: FC = () => {
     { value: 'vanilla', label: 'Vanilla' },
   ]
 
+  const [isLoading, setIsLoading] = useState(false)
+
   useEffect(() => {
     const fetchAccount = async () => {
       try {
@@ -54,7 +56,10 @@ export const NoteComponent: FC = () => {
         const stateQuery = query(noteCol, where('date', '==', `${date!}`))
 
         if (stateQuery === null) return
+
+        setIsLoading(true)
         const querySnapshot = await getDocs(stateQuery)
+        setIsLoading(false)
 
         querySnapshot.forEach((doc) => {
           setNoteData(doc.data() as Note)
@@ -80,8 +85,8 @@ export const NoteComponent: FC = () => {
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
 
-    const fileObject = e.target.files[0]
-    setFileObject(fileObject)
+    const fileData = e.target.files[0]
+    setFileObject(fileData)
   }
 
   const uploadNote = async (data: FieldValues) => {
@@ -104,6 +109,8 @@ export const NoteComponent: FC = () => {
       date,
     })
   }
+
+  if (isLoading) return <Spinner variants="full" />
 
   return (
     <VStack
