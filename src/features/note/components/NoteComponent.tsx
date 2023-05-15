@@ -32,8 +32,6 @@ export const NoteComponent: FC = () => {
     date: '',
   })
 
-  console.log(noteData)
-
   const defaultValues = useMemo(() => {
     return noteData
   }, [noteData])
@@ -72,8 +70,6 @@ export const NoteComponent: FC = () => {
   }, [date, reset, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
-
-  // const fileImg = fileObject ? window.URL.createObjectURL(fileObject) : null
 
   const fileImg = () => {
     if (noteData.img) return noteData.img
