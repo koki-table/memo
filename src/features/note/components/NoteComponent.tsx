@@ -32,8 +32,6 @@ export const NoteComponent: FC = () => {
     date: '',
   })
 
-  console.log(noteData)
-
   const defaultValues = useMemo(() => {
     return noteData
   }, [noteData])
