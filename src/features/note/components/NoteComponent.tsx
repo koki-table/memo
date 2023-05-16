@@ -151,16 +151,19 @@ export const NoteComponent: FC = () => {
             registration={register('img')}
             onChange={onFileInputChange}
             fileImg={fileImg()}
+            isRequired
           />
           <Input
             {...register('name')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
+            required
           />
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
             control={control}
             name="category"
+            rules={{ required: true }}
             render={({ field }) => (
               <CreatableSelect
                 {...field}
