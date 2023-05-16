@@ -28,7 +28,7 @@ export const NoteComponent: FC = () => {
     img: '',
     name: '',
     memo: '',
-    category: 'ddd',
+    category: '',
     date: '',
   })
 
@@ -104,13 +104,15 @@ export const NoteComponent: FC = () => {
 
     // const handleImgData = noteData.img ? noteData.img : downloadURL
 
+    console.log(downloadURL)
+
     setIsLoadingButton(true)
     // db登録
     await setDoc(noteDoc, {
       img: downloadURL,
       name: data.name,
       memo: data.memo,
-      category: data.category.value,
+      category: data.category,
       date,
     })
     setIsLoadingButton(false)
