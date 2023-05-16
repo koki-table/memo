@@ -90,26 +90,25 @@ export const NoteComponent: FC = () => {
     setFileObject(fileData)
   }
 
-  const uploadNote = async (data: FieldValues) => {
-    console.log(data)
-
-    // 画像をstorageにアップロード処理
+  const handleStorage = async () => {
+    // 画像をstorageにアップロード
     const uploadStorage = ref(storage, fileObject!.name)
     const imgData = await uploadBytes(uploadStorage, fileObject!)
 
     // アップロードした画像のURLを取得
     const downloadURL = await getDownloadURL(imgData.ref)
+    return downloadURL
+  }
+
+  const uploadNote = async (data: FieldValues) => {
+    const handleImgData = noteData.img ? noteData.img : handleStorage()
 
     const noteDoc = doc(createCollection('notes', user), date)
-
-    // const handleImgData = noteData.img ? noteData.img : downloadURL
-
-    console.log(downloadURL)
 
     setIsLoadingButton(true)
     // db登録
     await setDoc(noteDoc, {
-      img: downloadURL,
+      img: handleImgData,
       name: data.name,
       memo: data.memo,
       category: data.category,
