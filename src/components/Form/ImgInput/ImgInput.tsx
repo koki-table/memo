@@ -27,13 +27,14 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg })
       />
       <Box
         w={size}
-        h={size}
+        h={'auto'}
+        minH={size}
         position={'relative'}
         borderRadius={'md'}
         border={'1px solid var(--line-color-light)'}
         p={'6'}
       >
-        {fileImg ? <Image src={fileImg} w={size} /> : <Box minW={size} minH={size} />}
+        {fileImg ? <Image src={fileImg} w={size} /> : null}
         <ChakraButton
           position={'absolute'}
           top={0}
