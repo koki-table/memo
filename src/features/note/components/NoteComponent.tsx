@@ -28,7 +28,7 @@ export const NoteComponent: FC = () => {
     img: '',
     name: '',
     memo: '',
-    category: '',
+    category: 'ddd',
     date: '',
   })
 
@@ -48,6 +48,7 @@ export const NoteComponent: FC = () => {
   ]
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingButton, setIsLoadingButton] = useState(false)
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -77,8 +78,8 @@ export const NoteComponent: FC = () => {
   const [fileObject, setFileObject] = useState<Blob>()
 
   const fileImg = () => {
-    if (noteData.img) return noteData.img
     if (fileObject) return window.URL.createObjectURL(fileObject)
+    if (noteData.img) return noteData.img
     return null
   }
 
@@ -90,6 +91,8 @@ export const NoteComponent: FC = () => {
   }
 
   const uploadNote = async (data: FieldValues) => {
+    console.log(data)
+
     // 画像をstorageにアップロード処理
     const uploadStorage = ref(storage, fileObject!.name)
     const imgData = await uploadBytes(uploadStorage, fileObject!)
@@ -99,15 +102,18 @@ export const NoteComponent: FC = () => {
 
     const noteDoc = doc(createCollection('notes', user), date)
 
-    // dbにデータを登録
-    // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
+    // const handleImgData = noteData.img ? noteData.img : downloadURL
+
+    setIsLoadingButton(true)
+    // db登録
     await setDoc(noteDoc, {
       img: downloadURL,
       name: data.name,
       memo: data.memo,
-      category: data.category,
+      category: data.category.value,
       date,
     })
+    setIsLoadingButton(false)
   }
 
   if (isLoading) return <Spinner variants="full" />
@@ -148,6 +154,9 @@ export const NoteComponent: FC = () => {
                 placeholder={'カテゴリ'}
                 options={options}
                 value={options.find((v) => v.value === field.value)}
+                onChange={(newValue) => {
+                  field.onChange(newValue?.value)
+                }}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,
@@ -173,7 +182,7 @@ export const NoteComponent: FC = () => {
           <Box minW={'100%'}>
             <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
-          <Button type={'submit'}>
+          <Button type={'submit'} isLoading={isLoadingButton}>
             <Text fontSize={'sm'} fontWeight="700">
               保存
             </Text>
