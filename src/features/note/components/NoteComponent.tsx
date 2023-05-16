@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
+import { Text, chakra, VStack, Box, Input, useToast } from '@chakra-ui/react'
 import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -20,6 +20,7 @@ export const NoteComponent: FC = () => {
   const viewWidth = window.innerWidth - 32
   const { date } = useParams()
   const { user } = useAuth()
+  const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
@@ -48,6 +49,7 @@ export const NoteComponent: FC = () => {
   ]
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingButton, setIsLoadingButton] = useState(false)
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -69,16 +71,21 @@ export const NoteComponent: FC = () => {
         })
       } catch (e: any) {
         console.log(e.message)
+        toast({
+          title: 'エラーが発生しました。',
+          status: 'error',
+          position: 'top',
+        })
       }
     }
     fetchAccount()
-  }, [date, reset, user])
+  }, [date, reset, toast, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
 
   const fileImg = () => {
-    if (noteData.img) return noteData.img
     if (fileObject) return window.URL.createObjectURL(fileObject)
+    if (noteData.img) return noteData.img
     return null
   }
 
@@ -89,24 +96,36 @@ export const NoteComponent: FC = () => {
     setFileObject(fileData)
   }
 
-  const uploadNote = async (data: FieldValues) => {
-    // 画像をstorageにアップロード処理
+  const handleStorage = async () => {
+    // 画像をstorageにアップロード
     const uploadStorage = ref(storage, fileObject!.name)
     const imgData = await uploadBytes(uploadStorage, fileObject!)
 
     // アップロードした画像のURLを取得
     const downloadURL = await getDownloadURL(imgData.ref)
+    return downloadURL
+  }
+
+  const uploadNote = async (data: FieldValues) => {
+    const handleImgData = noteData.img ? noteData.img : handleStorage()
 
     const noteDoc = doc(createCollection('notes', user), date)
 
-    // dbにデータを登録
-    // TODO: 既に登録されている場合は、storageの登録済み画像を削除してから登録する
+    setIsLoadingButton(true)
+    // db登録
     await setDoc(noteDoc, {
-      img: downloadURL,
+      img: handleImgData,
       name: data.name,
       memo: data.memo,
       category: data.category,
       date,
+    })
+    setIsLoadingButton(false)
+    toast({
+      title: '保存しました。',
+      status: 'success',
+      position: 'top',
+      duration: 1300,
     })
   }
 
@@ -132,22 +151,28 @@ export const NoteComponent: FC = () => {
             registration={register('img')}
             onChange={onFileInputChange}
             fileImg={fileImg()}
+            isRequired
           />
           <Input
             {...register('name')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
+            required
           />
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
             control={control}
             name="category"
+            rules={{ required: true }}
             render={({ field }) => (
               <CreatableSelect
                 {...field}
                 placeholder={'カテゴリ'}
                 options={options}
                 value={options.find((v) => v.value === field.value)}
+                onChange={(newValue) => {
+                  field.onChange(newValue?.value)
+                }}
                 styles={{
                   control: (baseStyles) => ({
                     ...baseStyles,
@@ -173,7 +198,7 @@ export const NoteComponent: FC = () => {
           <Box minW={'100%'}>
             <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
-          <Button type={'submit'}>
+          <Button type={'submit'} isLoading={isLoadingButton}>
             <Text fontSize={'sm'} fontWeight="700">
               保存
             </Text>

@@ -5,7 +5,7 @@ import gyoza from '@/assets/gyoza.png'
 
 import { ImgInputProps } from './types'
 
-export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg }) => {
+export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg, ...props }) => {
   const inputRef = useRef<HTMLInputElement>(null!)
 
   const onProfileButtonClick = () => {
@@ -24,6 +24,7 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg })
         {...registration}
         onChange={onChange}
         ref={inputRef}
+        {...props}
       />
       <Box
         w={size}
@@ -33,7 +34,9 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg })
         border={'1px solid var(--line-color-light)'}
         p={'6'}
       >
-        {fileImg ? <Image src={fileImg} w={size} /> : <Box minW={size} minH={size} />}
+        {fileImg ? (
+          <Image src={fileImg} w={size} position={'absolute'} inset={0} m={'auto'} />
+        ) : null}
         <ChakraButton
           position={'absolute'}
           top={0}
