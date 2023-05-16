@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
+import { Text, chakra, VStack, Box, Input, useToast } from '@chakra-ui/react'
 import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -20,6 +20,7 @@ export const NoteComponent: FC = () => {
   const viewWidth = window.innerWidth - 32
   const { date } = useParams()
   const { user } = useAuth()
+  const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
@@ -70,10 +71,15 @@ export const NoteComponent: FC = () => {
         })
       } catch (e: any) {
         console.log(e.message)
+        toast({
+          title: 'エラーが発生しました。',
+          status: 'error',
+          position: 'top',
+        })
       }
     }
     fetchAccount()
-  }, [date, reset, user])
+  }, [date, reset, toast, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
 
@@ -115,6 +121,12 @@ export const NoteComponent: FC = () => {
       date,
     })
     setIsLoadingButton(false)
+    toast({
+      title: '保存しました。',
+      status: 'success',
+      position: 'top',
+      duration: 1300,
+    })
   }
 
   if (isLoading) return <Spinner variants="full" />
