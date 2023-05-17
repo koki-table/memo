@@ -107,7 +107,7 @@ export const NoteComponent: FC = () => {
   }
 
   const uploadNote = async (data: FieldValues) => {
-    const handleImgData = noteData.img ? noteData.img : handleStorage()
+    const handleImgData = noteData.img ? noteData.img : await handleStorage()
 
     const noteDoc = doc(createCollection('notes', user), date)
 
