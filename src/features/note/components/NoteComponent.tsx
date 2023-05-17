@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input, useToast } from '@chakra-ui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
+import { z } from 'zod'
 
 import { Button, Spinner } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
@@ -23,6 +25,34 @@ export const NoteComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
+  const IMAGE_TYPES = ['image/jpeg', 'image/png']
+
+  // const schema = yup.object().shape({
+  //   category: yup.string().required(),
+  //   name: yup.string().required(),
+  //   img: z
+  //     .custom<FileList>()
+  //     .refine((file) => file.length !== 0, { message: '必須です' })
+  //     .transform((file) => file[0])
+  //     .refine((file) => file.size < 500000, { message: 'ファイルサイズは最大5MBです' })
+  //     .refine((file) => IMAGE_TYPES.includes(file.type), {
+  //       message: '.jpgもしくは.pngのみ可能です',
+  //     }),
+  // })
+
+  const schema = z.object({
+    category: z.string().nonempty(),
+    name: z.string().nonempty(),
+    img: z
+      .custom<FileList>()
+      .refine((file) => file.length !== 0, { message: '必須です' })
+      .transform((file) => file[0])
+      .refine((file) => file.size < 500000, { message: 'ファイルサイズは最大5MBです' })
+      .refine((file) => IMAGE_TYPES.includes(file.type), {
+        message: '.jpgもしくは.pngのみ可能です',
+      }),
+  })
+
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
   const [noteData, setNoteData] = useState<Note>({
@@ -37,8 +67,15 @@ export const NoteComponent: FC = () => {
     return noteData
   }, [noteData])
 
-  const { register, handleSubmit, control, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues,
+    resolver: zodResolver(schema),
   })
 
   // TODO:カテゴリの内容を動的にする
@@ -151,19 +188,19 @@ export const NoteComponent: FC = () => {
             registration={register('img')}
             onChange={onFileInputChange}
             fileImg={fileImg()}
-            isRequired
           />
+          {errors.name && <Text>画像は選択必須です</Text>}
           <Input
             {...register('name')}
             placeholder={'料理名'}
             _placeholder={{ color: 'var(--text-color-placeholder)' }}
-            required
           />
+          {errors.name && <Text>料理名は選択必須です</Text>}
           {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
           <Controller
             control={control}
             name="category"
-            rules={{ required: true }}
+            // rules={{ required: true }}
             render={({ field }) => (
               <CreatableSelect
                 {...field}
@@ -195,6 +232,7 @@ export const NoteComponent: FC = () => {
               />
             )}
           />
+          {errors.category && <Text>カテゴリは選択必須です</Text>}
           <Box minW={'100%'}>
             <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
