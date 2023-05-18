@@ -25,32 +25,10 @@ export const NoteComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  const IMAGE_TYPES = ['image/jpeg', 'image/png']
-
-  // const schema = yup.object().shape({
-  //   category: yup.string().required(),
-  //   name: yup.string().required(),
-  //   img: z
-  //     .custom<FileList>()
-  //     .refine((file) => file.length !== 0, { message: '必須です' })
-  //     .transform((file) => file[0])
-  //     .refine((file) => file.size < 500000, { message: 'ファイルサイズは最大5MBです' })
-  //     .refine((file) => IMAGE_TYPES.includes(file.type), {
-  //       message: '.jpgもしくは.pngのみ可能です',
-  //     }),
-  // })
-
   const schema = z.object({
-    category: z.string().nonempty(),
-    name: z.string().nonempty(),
-    img: z
-      .custom<FileList>()
-      .refine((file) => file.length !== 0, { message: '必須です' })
-      .transform((file) => file[0])
-      .refine((file) => file.size < 500000, { message: 'ファイルサイズは最大5MBです' })
-      .refine((file) => IMAGE_TYPES.includes(file.type), {
-        message: '.jpgもしくは.pngのみ可能です',
-      }),
+    name: z.string().min(1, '料理名を入力は必須です。'),
+    category: z.string().min(1, 'カテゴリー選択は必須です。'),
+    memo: z.string(),
   })
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
@@ -148,12 +126,14 @@ export const NoteComponent: FC = () => {
 
     const noteDoc = doc(createCollection('notes', user), date)
 
+    console.log(noteData.img)
+
     setIsLoadingButton(true)
     // db登録
     await setDoc(noteDoc, {
       img: handleImgData,
       name: data.name,
-      memo: data.memo,
+      memo: '',
       category: data.category,
       date,
     })
@@ -189,50 +169,60 @@ export const NoteComponent: FC = () => {
             onChange={onFileInputChange}
             fileImg={fileImg()}
           />
-          {errors.name && <Text>画像は選択必須です</Text>}
-          <Input
-            {...register('name')}
-            placeholder={'料理名'}
-            _placeholder={{ color: 'var(--text-color-placeholder)' }}
-          />
-          {errors.name && <Text>料理名は選択必須です</Text>}
-          {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
-          <Controller
-            control={control}
-            name="category"
-            // rules={{ required: true }}
-            render={({ field }) => (
-              <CreatableSelect
-                {...field}
-                placeholder={'カテゴリ'}
-                options={options}
-                value={options.find((v) => v.value === field.value)}
-                onChange={(newValue) => {
-                  field.onChange(newValue?.value)
-                }}
-                styles={{
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    borderColor: 'var(--line-color-light)',
-                    minWidth: viewWidth,
-                  }),
-                  placeholder: (baseStyles) => ({
-                    ...baseStyles,
-                    color: 'var(--text-color-placeholder)',
-                  }),
-                  indicatorSeparator: (baseStyles) => ({
-                    ...baseStyles,
-                    display: 'none',
-                  }),
-                  singleValue: (baseStyles) => ({
-                    ...baseStyles,
-                    color: 'var(--text-color)',
-                  }),
-                }}
-              />
+          <VStack w="100%" alignItems={'flex-start'}>
+            <Input
+              {...register('name')}
+              placeholder={'料理名'}
+              _placeholder={{ color: 'var(--text-color-placeholder)' }}
+            />
+            {errors.name && (
+              <Text fontSize={'xs'} pl={2}>
+                {errors.name?.message}
+              </Text>
             )}
-          />
-          {errors.category && <Text>カテゴリは選択必須です</Text>}
+          </VStack>
+          <VStack w="100%" alignItems={'flex-start'}>
+            {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
+            <Controller
+              control={control}
+              name="category"
+              render={({ field }) => (
+                <CreatableSelect
+                  {...field}
+                  placeholder={'カテゴリ'}
+                  options={options}
+                  value={options.find((v) => v.value === field.value)}
+                  onChange={(newValue) => {
+                    field.onChange(newValue?.value)
+                  }}
+                  styles={{
+                    control: (baseStyles) => ({
+                      ...baseStyles,
+                      borderColor: 'var(--line-color-light)',
+                      minWidth: viewWidth,
+                    }),
+                    placeholder: (baseStyles) => ({
+                      ...baseStyles,
+                      color: 'var(--text-color-placeholder)',
+                    }),
+                    indicatorSeparator: (baseStyles) => ({
+                      ...baseStyles,
+                      display: 'none',
+                    }),
+                    singleValue: (baseStyles) => ({
+                      ...baseStyles,
+                      color: 'var(--text-color)',
+                    }),
+                  }}
+                />
+              )}
+            />
+            {errors.category && (
+              <Text fontSize={'xs'} pl={2}>
+                {errors.category.message}
+              </Text>
+            )}
+          </VStack>
           <Box minW={'100%'}>
             <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
