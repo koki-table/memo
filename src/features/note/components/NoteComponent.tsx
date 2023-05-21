@@ -29,6 +29,7 @@ export const NoteComponent: FC = () => {
     name: z.string().min(1, '料理名を入力は必須です。'),
     category: z.string().min(1, 'カテゴリー選択は必須です。'),
     memo: z.string(),
+    img: z.string(),
   })
 
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
@@ -121,17 +122,20 @@ export const NoteComponent: FC = () => {
     return downloadURL
   }
 
+  const handleImgData = async (data: FieldValues) => {
+    if (data.img === '') return data.img
+    if (data.img) return data.img
+    return await handleStorage()
+  }
+
   const uploadNote = async (data: FieldValues) => {
-    const handleImgData = noteData.img ? noteData.img : await handleStorage()
-
+    const imgData = await handleImgData(data)
     const noteDoc = doc(createCollection('notes', user), date)
-
-    console.log(noteData.img)
 
     setIsLoadingButton(true)
     // db登録
     await setDoc(noteDoc, {
-      img: handleImgData,
+      img: imgData,
       name: data.name,
       memo: data.memo,
       category: data.category,
