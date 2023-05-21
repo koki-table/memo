@@ -133,7 +133,7 @@ export const NoteComponent: FC = () => {
     await setDoc(noteDoc, {
       img: handleImgData,
       name: data.name,
-      memo: '',
+      memo: data.memo,
       category: data.category,
       date,
     })
