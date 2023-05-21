@@ -35,7 +35,7 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg, .
         p={'6'}
       >
         {fileImg ? (
-          <Image src={fileImg} w={size} position={'absolute'} inset={0} m={'auto'} />
+          <Image src={fileImg} w={size - 32} position={'absolute'} inset={0} m={'auto'} />
         ) : null}
         <ChakraButton
           position={'absolute'}

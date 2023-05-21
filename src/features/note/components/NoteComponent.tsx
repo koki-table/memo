@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input, useToast } from '@chakra-ui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
+import { z } from 'zod'
 
 import { Button, Spinner } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
@@ -23,6 +25,13 @@ export const NoteComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
+  const schema = z.object({
+    name: z.string().min(1, '料理名を入力は必須です。'),
+    category: z.string().min(1, 'カテゴリー選択は必須です。'),
+    memo: z.string(),
+    img: z.string(),
+  })
+
   const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
   const [noteData, setNoteData] = useState<Note>({
@@ -37,8 +46,15 @@ export const NoteComponent: FC = () => {
     return noteData
   }, [noteData])
 
-  const { register, handleSubmit, control, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues,
+    resolver: zodResolver(schema),
   })
 
   // TODO:カテゴリの内容を動的にする
@@ -106,15 +122,20 @@ export const NoteComponent: FC = () => {
     return downloadURL
   }
 
-  const uploadNote = async (data: FieldValues) => {
-    const handleImgData = noteData.img ? noteData.img : handleStorage()
+  const handleImgData = async (data: FieldValues) => {
+    if (data.img === '') return data.img
+    if (data.img) return data.img
+    return await handleStorage()
+  }
 
+  const uploadNote = async (data: FieldValues) => {
+    const imgData = await handleImgData(data)
     const noteDoc = doc(createCollection('notes', user), date)
 
     setIsLoadingButton(true)
     // db登録
     await setDoc(noteDoc, {
-      img: handleImgData,
+      img: imgData,
       name: data.name,
       memo: data.memo,
       category: data.category,
@@ -151,50 +172,61 @@ export const NoteComponent: FC = () => {
             registration={register('img')}
             onChange={onFileInputChange}
             fileImg={fileImg()}
-            isRequired
           />
-          <Input
-            {...register('name')}
-            placeholder={'料理名'}
-            _placeholder={{ color: 'var(--text-color-placeholder)' }}
-            required
-          />
-          {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
-          <Controller
-            control={control}
-            name="category"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <CreatableSelect
-                {...field}
-                placeholder={'カテゴリ'}
-                options={options}
-                value={options.find((v) => v.value === field.value)}
-                onChange={(newValue) => {
-                  field.onChange(newValue?.value)
-                }}
-                styles={{
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    borderColor: 'var(--line-color-light)',
-                    minWidth: viewWidth,
-                  }),
-                  placeholder: (baseStyles) => ({
-                    ...baseStyles,
-                    color: 'var(--text-color-placeholder)',
-                  }),
-                  indicatorSeparator: (baseStyles) => ({
-                    ...baseStyles,
-                    display: 'none',
-                  }),
-                  singleValue: (baseStyles) => ({
-                    ...baseStyles,
-                    color: 'var(--text-color)',
-                  }),
-                }}
-              />
+          <VStack w="100%" alignItems={'flex-start'}>
+            <Input
+              {...register('name')}
+              placeholder={'料理名'}
+              _placeholder={{ color: 'var(--text-color-placeholder)' }}
+            />
+            {errors.name && (
+              <Text fontSize={'xs'} pl={2}>
+                {errors.name?.message}
+              </Text>
             )}
-          />
+          </VStack>
+          <VStack w="100%" alignItems={'flex-start'}>
+            {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
+            <Controller
+              control={control}
+              name="category"
+              render={({ field }) => (
+                <CreatableSelect
+                  {...field}
+                  placeholder={'カテゴリ'}
+                  options={options}
+                  value={options.find((v) => v.value === field.value)}
+                  onChange={(newValue) => {
+                    field.onChange(newValue?.value)
+                  }}
+                  styles={{
+                    control: (baseStyles) => ({
+                      ...baseStyles,
+                      borderColor: 'var(--line-color-light)',
+                      minWidth: viewWidth,
+                    }),
+                    placeholder: (baseStyles) => ({
+                      ...baseStyles,
+                      color: 'var(--text-color-placeholder)',
+                    }),
+                    indicatorSeparator: (baseStyles) => ({
+                      ...baseStyles,
+                      display: 'none',
+                    }),
+                    singleValue: (baseStyles) => ({
+                      ...baseStyles,
+                      color: 'var(--text-color)',
+                    }),
+                  }}
+                />
+              )}
+            />
+            {errors.category && (
+              <Text fontSize={'xs'} pl={2}>
+                {errors.category.message}
+              </Text>
+            )}
+          </VStack>
           <Box minW={'100%'}>
             <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
           </Box>
