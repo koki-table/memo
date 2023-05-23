@@ -2,7 +2,6 @@
 import { getFirestore, CollectionReference, collection, DocumentData } from 'firebase/firestore'
 
 import { UseAuth } from '@/features/auth'
-import { Note } from '@/types/Note'
 
 export const db = getFirestore()
 

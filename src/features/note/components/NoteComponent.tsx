@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input, useToast } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { doc, getDocs, query, setDoc, where } from 'firebase/firestore'
+import { arrayUnion, doc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
@@ -16,7 +16,7 @@ import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
 import { Note } from '@/types/Note'
-import { createCollection } from '@/utils/database'
+import { createCollection, db } from '@/utils/database'
 
 export const NoteComponent: FC = () => {
   const viewWidth = window.innerWidth - 32
@@ -58,11 +58,13 @@ export const NoteComponent: FC = () => {
   })
 
   // TODO:カテゴリの内容を動的にする
-  const options = [
+  const defaultOptions = [
     { value: 'chocolate', label: 'Chocolate' },
     { value: 'strawberry', label: 'Strawberry' },
     { value: 'vanilla', label: 'Vanilla' },
   ]
+
+  const [options, setOptions] = useState(defaultOptions)
 
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingButton, setIsLoadingButton] = useState(false)
@@ -71,12 +73,12 @@ export const NoteComponent: FC = () => {
     const fetchAccount = async () => {
       try {
         const noteCol = createCollection('notes', user)
-        const stateQuery = query(noteCol, where('date', '==', `${date!}`))
+        const dateQuery = query(noteCol, where('date', '==', `${date!}`))
 
-        if (stateQuery === null) return
+        if (dateQuery === null) return
 
         setIsLoading(true)
-        const querySnapshot = await getDocs(stateQuery)
+        const querySnapshot = await getDocs(dateQuery)
         setIsLoading(false)
 
         querySnapshot.forEach((doc) => {
@@ -131,6 +133,7 @@ export const NoteComponent: FC = () => {
   const uploadNote = async (data: FieldValues) => {
     const imgData = await handleImgData(data)
     const noteDoc = doc(createCollection('notes', user), date)
+    const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
     setIsLoadingButton(true)
     // db登録
@@ -140,6 +143,9 @@ export const NoteComponent: FC = () => {
       memo: data.memo,
       category: data.category,
       date,
+    })
+    await updateDoc(categoryDoc, {
+      categories: arrayUnion(data.category),
     })
     setIsLoadingButton(false)
     toast({
