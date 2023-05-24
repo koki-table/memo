@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input, useToast } from '@chakra-ui/react'
+import { Text, chakra, VStack, Box, Input, useToast, Flex, Link, HStack } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   arrayUnion,
@@ -15,7 +15,9 @@ import {
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
+import { MdCalendarMonth } from 'react-icons/md'
+import { useNavigate, useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
 import { z } from 'zod'
 
@@ -25,6 +27,7 @@ import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
 import { Note } from '@/types/Note'
+import { calculateBeforeDay, calculateNextDay } from '@/utils/calculateDay'
 import { createCollection, db } from '@/utils/database'
 import { hasTargetValue } from '@/utils/hasTargetValue'
 
@@ -36,6 +39,7 @@ type option = [
 ]
 
 export const NoteComponent: FC = () => {
+  const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
   const { date } = useParams()
   const { user } = useAuth()
@@ -196,9 +200,22 @@ export const NoteComponent: FC = () => {
     >
       <chakra.form onSubmit={handleSubmit(onSubmit)}>
         <VStack spacing={6}>
-          <Text w={'100%'} fontSize={'sm'} fontWeight="700">
-            {formattedDate}
-          </Text>
+          <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
+            <HStack alignItems={'center'} spacing={3}>
+              <Text w={'100%'} fontSize={'sm'} fontWeight="700">
+                {formattedDate}
+              </Text>
+              <Link onClick={() => navigate(`/note/${calculateBeforeDay(date!)}`)}>
+                <IoIosArrowBack />
+              </Link>
+              <Link onClick={() => navigate(`/note/${calculateNextDay(date!)}`)}>
+                <IoIosArrowForward />
+              </Link>
+            </HStack>
+            <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
+              <MdCalendarMonth size={27} />
+            </Link>
+          </Flex>
           <ImgInput
             registration={register('img')}
             onChange={onFileInputChange}
