@@ -78,13 +78,13 @@ export const NoteComponent: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingButton, setIsLoadingButton] = useState(false)
 
-  const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-
   useEffect(() => {
     const fetchAccount = async () => {
       try {
         const noteCol = createCollection('notes', user)
         const dateQuery = query(noteCol, where('date', '==', `${date!}`))
+
+        const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
         if (dateQuery === null) return
 
@@ -118,7 +118,7 @@ export const NoteComponent: FC = () => {
       }
     }
     fetchAccount()
-  }, [categoryDoc, date, reset, toast, user])
+  }, [date, reset, toast, user])
 
   const [fileObject, setFileObject] = useState<Blob>()
 
@@ -154,6 +154,7 @@ export const NoteComponent: FC = () => {
   const uploadNote = async (data: FieldValues) => {
     const imgData = await handleImgData(data)
     const noteDoc = doc(createCollection('notes', user), date)
+    const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
     setIsLoadingButton(true)
     // db登録
