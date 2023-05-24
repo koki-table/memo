@@ -6,9 +6,6 @@ import { useCalendar } from '../lib'
 
 import { MonthMoveButton } from './MonthMoveButton'
 
-// type CalendarHeaderProps = {
-// }
-
 export const CalendarHeader: FC = () => {
   const { currentMonth } = useCalendar()
   return (
