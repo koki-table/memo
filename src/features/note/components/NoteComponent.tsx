@@ -100,7 +100,6 @@ export const NoteComponent: FC = () => {
           reset(doc.data() as Note)
         })
         if (queryCategorySnapshot.exists()) {
-          console.log('Document data:', queryCategorySnapshot.data())
           setOptions(
             queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
           )
