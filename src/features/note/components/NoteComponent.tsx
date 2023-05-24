@@ -16,6 +16,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
+import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
 import { z } from 'zod'
@@ -200,7 +201,7 @@ export const NoteComponent: FC = () => {
       <chakra.form onSubmit={handleSubmit(onSubmit)}>
         <VStack spacing={6}>
           <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
-            <HStack alignItems={'center'}>
+            <HStack alignItems={'center'} spacing={3}>
               <Text w={'100%'} fontSize={'sm'} fontWeight="700">
                 {formattedDate}
               </Text>
@@ -211,9 +212,9 @@ export const NoteComponent: FC = () => {
                 <IoIosArrowForward />
               </Link>
             </HStack>
-            <Button variant="circle" onClick={() => navigate(`/calendar`)} minWidth="40px">
-              <Text fontSize="xs">月</Text>
-            </Button>
+            <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
+              <MdCalendarMonth size={27} />
+            </Link>
           </Flex>
           <ImgInput
             registration={register('img')}

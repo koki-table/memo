@@ -15,10 +15,12 @@ export const CalendarHeader: FC = () => {
       top="100px"
       right="20px"
       justifyContent={'space-between'}
-      width={'88%'}
+      width={'90%'}
       alignItems={'center'}
     >
-      <Text fontSize="sm">{dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MMMM')}</Text>
+      <Text fontSize="sm" fontWeight="700">
+        {dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MMMM')}
+      </Text>
       <MonthMoveButton />
     </HStack>
   )
