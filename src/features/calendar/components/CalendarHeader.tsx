@@ -16,6 +16,7 @@ export const CalendarHeader: FC = () => {
       right="20px"
       justifyContent={'space-between'}
       width={'88%'}
+      alignItems={'center'}
     >
       <Text fontSize="sm">{dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MMMM')}</Text>
       <MonthMoveButton />
