@@ -26,6 +26,7 @@ import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
 import { Note } from '@/types/Note'
 import { createCollection, db } from '@/utils/database'
+import { hasTargetValue } from '@/utils/hasTargetValue'
 
 type option = [
   {
@@ -104,8 +105,7 @@ export const NoteComponent: FC = () => {
             queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
           )
         } else {
-          // docSnap.data() will be undefined in this case
-          console.log('No such document!')
+          console.log('categoryは未登録です。')
         }
       } catch (e: any) {
         console.log(e.message)
@@ -164,10 +164,15 @@ export const NoteComponent: FC = () => {
       category: data.category,
       date,
     })
-    await updateDoc(categoryDoc, {
-      categories: arrayUnion(data.category),
-    })
+
+    // 新規でカテゴリーを追加した場合は、dbのカテゴリーを更新
+    if (!hasTargetValue(options, data.category))
+      await updateDoc(categoryDoc, {
+        categories: arrayUnion(data.category),
+      })
+
     setIsLoadingButton(false)
+
     toast({
       title: '保存しました。',
       status: 'success',
