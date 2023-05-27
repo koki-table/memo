@@ -13,7 +13,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
@@ -38,6 +38,13 @@ type option = [
   }
 ]
 
+const schema = z.object({
+  name: z.string().min(1, '料理名を入力は必須です。'),
+  category: z.string().min(1, 'カテゴリー選択は必須です。'),
+  memo: z.string(),
+  img: z.string(),
+})
+
 export const NoteComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
@@ -45,15 +52,6 @@ export const NoteComponent: FC = () => {
   const { user } = useAuth()
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
-
-  const schema = z.object({
-    name: z.string().min(1, '料理名を入力は必須です。'),
-    category: z.string().min(1, 'カテゴリー選択は必須です。'),
-    memo: z.string(),
-    img: z.string(),
-  })
-
-  const onSubmit = async (data: FieldValues) => await uploadNote(data)
 
   const [noteData, setNoteData] = useState<Note>({
     img: '',
@@ -125,20 +123,20 @@ export const NoteComponent: FC = () => {
 
   const [fileObject, setFileObject] = useState<Blob>()
 
-  const fileImg = () => {
+  const fileImg = useCallback(() => {
     if (fileObject) return window.URL.createObjectURL(fileObject)
     if (noteData.img) return noteData.img
     return null
-  }
+  }, [fileObject, noteData.img])
 
-  const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
 
     const fileData = e.target.files[0]
     setFileObject(fileData)
-  }
+  }, [])
 
-  const handleStorage = async () => {
+  const handleStorage = useCallback(async () => {
     // 画像をstorageにアップロード
     const uploadStorage = ref(storage, fileObject!.name)
     const imgData = await uploadBytes(uploadStorage, fileObject!)
@@ -146,44 +144,50 @@ export const NoteComponent: FC = () => {
     // アップロードした画像のURLを取得
     const downloadURL = await getDownloadURL(imgData.ref)
     return downloadURL
-  }
+  }, [fileObject])
 
-  const handleImgData = async (data: FieldValues) => {
-    if (data.img === '') return data.img
-    if (data.img) return data.img
-    return await handleStorage()
-  }
+  const handleImgData = useCallback(
+    async (data: FieldValues) => {
+      if (data.img === '') return data.img
+      if (data.img) return data.img
+      return await handleStorage()
+    },
+    [handleStorage]
+  )
 
-  const uploadNote = async (data: FieldValues) => {
-    const imgData = await handleImgData(data)
-    const noteDoc = doc(createCollection('notes', user), date)
-    const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+  const onSubmit = useCallback(
+    async (data: FieldValues) => {
+      const imgData = await handleImgData(data)
+      const noteDoc = doc(createCollection('notes', user), date)
+      const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
-    setIsLoadingButton(true)
-    // db登録
-    await setDoc(noteDoc, {
-      img: imgData,
-      name: data.name,
-      memo: data.memo,
-      category: data.category,
-      date,
-    })
-
-    // 新規でカテゴリーを追加した場合は、dbのカテゴリーを更新
-    if (!hasTargetValue(options, data.category))
-      await updateDoc(categoryDoc, {
-        categories: arrayUnion(data.category),
+      setIsLoadingButton(true)
+      // db登録
+      await setDoc(noteDoc, {
+        img: imgData,
+        name: data.name,
+        memo: data.memo,
+        category: data.category,
+        date,
       })
 
-    setIsLoadingButton(false)
+      // 新規でカテゴリーを追加した場合は、dbのカテゴリーを更新
+      if (!hasTargetValue(options, data.category))
+        await updateDoc(categoryDoc, {
+          categories: arrayUnion(data.category),
+        })
 
-    toast({
-      title: '保存しました。',
-      status: 'success',
-      position: 'top',
-      duration: 1300,
-    })
-  }
+      setIsLoadingButton(false)
+
+      toast({
+        title: '保存しました。',
+        status: 'success',
+        position: 'top',
+        duration: 1300,
+      })
+    },
+    [date, handleImgData, options, toast, user]
+  )
 
   if (isLoading) return <Spinner variants="full" />
 

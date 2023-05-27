@@ -13,12 +13,13 @@ import {
   Image,
   Box,
 } from '@chakra-ui/react'
+import { memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import gyoza from '@/assets/gyoza.png'
 import { useAuth } from '@/features/auth'
 
-export const Header = () => {
+export const Header = memo(() => {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
 
@@ -65,4 +66,6 @@ export const Header = () => {
       </Container>
     </chakra.header>
   )
-}
+})
+
+Header.displayName = 'Header'
