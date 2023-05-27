@@ -1,11 +1,11 @@
 import { Input as ChakraInput, Box, Image, Flex, Button as ChakraButton } from '@chakra-ui/react'
-import { FC, useRef } from 'react'
+import { FC, memo, useRef } from 'react'
 
 import gyoza from '@/assets/gyoza.png'
 
 import { ImgInputProps } from './types'
 
-export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg, ...props }) => {
+export const ImgInput: FC<ImgInputProps> = memo(({ registration, onChange, fileImg, ...props }) => {
   const inputRef = useRef<HTMLInputElement>(null!)
 
   const onProfileButtonClick = () => {
@@ -53,4 +53,6 @@ export const ImgInput: FC<ImgInputProps> = ({ registration, onChange, fileImg, .
       </Box>
     </Flex>
   )
-}
+})
+
+ImgInput.displayName = 'ImgInput'
