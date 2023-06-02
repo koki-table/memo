@@ -1,7 +1,12 @@
-import { VStack, Flex } from '@chakra-ui/react'
+import { VStack, Flex, useToast } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import ja from 'dayjs/locale/ja'
+import { query, where, getDocs } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
 
+import { Spinner } from '@/components/Elements'
+import { useAuth } from '@/features/auth'
+import { createCollection } from '@/utils/database'
 import { getMonth } from '@/utils/getMonth'
 
 import { useCalendar } from '../lib'
@@ -12,8 +17,51 @@ import { Day } from './Day'
 export const MonthlyCalendarComponent = () => {
   dayjs.locale(ja)
   const { currentMonth } = useCalendar()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const currentMonthData = getMonth(currentMonth)
+  const { user } = useAuth()
+  const toast = useToast()
+
+  const { dayInit: currentMonthData } = getMonth(currentMonth)
+
+  const [activeDate, setActiveDate] = useState([''])
+
+  const hasActiveDate = (day: dayjs.Dayjs) => activeDate.includes(day.format('YYYYMMDD'))
+
+  useEffect(() => {
+    const { firstDate, lastDate } = getMonth(currentMonth)
+
+    const fetchAccount = async () => {
+      try {
+        const noteCol = createCollection('notes', user)
+        const dateQuery = query(
+          noteCol,
+          where('date', '>=', firstDate.format('YYYYMMDD')),
+          where('date', '<=', lastDate.format('YYYYMMDD'))
+        )
+
+        if (dateQuery === null) return
+
+        setIsLoading(true)
+        const queryDateSnapshot = await getDocs(dateQuery)
+        setIsLoading(false)
+
+        queryDateSnapshot.forEach((doc) => {
+          setActiveDate((prev) => [...prev, doc.data().date])
+        })
+      } catch (e: any) {
+        console.log(e.message)
+        toast({
+          title: 'エラーが発生しました。',
+          status: 'error',
+          position: 'top',
+        })
+      }
+    }
+    fetchAccount()
+  }, [currentMonth, toast, user])
+
+  if (isLoading) return <Spinner variants="full" />
 
   return (
     <VStack
@@ -36,7 +84,7 @@ export const MonthlyCalendarComponent = () => {
             _last={{ borderBottom: 'solid 1px var(--line-color-light)' }}
           >
             {row.map((day, idx) => (
-              <Day day={day} key={idx} rowIndex={i} />
+              <Day day={day} key={idx} rowIndex={i} hasActiveDate={hasActiveDate(day)} />
             ))}
           </Flex>
         ))}
