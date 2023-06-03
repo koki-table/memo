@@ -6,10 +6,11 @@ import { useNavigate } from 'react-router-dom'
 type DayProps = {
   day: dayjs.Dayjs
   rowIndex: number
+  hasActiveDate: boolean
 }
 
 export const Day: FC<DayProps> = (props) => {
-  const { day, rowIndex } = props
+  const { day, rowIndex, hasActiveDate } = props
   const navigate = useNavigate()
 
   // 今日の日付を色付けする
@@ -54,6 +55,18 @@ export const Day: FC<DayProps> = (props) => {
             margin: 'auto',
             borderRadius: '20px',
             backgroundColor: getTodayStyle,
+            zIndex: 1,
+            opacity: 0.6,
+          }}
+          _after={{
+            content: '""',
+            position: 'absolute',
+            w: '5px',
+            h: '5px',
+            top: '18px',
+            right: '10px',
+            borderRadius: '20px',
+            backgroundColor: hasActiveDate ? 'var(--primary-color-dark)' : '',
             zIndex: 1,
             opacity: 0.6,
           }}
