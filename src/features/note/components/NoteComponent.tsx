@@ -121,7 +121,7 @@ export const NoteComponent: FC = () => {
     fetchAccount()
   }, [date, reset, toast, user])
 
-  const [fileObject, setFileObject] = useState<Blob>()
+  const [fileObject, setFileObject] = useState<File>()
 
   const fileImg = useCallback(() => {
     if (fileObject) return window.URL.createObjectURL(fileObject)
@@ -148,11 +148,11 @@ export const NoteComponent: FC = () => {
 
   const handleImgData = useCallback(
     async (data: FieldValues) => {
+      if (fileObject) return await handleStorage()
       if (data.img === '') return data.img
-      if (data.img) return data.img
-      return await handleStorage()
+      return data.img
     },
-    [handleStorage]
+    [fileObject, handleStorage]
   )
 
   const onSubmit = useCallback(
