@@ -26,7 +26,7 @@ import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
-import { Note } from '@/types/Note'
+import { Recipe } from '@/types/Recipe'
 import { calculateBeforeDay, calculateNextDay } from '@/utils/calculateDay'
 import { createCollection, db } from '@/utils/database'
 import { hasTargetValue } from '@/utils/hasTargetValue'
@@ -45,7 +45,7 @@ const schema = z.object({
   img: z.string(),
 })
 
-export const NoteComponent: FC = () => {
+export const RecipeComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
   const { date } = useParams()
@@ -53,7 +53,7 @@ export const NoteComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  const defaultNotes = useMemo(() => {
+  const defaultRecipes = useMemo(() => {
     return {
       img: '',
       name: '',
@@ -63,7 +63,7 @@ export const NoteComponent: FC = () => {
     }
   }, [])
 
-  const [noteData, setNoteData] = useState<Note>(defaultNotes)
+  const [recipeData, setRecipeData] = useState<Recipe>(defaultRecipes)
 
   const {
     register,
@@ -72,7 +72,7 @@ export const NoteComponent: FC = () => {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: noteData,
+    defaultValues: recipeData,
     resolver: zodResolver(schema),
   })
 
@@ -84,8 +84,8 @@ export const NoteComponent: FC = () => {
   useEffect(() => {
     const fetchDb = async () => {
       try {
-        const noteCol = createCollection('notes', user)
-        const dateQuery = query(noteCol, where('date', '==', `${date!}`))
+        const recipeCol = createCollection('recipes', user)
+        const dateQuery = query(recipeCol, where('date', '==', `${date!}`))
 
         const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
@@ -104,16 +104,16 @@ export const NoteComponent: FC = () => {
 
         if (queryDateSnapshot.size === 0) {
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          reset(defaultNotes)
-          setNoteData(defaultNotes)
+          reset(defaultRecipes)
+          setRecipeData(defaultRecipes)
           return
         }
 
         queryDateSnapshot.forEach((doc) => {
-          setNoteData(doc.data() as Note)
+          setRecipeData(doc.data() as Recipe)
 
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          reset(doc.data() as Note)
+          reset(doc.data() as Recipe)
         })
       } catch (e: any) {
         console.log(e.message)
@@ -125,15 +125,15 @@ export const NoteComponent: FC = () => {
       }
     }
     fetchDb()
-  }, [date, defaultNotes, reset, toast, user])
+  }, [date, defaultRecipes, reset, toast, user])
 
   const [fileObject, setFileObject] = useState<File>()
 
   const fileImg = useCallback(() => {
-    if (fileObject) return window.URL.createObjectURL(fileObject)
-    if (noteData.img) return noteData.img
+    if (fileObject != null) return window.URL.createObjectURL(fileObject)
+    if (recipeData.img) return recipeData.img
     return null
-  }, [fileObject, noteData.img])
+  }, [fileObject, recipeData.img])
 
   const onFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -154,8 +154,8 @@ export const NoteComponent: FC = () => {
 
   const handleImgData = useCallback(
     async (data: FieldValues) => {
-      if (fileObject) return await handleStorage()
-      if (data.img === '') return data.img
+      if (fileObject != null) return await handleStorage()
+      return data.img
     },
     [fileObject, handleStorage]
   )
@@ -163,12 +163,12 @@ export const NoteComponent: FC = () => {
   const onSubmit = useCallback(
     async (data: FieldValues) => {
       const imgData = await handleImgData(data)
-      const noteDoc = doc(createCollection('notes', user), date)
+      const recipeDoc = doc(createCollection('recipes', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
       setIsLoadingButton(true)
       // db登録
-      await setDoc(noteDoc, {
+      await setDoc(recipeDoc, {
         img: imgData,
         name: data.name,
         memo: data.memo,
@@ -199,9 +199,9 @@ export const NoteComponent: FC = () => {
       setFileObject(undefined)
 
       if (isNext) {
-        navigate(`/note/${calculateNextDay(date!)}`)
+        navigate(`/recipe/${calculateBeforeDay(date!)}`)
       }
-      navigate(`/note/${calculateBeforeDay(date!)}`)
+      navigate(`/recipe/${calculateNextDay(date!)}`)
     },
     [date, navigate]
   )
@@ -297,7 +297,7 @@ export const NoteComponent: FC = () => {
             )}
           </VStack>
           <Box minW={'100%'}>
-            <Textarea placeholder="メモしたいこと" minH={'180px'} registration={register('memo')} />
+            <Textarea placeholder="メモ" minH={'180px'} registration={register('memo')} />
           </Box>
           <Button type={'submit'} isLoading={isLoadingButton}>
             <Text fontSize={'sm'} fontWeight="700">

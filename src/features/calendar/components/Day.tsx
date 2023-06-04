@@ -38,7 +38,7 @@ export const Day: FC<DayProps> = (props) => {
         display="grid"
         placeItems="center"
         textAlign={'center'}
-        onClick={() => navigate(`/note/${day.format('YYYYMMDD')}`)}
+        onClick={() => navigate(`/recipe/${day.format('YYYYMMDD')}`)}
       >
         {/* 1行目に曜日を表示 */}
         <Text
@@ -66,7 +66,7 @@ export const Day: FC<DayProps> = (props) => {
             top: '18px',
             right: '10px',
             borderRadius: '20px',
-            backgroundColor: hasActiveDate ? 'var(--primary-color-dark)' : '',
+            backgroundColor: hasActiveDate ? 'var(--warning-color-main)' : '',
             zIndex: 1,
             opacity: 0.6,
           }}

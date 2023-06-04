@@ -9,30 +9,30 @@ type State = {
   currentMonth: number
 }
 
-export type UseNote = {
+export type UseRecipe = {
   currentMonth: State['currentMonth']
   dispatch: React.Dispatch<Action>
 }
 
-const calendarContext = createContext<UseNote | undefined>(undefined)
+const calendarContext = createContext<UseRecipe | undefined>(undefined)
 
 type Props = { children: ReactNode }
 
-export const useNote = () => {
+export const useRecipe = () => {
   const context = useContext(calendarContext)
 
   if (context === undefined) {
-    throw new Error('useNoteがNoteProvider内で利用されていません')
+    throw new Error('useRecipeがRecipeProvider内で利用されていません')
   }
   return context
 }
 
-export const NoteProvider: FC<{ children: ReactNode }> = ({ children }: Props) => {
-  const calendar = useNoteProvider()
+export const RecipeProvider: FC<{ children: ReactNode }> = ({ children }: Props) => {
+  const calendar = useRecipeProvider()
   return <calendarContext.Provider value={calendar}>{children}</calendarContext.Provider>
 }
 
-const useNoteProvider = (): UseNote => {
+const useRecipeProvider = (): UseRecipe => {
   const month = dayjs().month()
 
   const initialState: State = {

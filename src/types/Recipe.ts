@@ -1,4 +1,4 @@
-export type Note = {
+export type Recipe = {
   img: string
   name: string
   memo: string
