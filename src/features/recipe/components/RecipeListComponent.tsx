@@ -5,6 +5,7 @@ import { getDocs, limit, orderBy, query } from 'firebase/firestore'
 import { FC, useEffect, useMemo, useState } from 'react'
 
 import { Spinner } from '@/components/Elements'
+import { Tag } from '@/components/Elements/Tag'
 import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
 import { createCollection } from '@/utils/database'
@@ -33,7 +34,6 @@ export const RecipeListComponent: FC = () => {
           const recipes = queryDateSnapshot.docs.map((doc) => ({
             name: doc.data().name,
             category: doc.data().category,
-            date: doc.data().date,
           })) as RecipeList
 
           setRecipeList(recipes)
@@ -59,17 +59,34 @@ export const RecipeListComponent: FC = () => {
       px={'4'}
       pb={8}
       display="flex"
-      justifyContent="center"
-      alignItems="center"
+      justifyContent="flex-start"
+      alignItems="flex-start"
       maxW={['100%', '400px']}
       margin="0 auto"
       minH={`calc(100vh)`}
     >
       <VStack spacing={6}>
         <VStack w="100%" alignItems={'flex-start'}>
-          <Text fontSize={'xs'} pl={2}>
-            サンプル
-          </Text>
+          {recipeList?.map((recipe, index) => (
+            <VStack
+              width={viewWidth}
+              key={index}
+              alignItems={'flex-start'}
+              spacing={2}
+              py="4"
+              borderBottom={'1px'}
+              borderColor={'var(--line-color-main)'}
+            >
+              <Text fontSize={'md'} pl={2} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
+                {recipe.name}
+              </Text>
+              <Box pl="2">
+                <Tag>
+                  <Text fontSize={'xs'}>{recipe.category}</Text>
+                </Tag>
+              </Box>
+            </VStack>
+          ))}
         </VStack>
       </VStack>
     </VStack>
