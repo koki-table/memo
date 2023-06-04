@@ -1,25 +1,15 @@
-import dayjs from 'dayjs'
-import { createContext, ReactNode, useContext, FC, useReducer } from 'react'
-
-type Action = {
-  type: 'increment' | 'decrement'
-}
-
-type State = {
-  currentMonth: number
-}
+import { createContext, ReactNode, useContext, FC, useState } from 'react'
 
 export type UseRecipe = {
-  currentMonth: State['currentMonth']
-  dispatch: React.Dispatch<Action>
+  isLoading: boolean
 }
 
-const calendarContext = createContext<UseRecipe | undefined>(undefined)
+const recipeContext = createContext<UseRecipe | undefined>(undefined)
 
 type Props = { children: ReactNode }
 
 export const useRecipe = () => {
-  const context = useContext(calendarContext)
+  const context = useContext(recipeContext)
 
   if (context === undefined) {
     throw new Error('useRecipeがRecipeProvider内で利用されていません')
@@ -28,41 +18,15 @@ export const useRecipe = () => {
 }
 
 export const RecipeProvider: FC<{ children: ReactNode }> = ({ children }: Props) => {
-  const calendar = useRecipeProvider()
-  return <calendarContext.Provider value={calendar}>{children}</calendarContext.Provider>
+  const recipe = useRecipeProvider()
+  return <recipeContext.Provider value={recipe}>{children}</recipeContext.Provider>
 }
 
 const useRecipeProvider = (): UseRecipe => {
-  const month = dayjs().month()
-
-  const initialState: State = {
-    currentMonth: month,
-  } as const
-
-  const reducer = (state: State, action: Action): State => {
-    switch (action.type) {
-      case 'increment': {
-        return {
-          ...state,
-          currentMonth: state.currentMonth + 1,
-        }
-      }
-      case 'decrement': {
-        return {
-          ...state,
-          currentMonth: state.currentMonth - 1,
-        }
-      }
-      default: {
-        return state
-      }
-    }
-  }
-
-  const [{ currentMonth }, dispatch] = useReducer(reducer, initialState)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoading, setIsLoading] = useState(true)
 
   return {
-    currentMonth,
-    dispatch,
+    isLoading,
   }
 }
