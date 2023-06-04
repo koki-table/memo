@@ -8,6 +8,7 @@ import { MonthMoveButton } from './MonthMoveButton'
 
 export const CalendarHeader: FC = () => {
   const { currentMonth } = useCalendar()
+
   return (
     <HStack
       spacing={5}
