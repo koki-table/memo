@@ -74,7 +74,7 @@ export const RecipeListComponent: FC = () => {
       margin="0 auto"
       minH={`calc(100vh)`}
     >
-      <VStack spacing={6}>
+      <VStack>
         <Box
           backgroundImage={gyoza}
           w={'120%'}
@@ -93,7 +93,8 @@ export const RecipeListComponent: FC = () => {
               width={viewWidth}
               alignItems={'flex-start'}
               spacing={2}
-              py="4"
+              pt="6"
+              pb="6"
               borderBottom={'1px'}
               borderColor={'var(--line-color-main)'}
             >
