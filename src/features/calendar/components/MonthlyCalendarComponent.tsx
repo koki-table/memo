@@ -33,9 +33,9 @@ export const MonthlyCalendarComponent = () => {
 
     const fetchAccount = async () => {
       try {
-        const noteCol = createCollection('notes', user)
+        const recipeCol = createCollection('recipes', user)
         const dateQuery = query(
-          noteCol,
+          recipeCol,
           where('date', '>=', firstDate.format('YYYYMMDD')),
           where('date', '<=', lastDate.format('YYYYMMDD'))
         )

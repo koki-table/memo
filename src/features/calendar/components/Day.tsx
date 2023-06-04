@@ -38,7 +38,7 @@ export const Day: FC<DayProps> = (props) => {
         display="grid"
         placeItems="center"
         textAlign={'center'}
-        onClick={() => navigate(`/note/${day.format('YYYYMMDD')}`)}
+        onClick={() => navigate(`/recipe/${day.format('YYYYMMDD')}`)}
       >
         {/* 1行目に曜日を表示 */}
         <Text

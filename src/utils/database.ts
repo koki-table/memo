@@ -9,7 +9,7 @@ export const db = getFirestore()
 // const createCollection = <T = DocumentData>(collectionName: string) => {
 //   return collection(db, collectionName) as CollectionReference<T>
 // }
-// export const notesCol = createCollection<Note>('notes')
+// export const recipesCol = createCollection<Recipe>('recipes')
 
 // dbからのレスポンスに型を追加するためのユーティリティ関数
 export const createCollection = <T = DocumentData>(
