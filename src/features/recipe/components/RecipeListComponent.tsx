@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Box, useToast, Link } from '@chakra-ui/react'
+import { Text, VStack, Box, useToast, Link, keyframes } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import { getDocs, limit, orderBy, query } from 'firebase/firestore'
 import { FC, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import gyoza from '@/assets/gyoza.png'
 import { Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
 import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
 import { createCollection } from '@/utils/database'
+
+const bgLoop = keyframes`
+  from { background-position: 0 0; }
+to { background-position: -6300px 0; }
+`
 
 export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
@@ -62,39 +68,46 @@ export const RecipeListComponent: FC = () => {
       px={'4'}
       pb={8}
       display="flex"
-      justifyContent="flex-start"
-      alignItems="flex-start"
+      justifyContent="center"
+      alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
       minH={`calc(100vh)`}
     >
       <VStack spacing={6}>
-        <VStack w="100%" alignItems={'flex-start'}>
-          {recipeList?.map((recipe, index) => (
-            <Link
-              key={index}
-              onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
+        <Box
+          backgroundImage={gyoza}
+          w={'120%'}
+          h={'160px'}
+          backgroundPosition="0 0"
+          backgroundSize={'auto 100%'}
+          backgroundRepeat={'repeat-x'}
+          animation={`${bgLoop} 180s linear infinite`}
+        />
+        {recipeList?.map((recipe, index) => (
+          <Link
+            key={index}
+            onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
+          >
+            <VStack
+              width={viewWidth}
+              alignItems={'flex-start'}
+              spacing={2}
+              py="4"
+              borderBottom={'1px'}
+              borderColor={'var(--line-color-main)'}
             >
-              <VStack
-                width={viewWidth}
-                alignItems={'flex-start'}
-                spacing={2}
-                py="4"
-                borderBottom={'1px'}
-                borderColor={'var(--line-color-main)'}
-              >
-                <Text fontSize={'md'} pl={2} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
-                  {recipe.name}
-                </Text>
-                <Box pl="2">
-                  <Tag>
-                    <Text fontSize={'xs'}>{recipe.category}</Text>
-                  </Tag>
-                </Box>
-              </VStack>
-            </Link>
-          ))}
-        </VStack>
+              <Text fontSize={'md'} pl={2} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
+                {recipe.name}
+              </Text>
+              <Box pl="2">
+                <Tag>
+                  <Text fontSize={'xs'}>{recipe.category}</Text>
+                </Tag>
+              </Box>
+            </VStack>
+          </Link>
+        ))}
       </VStack>
     </VStack>
   )
