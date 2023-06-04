@@ -76,7 +76,7 @@ export const NoteComponent: FC = () => {
     resolver: zodResolver(schema),
   })
 
-  const [options, setOptions] = useState<option>([{ value: '', label: '' }])
+  const [options, setOptions] = useState<option>()
 
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingButton, setIsLoadingButton] = useState(false)
@@ -178,7 +178,7 @@ export const NoteComponent: FC = () => {
       })
 
       // 新規でカテゴリーを追加した場合は、dbのカテゴリーを更新
-      if (!hasTargetValue(options, data.category))
+      if (!hasTargetValue(options!, data.category))
         await updateDoc(categoryDoc, {
           categories: arrayUnion(data.category),
         })
@@ -253,7 +253,7 @@ export const NoteComponent: FC = () => {
                   {...field}
                   placeholder={'カテゴリ'}
                   options={options}
-                  value={options.find((v) => v.value === field.value)}
+                  value={options?.find((v) => v.value === field.value)}
                   onChange={(newValue) => {
                     field.onChange(newValue?.value)
                   }}
