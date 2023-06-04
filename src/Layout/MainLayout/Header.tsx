@@ -35,7 +35,7 @@ export const Header = memo(() => {
     <chakra.header py={6} bgColor={'var(--white)'}>
       <Container maxW={'container.lg'}>
         <Flex justifyContent="space-between">
-          <Link href={'/'}>
+          <Link href={'/recipe/list'}>
             <chakra.a
               _hover={{
                 opacity: 0.8,
@@ -49,7 +49,7 @@ export const Header = memo(() => {
           {user ? (
             <Menu>
               <MenuButton>
-                <Avatar flexShrink={0} width={10} height={10} />
+                <Avatar flexShrink={0} width={7} height={7} />
               </MenuButton>
               <MenuList py={0}>
                 <MenuItem onClick={onSubmit}>サインアウト</MenuItem>
