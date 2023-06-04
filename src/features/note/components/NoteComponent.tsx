@@ -53,17 +53,17 @@ export const NoteComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  const [noteData, setNoteData] = useState<Note>({
-    img: '',
-    name: '',
-    memo: '',
-    category: '',
-    date: '',
-  })
+  const defaultNotes = useMemo(() => {
+    return {
+      img: '',
+      name: '',
+      memo: '',
+      category: '',
+      date: '',
+    }
+  }, [])
 
-  const defaultValues = useMemo(() => {
-    return noteData
-  }, [noteData])
+  const [noteData, setNoteData] = useState<Note>(defaultNotes)
 
   const {
     register,
@@ -72,7 +72,7 @@ export const NoteComponent: FC = () => {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues,
+    defaultValues: noteData,
     resolver: zodResolver(schema),
   })
 
@@ -82,19 +82,25 @@ export const NoteComponent: FC = () => {
   const [isLoadingButton, setIsLoadingButton] = useState(false)
 
   useEffect(() => {
-    const fetchAccount = async () => {
+    const fetchDb = async () => {
       try {
         const noteCol = createCollection('notes', user)
         const dateQuery = query(noteCol, where('date', '==', `${date!}`))
 
         const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
-        if (dateQuery === null) return
-
         setIsLoading(true)
         const queryDateSnapshot = await getDocs(dateQuery)
         const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
+
+        if (queryDateSnapshot.size === 0) {
+          console.log('データがありません。')
+          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
+          reset(defaultNotes)
+          setNoteData(defaultNotes)
+          return
+        }
 
         queryDateSnapshot.forEach((doc) => {
           setNoteData(doc.data() as Note)
@@ -118,8 +124,8 @@ export const NoteComponent: FC = () => {
         })
       }
     }
-    fetchAccount()
-  }, [date, reset, toast, user])
+    fetchDb()
+  }, [date, defaultNotes, reset, toast, user])
 
   const [fileObject, setFileObject] = useState<File>()
 
