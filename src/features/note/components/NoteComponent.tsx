@@ -94,8 +94,15 @@ export const NoteComponent: FC = () => {
         const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
 
+        if (queryCategorySnapshot.exists()) {
+          setOptions(
+            queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
+          )
+        } else {
+          console.log('categoryは未登録です。')
+        }
+
         if (queryDateSnapshot.size === 0) {
-          console.log('データがありません。')
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
           reset(defaultNotes)
           setNoteData(defaultNotes)
@@ -108,13 +115,6 @@ export const NoteComponent: FC = () => {
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
           reset(doc.data() as Note)
         })
-        if (queryCategorySnapshot.exists()) {
-          setOptions(
-            queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
-          )
-        } else {
-          console.log('categoryは未登録です。')
-        }
       } catch (e: any) {
         console.log(e.message)
         toast({
@@ -156,7 +156,6 @@ export const NoteComponent: FC = () => {
     async (data: FieldValues) => {
       if (fileObject) return await handleStorage()
       if (data.img === '') return data.img
-      return data.img
     },
     [fileObject, handleStorage]
   )
@@ -195,6 +194,18 @@ export const NoteComponent: FC = () => {
     [date, handleImgData, options, toast, user]
   )
 
+  const handleDateChange = useCallback(
+    (isNext: boolean) => {
+      setFileObject(undefined)
+
+      if (isNext) {
+        navigate(`/note/${calculateNextDay(date!)}`)
+      }
+      navigate(`/note/${calculateBeforeDay(date!)}`)
+    },
+    [date, navigate]
+  )
+
   if (isLoading) return <Spinner variants="full" />
 
   return (
@@ -215,10 +226,10 @@ export const NoteComponent: FC = () => {
               <Text w={'100%'} fontSize={'sm'} fontWeight="700">
                 {formattedDate}
               </Text>
-              <Link onClick={() => navigate(`/note/${calculateBeforeDay(date!)}`)}>
+              <Link onClick={() => handleDateChange(false)}>
                 <IoIosArrowBack />
               </Link>
-              <Link onClick={() => navigate(`/note/${calculateNextDay(date!)}`)}>
+              <Link onClick={() => handleDateChange(true)}>
                 <IoIosArrowForward />
               </Link>
             </HStack>
