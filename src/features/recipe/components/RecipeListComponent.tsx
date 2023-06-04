@@ -1,22 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input, useToast, Flex, Link, HStack } from '@chakra-ui/react'
-import {
-  arrayUnion,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore'
+import { getDocs, limit, orderBy, query } from 'firebase/firestore'
 import { FC, useEffect, useMemo, useState } from 'react'
 
 import { Spinner } from '@/components/Elements'
 import { useAuth } from '@/features/auth'
-import { Recipe } from '@/types/Recipe'
-import { createCollection, db } from '@/utils/database'
+import { RecipeList } from '@/types/RecipeList'
+import { createCollection } from '@/utils/database'
 
 export const RecipeListComponent: FC = () => {
   // const navigate = useNavigate()
@@ -24,17 +15,7 @@ export const RecipeListComponent: FC = () => {
   const { user } = useAuth()
   const toast = useToast()
 
-  const defaultRecipes = useMemo(() => {
-    return {
-      img: '',
-      name: '',
-      memo: '',
-      category: '',
-      date: '',
-    }
-  }, [])
-
-  const [recipeList, setRecipeList] = useState<Recipe>(defaultRecipes)
+  const [recipeList, setRecipeList] = useState<RecipeList>()
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -42,17 +23,22 @@ export const RecipeListComponent: FC = () => {
     const fetchDb = async () => {
       try {
         const recipeCol = createCollection('recipes', user)
+        const recipeQuery = query(recipeCol, orderBy('date', 'desc'), limit(10))
 
         setIsLoading(true)
-        const queryDateSnapshot = await getDocs(recipeCol)
+        const queryDateSnapshot = await getDocs(recipeQuery)
         setIsLoading(false)
 
         if (queryDateSnapshot.size > 0) {
-          // setRecipeList(
-          //   queryDateSnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
-          // )
+          const recipes = queryDateSnapshot.docs.map((doc) => ({
+            name: doc.data().name,
+            category: doc.data().category,
+            date: doc.data().date,
+          })) as RecipeList
+
+          setRecipeList(recipes)
         } else {
-          console.log('categoryは未登録です。')
+          console.log('recipeは未登録です。')
         }
       } catch (e: any) {
         console.log(e.message)
@@ -64,7 +50,7 @@ export const RecipeListComponent: FC = () => {
       }
     }
     fetchDb()
-  }, [defaultRecipes, toast, user])
+  }, [toast, user])
 
   if (isLoading) return <Spinner variants="full" />
 
