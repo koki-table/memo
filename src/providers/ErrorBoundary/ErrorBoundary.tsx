@@ -18,5 +18,15 @@ type ErrorBoundaryProps = {
 }
 
 export const ErrorBoundary: FC<ErrorBoundaryProps> = ({ children }) => {
-  return <_ErrorBoundary FallbackComponent={ErrorFallback}>{children}</_ErrorBoundary>
+  const onError = (error: Error, info: { componentStack: string }) => {
+    // ここでログ出力などを行う
+    console.log('error.message', error.message)
+    console.log('info.componentStack:', info.componentStack)
+  }
+
+  return (
+    <_ErrorBoundary FallbackComponent={ErrorFallback} onError={onError}>
+      {children}
+    </_ErrorBoundary>
+  )
 }

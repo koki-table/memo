@@ -56,6 +56,7 @@ export const MonthlyCalendarComponent = () => {
           status: 'error',
           position: 'top',
         })
+        throw Error('Error in fetchUserAPI')
       }
     }
     fetchAccount()
