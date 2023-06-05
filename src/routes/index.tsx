@@ -23,7 +23,6 @@ const { CalendarRoutes } = lazyImport(
   'CalendarRoutes'
 )
 const { RecipeRoutes } = lazyImport(async () => await import('@/features/recipe'), 'RecipeRoutes')
-const { App } = lazyImport(async () => await import('@/App'), 'App')
 
 export const AppRoutes = () => {
   const { user } = useAuth()
@@ -37,9 +36,8 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={handleAuth()}>
-        <Route index element={<App />} />
-        <Route path="/calendar/*" element={<CalendarRoutes />} />
         <Route path="/recipe/*" element={<RecipeRoutes />} />
+        <Route path="/calendar/*" element={<CalendarRoutes />} />
       </Route>
       <Route path="/auth/*" element={<AuthRoutes />} />
       <Route path="*" element={<NotFound />} />
