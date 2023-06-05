@@ -25,7 +25,7 @@ export const HomeComponent: FC = () => {
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
-      minH={`calc(100vh)`}
+      minH={`calc(100vh - 93px)`}
       spacing={10}
     >
       <VStack>
