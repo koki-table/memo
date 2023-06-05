@@ -13,7 +13,7 @@ export const LoginForm = () => {
     e.preventDefault()
     const { success } = await signIn(e)
     if (success) {
-      navigate('/recipe/list')
+      navigate('/')
     }
   }
 

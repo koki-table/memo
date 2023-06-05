@@ -35,7 +35,7 @@ export const Header = memo(() => {
     <chakra.header py={6} bgColor={'var(--white)'}>
       <Container maxW={'container.lg'}>
         <Flex justifyContent="space-between">
-          <Link href={'/recipe/list'}>
+          <Link href={'/'}>
             <chakra.a
               _hover={{
                 opacity: 0.8,
