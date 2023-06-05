@@ -21,6 +21,7 @@ to { background-position: -6300px 0; }
 export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
+
   const { user } = useAuth()
   const toast = useToast()
 
@@ -56,6 +57,7 @@ export const RecipeListComponent: FC = () => {
           status: 'error',
           position: 'top',
         })
+        throw Error('Error in fetchUserAPI')
       }
     }
     fetchDb()
