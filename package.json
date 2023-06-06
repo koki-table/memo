@@ -109,5 +109,8 @@
     "*.md": [
       "bash -c 'yarn stylelint:fix'"
     ]
+  },
+  "resolutions": {
+    "stylelint/postcss": "8.4.14"
   }
 }

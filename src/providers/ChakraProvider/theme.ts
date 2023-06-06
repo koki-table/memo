@@ -30,8 +30,7 @@ export const theme = extendTheme({
             bg: 'var(--primary-color-main)',
             borderColor: 'var(--primary-color-main)',
             _hover: {
-              bg: 'var(--primary-color-heavy)',
-              borderColor: 'var(--primary-color-heavy)',
+              opacity: 0.7,
             },
             _disabled: {
               bg: 'var(--primary-color-main)',
