@@ -40,7 +40,7 @@ const roundTransparent = defineStyle({
 const circle = defineStyle({
   transition: 'var(--transition-ease-in)',
   borderRadius: '50%',
-  bg: 'var(--hover-color-primary)',
+  bg: 'var(--secondary-color-main)',
   p: 1,
   color: 'var(--text-color-pagination)',
   fontWeight: '400',

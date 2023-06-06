@@ -13,6 +13,8 @@ import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
 import { createCollection } from '@/utils/database'
 
+import { PaginationComponent } from './PaginationComponent'
+
 const bgLoop = keyframes`
   from { background-position: 0 0; }
 to { background-position: -6300px 0; }
@@ -27,13 +29,22 @@ export const RecipeListComponent: FC = () => {
 
   const [recipeList, setRecipeList] = useState<RecipeList>()
 
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const handlePage = (index: number) => {
+    setCurrentPage(index)
+  }
+
+  const totalCount = recipeList?.length
+
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const fetchDb = async () => {
       try {
         const recipeCol = createCollection('recipes', user)
-        const recipeQuery = query(recipeCol, orderBy('date', 'desc'), limit(10))
+        // const recipeQuery = query(recipeCol, orderBy('date', 'desc'), limit(10))
+        const recipeQuery = query(recipeCol)
 
         setIsLoading(true)
         const queryDateSnapshot = await getDocs(recipeQuery)
@@ -112,6 +123,12 @@ export const RecipeListComponent: FC = () => {
           </Link>
         ))}
       </VStack>
+      <PaginationComponent
+        totalCount={totalCount}
+        requestCount={10}
+        currentPage={currentPage}
+        handlePage={handlePage}
+      />
     </VStack>
   )
 }
