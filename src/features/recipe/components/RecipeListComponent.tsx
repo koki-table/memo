@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, useToast, Link, keyframes } from '@chakra-ui/react'
 import dayjs from 'dayjs'
-import { getDocs, limit, orderBy, query } from 'firebase/firestore'
+import { getDocs, orderBy, query } from 'firebase/firestore'
 import { FC, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -27,7 +27,7 @@ export const RecipeListComponent: FC = () => {
   const { user } = useAuth()
   const toast = useToast()
 
-  const [recipeList, setRecipeList] = useState<RecipeList>()
+  const [recipeList, setRecipeList] = useState<RecipeList[]>([])
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -35,7 +35,8 @@ export const RecipeListComponent: FC = () => {
     setCurrentPage(index)
   }
 
-  const totalCount = recipeList?.length
+  // recipeListが10個のオブジェクトを1つの配列に詰めているので、10倍にする
+  const totalCount = recipeList?.length * 10
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -43,8 +44,7 @@ export const RecipeListComponent: FC = () => {
     const fetchDb = async () => {
       try {
         const recipeCol = createCollection('recipes', user)
-        // const recipeQuery = query(recipeCol, orderBy('date', 'desc'), limit(10))
-        const recipeQuery = query(recipeCol)
+        const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
 
         setIsLoading(true)
         const queryDateSnapshot = await getDocs(recipeQuery)
@@ -57,7 +57,16 @@ export const RecipeListComponent: FC = () => {
             date: doc.data().date,
           })) as RecipeList
 
-          setRecipeList(recipes)
+          const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
+            const chunkIndex = Math.floor(index / 10)
+            if (!acc[chunkIndex]) {
+              acc[chunkIndex] = []
+            }
+            acc[chunkIndex].push(recipe)
+            return acc
+          }, [])
+
+          setRecipeList(chunkedRecipes)
         } else {
           console.log('recipeは未登録です。')
         }
@@ -97,7 +106,8 @@ export const RecipeListComponent: FC = () => {
           backgroundRepeat={'repeat-x'}
           animation={`${bgLoop} 180s linear infinite`}
         />
-        {recipeList?.map((recipe, index) => (
+        {/* currentPageが1から始まる為、-1している */}
+        {recipeList[currentPage - 1]?.map((recipe, index) => (
           <Link
             key={index}
             onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
