@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, useToast, Link, HStack, Flex } from '@chakra-ui/react'
 import { doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore'
-import { FC, useEffect, useState } from 'react'
+import { FC, memo, useEffect, useState } from 'react'
 
 import { Tag } from '@/components/Elements/Tag'
 import { useAuth } from '@/features/auth'
 import { db } from '@/utils/database'
 
-export const CategoryListComponent: FC = () => {
+export const CategoryListComponent: FC = memo(() => {
   const { user } = useAuth()
   const toast = useToast()
   const [categoryList, setCategoryList] = useState<string[]>()
@@ -52,4 +52,6 @@ export const CategoryListComponent: FC = () => {
       </Flex>
     </VStack>
   )
-}
+})
+
+CategoryListComponent.displayName = 'CategoryListComponent'
