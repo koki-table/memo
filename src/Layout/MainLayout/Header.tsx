@@ -32,7 +32,23 @@ export const Header = memo(() => {
   }
 
   return (
-    <chakra.header py={6} bgColor={'var(--white)'}>
+    <chakra.header
+      py={3}
+      bgColor={'var(--white)'}
+      position={'relative'}
+      _before={{
+        content: "''",
+        position: 'absolute',
+        display: 'block',
+        height: '1px',
+        width: '90%',
+        inset: 0,
+        margin: 'auto auto 0',
+        bottom: 0,
+        zIndex: 1,
+        backgroundColor: 'var(--line-color-main)',
+      }}
+    >
       <Container maxW={'container.lg'}>
         <Flex justifyContent="space-between">
           <Link href={'/'}>
