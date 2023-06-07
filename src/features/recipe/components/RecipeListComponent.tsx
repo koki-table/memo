@@ -57,6 +57,7 @@ export const RecipeListComponent: FC = () => {
             date: doc.data().date,
           })) as RecipeList
 
+          // RecipeListを10個ずつの配列に分割
           const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
             const chunkIndex = Math.floor(index / 10)
             if (!acc[chunkIndex]) {
