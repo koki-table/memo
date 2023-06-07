@@ -12,7 +12,7 @@ import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
 import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
-import { createCollection, db } from '@/utils/database'
+import { createCollection } from '@/utils/database'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'
@@ -30,9 +30,9 @@ export const RecipeListComponent: FC = () => {
   const toast = useToast()
 
   const [recipeList, setRecipeList] = useState<RecipeList[]>([])
-  const [categoryList, setCategoryList] = useState<string[]>()
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
 
-  console.log(categoryList)
+  console.log(selectedCategory)
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -51,11 +51,8 @@ export const RecipeListComponent: FC = () => {
         const recipeCol = createCollection('recipes', user)
         const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
 
-        const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-
         setIsLoading(true)
         const queryDateSnapshot = await getDocs(recipeQuery)
-        const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
 
         if (queryDateSnapshot.size > 0) {
@@ -78,12 +75,6 @@ export const RecipeListComponent: FC = () => {
           setRecipeList(chunkedRecipes)
         } else {
           console.log('recipeは未登録です。')
-        }
-
-        if (queryCategorySnapshot.exists()) {
-          setCategoryList(queryCategorySnapshot.data()!.categories)
-        } else {
-          console.log('categoryは未登録です。')
         }
       } catch (e: any) {
         console.log(e.message)
