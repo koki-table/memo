@@ -8,7 +8,7 @@ import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
 
 import gyoza from '@/assets/gyoza.png'
-import { Spinner } from '@/components/Elements'
+import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
 import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
@@ -121,6 +121,9 @@ export const RecipeListComponent: FC = () => {
           backgroundRepeat={'repeat-x'}
           animation={`${bgLoop} 180s linear infinite`}
         />
+        <Heading w="100%" pb="8">
+          レシピリスト 🥘
+        </Heading>
         <CategoryListComponent />
         {/* currentPageが1から始まる為、-1している */}
         {recipeList[currentPage - 1]?.map((recipe, index) => (
