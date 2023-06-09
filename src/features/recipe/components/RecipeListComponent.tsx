@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, useToast, Link, keyframes, HStack } from '@chakra-ui/react'
 import dayjs from 'dayjs'
-import { doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore'
+import { doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { FC, useEffect, useState } from 'react'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
@@ -49,6 +49,7 @@ export const RecipeListComponent: FC = () => {
     const fetchDb = async () => {
       try {
         const recipeCol = createCollection('recipes', user)
+
         const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
 
         setIsLoading(true)
@@ -100,7 +101,7 @@ export const RecipeListComponent: FC = () => {
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
-      minH={`calc(100vh - 93px)`}
+      minH={`calc(100vh - 69px)`}
     >
       <VStack>
         <Box
