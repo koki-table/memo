@@ -1,7 +1,17 @@
-import { createContext, ReactNode, useContext, FC, useState } from 'react'
+import { useToast } from '@chakra-ui/react'
+import { query, orderBy, getDocs, where } from 'firebase/firestore'
+import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
+
+import { useAuth } from '@/features/auth'
+import { RecipeList } from '@/types/RecipeList'
+import { createCollection } from '@/utils/database'
 
 export type UseRecipe = {
   isLoading: boolean
+  fetchAllRecipe: () => Promise<void>
+  recipeList: RecipeList[]
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>
+  fetchSelectedRecipe: () => Promise<void>
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -25,8 +35,103 @@ export const RecipeProvider: FC<{ children: ReactNode }> = ({ children }: Props)
 const useRecipeProvider = (): UseRecipe => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true)
+  const toast = useToast()
+  const { user } = useAuth()
+
+  const [recipeList, setRecipeList] = useState<RecipeList[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
+
+  const fetchAllRecipe = useCallback(async () => {
+    try {
+      const recipeCol = createCollection('recipes', user)
+      const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
+
+      setIsLoading(true)
+      const queryDateSnapshot = await getDocs(recipeQuery)
+      setIsLoading(false)
+
+      if (queryDateSnapshot.size > 0) {
+        const recipes = queryDateSnapshot.docs.map((doc) => ({
+          name: doc.data().name,
+          category: doc.data().category,
+          date: doc.data().date,
+        })) as RecipeList
+
+        // RecipeListを10個ずつの配列に分割
+        const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
+          const chunkIndex = Math.floor(index / 10)
+          if (!acc[chunkIndex]) {
+            acc[chunkIndex] = []
+          }
+          acc[chunkIndex].push(recipe)
+          return acc
+        }, [])
+
+        setRecipeList(chunkedRecipes)
+      } else {
+        console.log('recipeは未登録です。')
+      }
+    } catch (e: any) {
+      console.log(e.message)
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+      throw Error('Error in fetchUserAPI')
+    }
+  }, [toast, user])
+
+  const fetchSelectedRecipe = useCallback(async () => {
+    try {
+      const recipeCol = createCollection('recipes', user)
+      const recipeQuery = query(
+        recipeCol,
+        orderBy('date', 'desc'),
+        where('category', '==', selectedCategory)
+      )
+
+      setIsLoading(true)
+      const queryDateSnapshot = await getDocs(recipeQuery)
+      setIsLoading(false)
+
+      if (queryDateSnapshot.size > 0) {
+        const recipes = queryDateSnapshot.docs.map((doc) => ({
+          name: doc.data().name,
+          category: doc.data().category,
+          date: doc.data().date,
+        })) as RecipeList
+
+        // RecipeListを10個ずつの配列に分割
+        const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
+          const chunkIndex = Math.floor(index / 10)
+          if (!acc[chunkIndex]) {
+            acc[chunkIndex] = []
+          }
+          acc[chunkIndex].push(recipe)
+          return acc
+        }, [])
+
+        setRecipeList(chunkedRecipes)
+      } else {
+        console.log('recipeは未登録です。')
+      }
+    } catch (e: any) {
+      console.log(e.message)
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+      throw Error('Error in fetchUserAPI')
+    }
+  }, [selectedCategory, toast, user])
 
   return {
     isLoading,
+    fetchAllRecipe,
+    recipeList,
+    setSelectedCategory,
+    fetchSelectedRecipe,
   }
 }

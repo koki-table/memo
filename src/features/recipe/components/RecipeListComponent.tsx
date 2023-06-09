@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, useToast, Link, keyframes, HStack } from '@chakra-ui/react'
 import dayjs from 'dayjs'
-import { doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { FC, useEffect, useState } from 'react'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
@@ -10,9 +9,8 @@ import { useNavigate } from 'react-router-dom'
 import gyoza from '@/assets/gyoza.png'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
-import { useAuth } from '@/features/auth'
-import { RecipeList } from '@/types/RecipeList'
-import { createCollection } from '@/utils/database'
+
+import { useRecipe } from '../lib/recipe'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'
@@ -26,10 +24,8 @@ export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
 
-  const { user } = useAuth()
-  const toast = useToast()
+  const { fetchAllRecipe, recipeList } = useRecipe()
 
-  const [recipeList, setRecipeList] = useState<RecipeList[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
 
   console.log(selectedCategory)
@@ -46,49 +42,8 @@ export const RecipeListComponent: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const fetchDb = async () => {
-      try {
-        const recipeCol = createCollection('recipes', user)
-
-        const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
-
-        setIsLoading(true)
-        const queryDateSnapshot = await getDocs(recipeQuery)
-        setIsLoading(false)
-
-        if (queryDateSnapshot.size > 0) {
-          const recipes = queryDateSnapshot.docs.map((doc) => ({
-            name: doc.data().name,
-            category: doc.data().category,
-            date: doc.data().date,
-          })) as RecipeList
-
-          // RecipeListを10個ずつの配列に分割
-          const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
-            const chunkIndex = Math.floor(index / 10)
-            if (!acc[chunkIndex]) {
-              acc[chunkIndex] = []
-            }
-            acc[chunkIndex].push(recipe)
-            return acc
-          }, [])
-
-          setRecipeList(chunkedRecipes)
-        } else {
-          console.log('recipeは未登録です。')
-        }
-      } catch (e: any) {
-        console.log(e.message)
-        toast({
-          title: 'エラーが発生しました。',
-          status: 'error',
-          position: 'top',
-        })
-        throw Error('Error in fetchUserAPI')
-      }
-    }
-    fetchDb()
-  }, [toast, user])
+    fetchAllRecipe()
+  }, [fetchAllRecipe])
 
   if (isLoading) return <Spinner variants="full" />
 
