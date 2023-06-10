@@ -35,7 +35,7 @@ export const RecipeListComponent: FC = () => {
       pt={8}
       pb={8}
       display="flex"
-      justifyContent="center"
+      justifyContent="flex-start"
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
@@ -43,7 +43,7 @@ export const RecipeListComponent: FC = () => {
     >
       <VStack>
         <Heading w="100%" pb="8">
-          レシピリスト 🥘
+          料理リスト 🥘
         </Heading>
         <CategoryListComponent />
         {/* currentPageが1から始まる為、-1している */}

@@ -21,7 +21,7 @@ export const HomeComponent: FC = () => {
     >
       <VStack>
         <LinkItem text={'カレンダー'} path={'/calendar'} />
-        <LinkItem text={'レシピリスト'} path={'/recipe/list'} />
+        <LinkItem text={'料理リスト'} path={'/recipe/list'} />
       </VStack>
       <LoopingBackground source={gyoza} w="120%" h={'50px'} animationDuration={'380s'} />
     </VStack>
