@@ -26,10 +26,6 @@ export const RecipeListComponent: FC = () => {
 
   const { fetchAllRecipe, recipeList } = useRecipe()
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
-
-  console.log(selectedCategory)
-
   const [currentPage, setCurrentPage] = useState(1)
 
   const handlePage = (index: number) => {

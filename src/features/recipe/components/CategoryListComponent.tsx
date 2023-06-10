@@ -1,42 +1,21 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Box, useToast, Link, HStack, Flex } from '@chakra-ui/react'
-import { doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore'
-import { FC, memo, useEffect, useState } from 'react'
+import { Text, VStack, useToast, Flex } from '@chakra-ui/react'
+import { FC, memo, useEffect } from 'react'
 
 import { Tag } from '@/components/Elements/Tag'
 import { useAuth } from '@/features/auth'
-import { db } from '@/utils/database'
+
+import { useRecipe } from '../lib'
 
 export const CategoryListComponent: FC = memo(() => {
   const { user } = useAuth()
   const toast = useToast()
-  const [categoryList, setCategoryList] = useState<string[]>()
+  const { categoryList, fetchCategoryList } = useRecipe()
 
   useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-
-        const queryCategorySnapshot = await getDoc(categoryDoc)
-
-        if (queryCategorySnapshot.exists()) {
-          setCategoryList(queryCategorySnapshot.data()!.categories)
-        } else {
-          console.log('categoryは未登録です。')
-        }
-      } catch (e: any) {
-        console.log(e.message)
-        toast({
-          title: 'エラーが発生しました。',
-          status: 'error',
-          position: 'top',
-        })
-        throw Error('Error in fetchUserAPI')
-      }
-    }
-    fetchCategory()
-  }, [toast, user])
+    fetchCategoryList()
+  }, [fetchCategoryList, toast, user])
 
   return (
     <VStack spacing={4} borderBottom={'2px'} borderColor={'var(--secondary-color-main)'} mb={3}>

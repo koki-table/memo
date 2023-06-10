@@ -1,17 +1,18 @@
 import { useToast } from '@chakra-ui/react'
-import { query, orderBy, getDocs, where } from 'firebase/firestore'
+import { query, orderBy, getDocs, where, doc, getDoc } from 'firebase/firestore'
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
-import { createCollection } from '@/utils/database'
+import { createCollection, db } from '@/utils/database'
 
 export type UseRecipe = {
   isLoading: boolean
   fetchAllRecipe: () => Promise<void>
   recipeList: RecipeList[]
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>
-  fetchSelectedRecipe: () => Promise<void>
+  fetchSelectedRecipe: (selectedCategory: string) => Promise<void>
+  fetchCategoryList: () => Promise<void>
+  categoryList: string[] | undefined
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -39,7 +40,8 @@ const useRecipeProvider = (): UseRecipe => {
   const { user } = useAuth()
 
   const [recipeList, setRecipeList] = useState<RecipeList[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [categoryList, setCategoryList] = useState<string[]>()
+  // const [selectedCategory, setSelectedCategory] = useState<string>('All')
 
   const fetchAllRecipe = useCallback(async () => {
     try {
@@ -82,39 +84,64 @@ const useRecipeProvider = (): UseRecipe => {
     }
   }, [toast, user])
 
-  const fetchSelectedRecipe = useCallback(async () => {
+  const fetchSelectedRecipe = useCallback(
+    async (selectedCategory: string) => {
+      try {
+        const recipeCol = createCollection('recipes', user)
+        const recipeQuery = query(
+          recipeCol,
+          orderBy('date', 'desc'),
+          where('category', '==', selectedCategory)
+        )
+
+        setIsLoading(true)
+        const queryDateSnapshot = await getDocs(recipeQuery)
+        setIsLoading(false)
+
+        if (queryDateSnapshot.size > 0) {
+          const recipes = queryDateSnapshot.docs.map((doc) => ({
+            name: doc.data().name,
+            category: doc.data().category,
+            date: doc.data().date,
+          })) as RecipeList
+
+          // RecipeListを10個ずつの配列に分割
+          const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
+            const chunkIndex = Math.floor(index / 10)
+            if (!acc[chunkIndex]) {
+              acc[chunkIndex] = []
+            }
+            acc[chunkIndex].push(recipe)
+            return acc
+          }, [])
+
+          setRecipeList(chunkedRecipes)
+        } else {
+          console.log('recipeは未登録です。')
+        }
+      } catch (e: any) {
+        console.log(e.message)
+        toast({
+          title: 'エラーが発生しました。',
+          status: 'error',
+          position: 'top',
+        })
+        throw Error('Error in fetchUserAPI')
+      }
+    },
+    [toast, user]
+  )
+
+  const fetchCategoryList = useCallback(async () => {
     try {
-      const recipeCol = createCollection('recipes', user)
-      const recipeQuery = query(
-        recipeCol,
-        orderBy('date', 'desc'),
-        where('category', '==', selectedCategory)
-      )
+      const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
-      setIsLoading(true)
-      const queryDateSnapshot = await getDocs(recipeQuery)
-      setIsLoading(false)
+      const queryCategorySnapshot = await getDoc(categoryDoc)
 
-      if (queryDateSnapshot.size > 0) {
-        const recipes = queryDateSnapshot.docs.map((doc) => ({
-          name: doc.data().name,
-          category: doc.data().category,
-          date: doc.data().date,
-        })) as RecipeList
-
-        // RecipeListを10個ずつの配列に分割
-        const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
-          const chunkIndex = Math.floor(index / 10)
-          if (!acc[chunkIndex]) {
-            acc[chunkIndex] = []
-          }
-          acc[chunkIndex].push(recipe)
-          return acc
-        }, [])
-
-        setRecipeList(chunkedRecipes)
+      if (queryCategorySnapshot.exists()) {
+        setCategoryList(queryCategorySnapshot.data()!.categories)
       } else {
-        console.log('recipeは未登録です。')
+        console.log('categoryは未登録です。')
       }
     } catch (e: any) {
       console.log(e.message)
@@ -125,13 +152,14 @@ const useRecipeProvider = (): UseRecipe => {
       })
       throw Error('Error in fetchUserAPI')
     }
-  }, [selectedCategory, toast, user])
+  }, [toast, user])
 
   return {
     isLoading,
     fetchAllRecipe,
     recipeList,
-    setSelectedCategory,
     fetchSelectedRecipe,
+    categoryList,
+    fetchCategoryList,
   }
 }
