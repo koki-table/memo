@@ -212,6 +212,7 @@ export const RecipeComponent: FC = () => {
     <VStack
       px={'4'}
       pb={8}
+      pt={4}
       display="flex"
       justifyContent="center"
       alignItems="center"

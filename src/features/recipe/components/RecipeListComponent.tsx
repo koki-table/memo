@@ -24,7 +24,7 @@ export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
 
-  const { fetchAllRecipe, recipeList } = useRecipe()
+  const { fetchAllRecipe, recipeList, isLoading } = useRecipe()
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -34,8 +34,6 @@ export const RecipeListComponent: FC = () => {
 
   // recipeListが10個のオブジェクトを1つの配列に詰めているので、10倍にする
   const totalCount = recipeList?.length * 10
-
-  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     fetchAllRecipe()
