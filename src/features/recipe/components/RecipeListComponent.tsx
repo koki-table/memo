@@ -43,7 +43,7 @@ export const RecipeListComponent: FC = () => {
     >
       <VStack>
         <Heading w="100%" pb="8">
-          レシピリスト 🥘
+          料理リスト 🥘
         </Heading>
         <CategoryListComponent />
         {/* currentPageが1から始まる為、-1している */}
