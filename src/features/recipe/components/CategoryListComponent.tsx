@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, useToast, Flex } from '@chakra-ui/react'
-import { FC, memo, useEffect } from 'react'
+import { Text, VStack, Flex, Link } from '@chakra-ui/react'
+import { FC, memo, useEffect, useState } from 'react'
 
 import { Tag } from '@/components/Elements/Tag'
-import { useAuth } from '@/features/auth'
 
 import { useRecipe } from '../lib'
 
 export const CategoryListComponent: FC = memo(() => {
-  const { user } = useAuth()
-  const toast = useToast()
-  const { categoryList, fetchCategoryList } = useRecipe()
+  const { categoryList, fetchCategoryList, fetchSelectedRecipe, fetchAllRecipe, selectedCategory } =
+    useRecipe()
 
   useEffect(() => {
     fetchCategoryList()
-  }, [fetchCategoryList, toast, user])
+  }, [fetchCategoryList])
 
   return (
     <VStack spacing={4} borderBottom={'2px'} borderColor={'var(--secondary-color-main)'} mb={3}>
@@ -23,10 +21,31 @@ export const CategoryListComponent: FC = memo(() => {
         カテゴリ
       </Text>
       <Flex flexWrap={'wrap'}>
-        {categoryList?.map((category, index) => (
-          <Tag key={index} mb={3} mr={2} px={4} py={2}>
-            <Text fontSize={'xs'}>{category}</Text>
+        <Link mb={3} mr={2} onClick={async () => await fetchAllRecipe()}>
+          <Tag px={4} py={2} backgroundColor={selectedCategory === 'All' ? 'var(--black)' : 'none'}>
+            <Text
+              fontSize={'xs'}
+              color={selectedCategory === 'All' ? 'var(--white)' : 'var(--black)'}
+            >
+              All
+            </Text>
           </Tag>
+        </Link>
+        {categoryList?.map((category, index) => (
+          <Link key={index} mb={3} mr={2} onClick={async () => await fetchSelectedRecipe(category)}>
+            <Tag
+              px={4}
+              py={2}
+              backgroundColor={selectedCategory === category ? 'var(--black)' : 'none'}
+            >
+              <Text
+                fontSize={'xs'}
+                color={selectedCategory === category ? 'var(--white)' : 'var(--black)'}
+              >
+                {category}
+              </Text>
+            </Tag>
+          </Link>
         ))}
       </Flex>
     </VStack>
