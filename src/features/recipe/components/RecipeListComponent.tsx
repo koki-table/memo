@@ -8,17 +8,13 @@ import { useNavigate } from 'react-router-dom'
 
 import gyoza from '@/assets/gyoza.png'
 import { Heading, Spinner } from '@/components/Elements'
+import { LoopingBackground } from '@/components/Elements/Animation/Loop'
 import { Tag } from '@/components/Elements/Tag'
 
 import { useRecipe } from '../lib/recipe'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'
-
-const bgLoop = keyframes`
-  from { background-position: 0 0; }
-to { background-position: -6300px 0; }
-`
 
 export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
@@ -47,15 +43,7 @@ export const RecipeListComponent: FC = () => {
       minH={`calc(100vh - 69px)`}
     >
       <VStack>
-        <Box
-          backgroundImage={gyoza}
-          w={'120%'}
-          h={'160px'}
-          backgroundPosition="0 0"
-          backgroundSize={'auto 100%'}
-          backgroundRepeat={'repeat-x'}
-          animation={`${bgLoop} 180s linear infinite`}
-        />
+        <LoopingBackground source={gyoza} w="120%" h={'160px'} />
         <Heading w="100%" pb="8">
           レシピリスト 🥘
         </Heading>
