@@ -212,12 +212,13 @@ export const RecipeComponent: FC = () => {
     <VStack
       px={'4'}
       pb={8}
+      pt={4}
       display="flex"
       justifyContent="center"
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
-      minH={`calc(100vh - 93px)`}
+      minH={`calc(100vh - 69px)`}
     >
       <chakra.form onSubmit={handleSubmit(onSubmit)}>
         <VStack spacing={6}>

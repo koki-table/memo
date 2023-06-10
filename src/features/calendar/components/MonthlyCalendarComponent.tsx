@@ -72,7 +72,7 @@ export const MonthlyCalendarComponent = () => {
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
-      minH={`calc(100vh - 93px)`}
+      minH={`calc(100vh - 69px)`}
     >
       <CalendarHeader />
       <Flex flexWrap="wrap" justifyContent="center" position="absolute" top="140px">
