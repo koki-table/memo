@@ -16,7 +16,7 @@ export const CategoryListComponent: FC = memo(() => {
   }, [fetchCategoryList])
 
   return (
-    <VStack spacing={4} borderBottom={'2px'} borderColor={'var(--secondary-color-main)'} mb={3}>
+    <VStack spacing={4} borderBottom={'2px'} borderColor={'var(--line-color-main)'} pb={3} mb={2}>
       <Text fontSize={'xs'} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
         カテゴリ
       </Text>
@@ -25,7 +25,7 @@ export const CategoryListComponent: FC = memo(() => {
           <Tag px={4} py={2} backgroundColor={selectedCategory === 'All' ? 'var(--black)' : 'none'}>
             <Text
               fontSize={'xs'}
-              color={selectedCategory === 'All' ? 'var(--white)' : 'var(--black)'}
+              color={selectedCategory === 'All' ? 'var(--white)' : 'var(--text-color-main)'}
             >
               All
             </Text>
@@ -40,7 +40,7 @@ export const CategoryListComponent: FC = memo(() => {
             >
               <Text
                 fontSize={'xs'}
-                color={selectedCategory === category ? 'var(--white)' : 'var(--black)'}
+                color={selectedCategory === category ? 'var(--white)' : 'var(--text-color-main)'}
               >
                 {category}
               </Text>

@@ -14,6 +14,8 @@ export type UseRecipe = {
   fetchCategoryList: () => Promise<void>
   categoryList: string[] | undefined
   selectedCategory: string
+  currentPage: number
+  handlePage: (index: number) => void
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -42,6 +44,7 @@ const useRecipeProvider = (): UseRecipe => {
   const [recipeList, setRecipeList] = useState<RecipeList[]>([])
   const [categoryList, setCategoryList] = useState<string[]>()
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const fetchAllRecipe = useCallback(async () => {
     try {
@@ -71,6 +74,7 @@ const useRecipeProvider = (): UseRecipe => {
 
         setRecipeList(chunkedRecipes)
         setSelectedCategory('All')
+        setCurrentPage(1)
       } else {
         console.log('recipeは未登録です。')
       }
@@ -118,6 +122,7 @@ const useRecipeProvider = (): UseRecipe => {
 
           setRecipeList(chunkedRecipes)
           setSelectedCategory(selectedValue)
+          setCurrentPage(1)
         } else {
           console.log('recipeは未登録です。')
         }
@@ -156,6 +161,10 @@ const useRecipeProvider = (): UseRecipe => {
     }
   }, [toast, user])
 
+  const handlePage = useCallback((index: number) => {
+    setCurrentPage(index)
+  }, [])
+
   return {
     isLoading,
     fetchAllRecipe,
@@ -164,5 +173,7 @@ const useRecipeProvider = (): UseRecipe => {
     categoryList,
     fetchCategoryList,
     selectedCategory,
+    currentPage,
+    handlePage,
   }
 }

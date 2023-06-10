@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, useToast, Link, keyframes, HStack } from '@chakra-ui/react'
 import dayjs from 'dayjs'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
 
@@ -24,13 +24,7 @@ export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
 
-  const { fetchAllRecipe, recipeList, isLoading } = useRecipe()
-
-  const [currentPage, setCurrentPage] = useState(1)
-
-  const handlePage = (index: number) => {
-    setCurrentPage(index)
-  }
+  const { fetchAllRecipe, recipeList, isLoading, handlePage, currentPage } = useRecipe()
 
   // recipeListが10個のオブジェクトを1つの配列に詰めているので、10倍にする
   const totalCount = recipeList?.length * 10
@@ -67,35 +61,37 @@ export const RecipeListComponent: FC = () => {
         </Heading>
         <CategoryListComponent />
         {/* currentPageが1から始まる為、-1している */}
-        {recipeList[currentPage - 1]?.map((recipe, index) => (
-          <Link
-            key={index}
-            onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
-          >
-            <HStack
-              width={viewWidth}
-              pt="6"
-              pb="6"
-              borderBottom={'1px'}
-              borderColor={'var(--line-color-main)'}
-              justifyContent={'space-between'}
+        <Box pt={5}>
+          {recipeList[currentPage - 1]?.map((recipe, index) => (
+            <Link
+              key={index}
+              onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
             >
-              <VStack alignItems={'flex-start'} spacing={2}>
-                <Text fontSize={'md'} pl={2} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
-                  {recipe.name}
-                </Text>
-                <Box pl="2">
-                  <Tag>
-                    <Text fontSize={'xs'}>{recipe.category}</Text>
-                  </Tag>
+              <HStack
+                width={viewWidth}
+                pt="6"
+                pb="6"
+                borderBottom={'1px'}
+                borderColor={'var(--line-color-main)'}
+                justifyContent={'space-between'}
+              >
+                <VStack alignItems={'flex-start'} spacing={2}>
+                  <Text fontSize={'md'} pl={2} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
+                    {recipe.name}
+                  </Text>
+                  <Box pl="2">
+                    <Tag>
+                      <Text fontSize={'xs'}>{recipe.category}</Text>
+                    </Tag>
+                  </Box>
+                </VStack>
+                <Box pr={3}>
+                  <BsArrowRightShort size={23} />
                 </Box>
-              </VStack>
-              <Box pr={3}>
-                <BsArrowRightShort size={23} />
-              </Box>
-            </HStack>
-          </Link>
-        ))}
+              </HStack>
+            </Link>
+          ))}
+        </Box>
       </VStack>
       <PaginationComponent
         totalCount={totalCount}
