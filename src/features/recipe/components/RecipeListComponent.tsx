@@ -35,7 +35,7 @@ export const RecipeListComponent: FC = () => {
       pt={8}
       pb={8}
       display="flex"
-      justifyContent="center"
+      justifyContent="flex-start"
       alignItems="center"
       maxW={['100%', '400px']}
       margin="0 auto"
