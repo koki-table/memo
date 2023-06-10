@@ -6,9 +6,7 @@ import { FC, useEffect } from 'react'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
 
-import gyoza from '@/assets/gyoza.png'
 import { Heading, Spinner } from '@/components/Elements'
-import { LoopingBackground } from '@/components/Elements/Animation/Loop'
 import { Tag } from '@/components/Elements/Tag'
 
 import { useRecipe } from '../lib/recipe'
@@ -34,6 +32,7 @@ export const RecipeListComponent: FC = () => {
   return (
     <VStack
       px={'4'}
+      pt={8}
       pb={8}
       display="flex"
       justifyContent="center"
@@ -43,7 +42,6 @@ export const RecipeListComponent: FC = () => {
       minH={`calc(100vh - 69px)`}
     >
       <VStack>
-        <LoopingBackground source={gyoza} w="120%" h={'160px'} />
         <Heading w="100%" pb="8">
           レシピリスト 🥘
         </Heading>
