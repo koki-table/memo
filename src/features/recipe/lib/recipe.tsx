@@ -34,14 +34,12 @@ export const RecipeProvider: FC<{ children: ReactNode }> = ({ children }: Props)
 }
 
 const useRecipeProvider = (): UseRecipe => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
   const { user } = useAuth()
 
   const [recipeList, setRecipeList] = useState<RecipeList[]>([])
   const [categoryList, setCategoryList] = useState<string[]>()
-  // const [selectedCategory, setSelectedCategory] = useState<string>('All')
 
   const fetchAllRecipe = useCallback(async () => {
     try {
