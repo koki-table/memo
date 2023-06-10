@@ -16,11 +16,18 @@ export const CategoryListComponent: FC = memo(() => {
   }, [fetchCategoryList])
 
   return (
-    <VStack spacing={4} borderBottom={'2px'} borderColor={'var(--line-color-main)'} pb={3} mb={2}>
+    <VStack
+      w={'100%'}
+      spacing={4}
+      borderBottom={'2px'}
+      borderColor={'var(--line-color-main)'}
+      pb={3}
+      mb={2}
+    >
       <Text fontSize={'xs'} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
         カテゴリ
       </Text>
-      <Flex flexWrap={'wrap'}>
+      <Flex flexWrap={'wrap'} w={'100%'}>
         <Link mb={3} mr={2} onClick={async () => await fetchAllRecipe()}>
           <Tag px={4} py={2} backgroundColor={selectedCategory === 'All' ? 'var(--black)' : 'none'}>
             <Text
