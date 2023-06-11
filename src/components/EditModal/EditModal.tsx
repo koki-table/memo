@@ -26,6 +26,7 @@ type EditModalProps = {
   register: UseFormRegister<FieldValues>
   title: string
   buttonText: string
+  inputName: string[]
 }
 
 export const EditModal: FC<EditModalProps> = ({
@@ -39,6 +40,7 @@ export const EditModal: FC<EditModalProps> = ({
   register,
   title,
   buttonText,
+  inputName,
 }) => {
   return (
     <Modal
@@ -62,17 +64,17 @@ export const EditModal: FC<EditModalProps> = ({
             <Stack spacing={6}>
               {fields.map((field, index) => {
                 return (
-                  <FormControl key={index} isInvalid={Boolean(errors?.[field])}>
+                  <FormControl key={index} isInvalid={Boolean(errors?.[inputName[index]])}>
                     <VStack w="100%" alignItems={'flex-start'}>
                       <Input
-                        {...register(field)}
-                        name={field}
+                        {...register(inputName[index])}
+                        name={inputName[index]}
                         placeholder={field}
                         isDisabled={isSubmitting}
                       />
-                      {errors?.[field] && (
+                      {errors?.[inputName[index]] && (
                         <Text fontSize={'xs'} pl={2}>
-                          {errors?.[field].message}
+                          {errors?.[inputName[index]].message}
                         </Text>
                       )}
                     </VStack>

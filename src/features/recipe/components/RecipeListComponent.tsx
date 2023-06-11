@@ -3,10 +3,11 @@
 import { Text, VStack, Box, Link, HStack, useDisclosure } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
+import { l } from 'vitest/dist/index-220c1d70'
 import { z } from 'zod'
 
 import { EditModal } from '@/components/EditModal'
@@ -36,7 +37,15 @@ export const RecipeListComponent: FC = () => {
     fetchAllRecipe()
   }, [fetchAllRecipe])
 
-  const fields = ['category']
+  const [updatingCategory, setUpdatingCategory] = useState<string>('')
+  console.log(updatingCategory)
+
+  const fields = [updatingCategory]
+
+  const handleOpenModal = async (category: string) => {
+    setUpdatingCategory(category)
+    onOpen()
+  }
 
   const {
     handleSubmit,
@@ -79,13 +88,14 @@ export const RecipeListComponent: FC = () => {
           isSubmitting={isSubmitting}
           fields={fields}
           register={register}
-          title={'カテゴリー編集'}
+          title={'カテゴリ編集'}
           buttonText={'更新'}
+          inputName={['category']}
         />
         <Heading w="100%" pb="8">
           料理リスト 🥘
         </Heading>
-        <CategoryListComponent onClick={onOpen} />
+        <CategoryListComponent onClick={handleOpenModal} />
         {/* currentPageが1から始まる為、-1している */}
         <Box pt={5}>
           {recipeList[currentPage - 1]?.map((recipe, index) => (

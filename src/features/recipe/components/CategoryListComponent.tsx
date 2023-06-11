@@ -10,7 +10,7 @@ import { useRecipe } from '../lib'
 import { TagPicker } from './TagPicker'
 
 type CategoryListComponentProps = {
-  onClick?: () => void
+  onClick?: (categoryName: string) => void
 }
 
 export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props) => {
