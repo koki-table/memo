@@ -9,12 +9,12 @@ import { Tag } from '@/components/Elements/Tag'
 import { useRecipe } from '../lib'
 
 type TagPickerProps = {
-  category: string
+  title: string
   hasBadge?: boolean
 }
 
 export const TagPicker: FC<TagPickerProps> = memo((props) => {
-  const { category, hasBadge } = props
+  const { title, hasBadge } = props
 
   const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipe()
 
@@ -22,17 +22,17 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
     <>
       {hasBadge ? (
         <Badge type={'icon'}>
-          <Link onClick={async () => await fetchSelectedRecipe(category)}>
+          <Link onClick={async () => await fetchSelectedRecipe(title)}>
             <Tag
               px={4}
               py={2}
-              backgroundColor={selectedCategory === category ? 'var(--black)' : 'none'}
+              backgroundColor={selectedCategory === title ? 'var(--black)' : 'none'}
             >
               <Text
                 fontSize={'xs'}
-                color={selectedCategory === category ? 'var(--white)' : 'var(--text-color-main)'}
+                color={selectedCategory === title ? 'var(--white)' : 'var(--text-color-main)'}
               >
-                {category}
+                {title}
               </Text>
             </Tag>
           </Link>
@@ -40,19 +40,15 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
       ) : (
         <Link
           onClick={async () =>
-            category === 'All' ? await fetchAllRecipe() : await fetchSelectedRecipe(category)
+            title === 'All' ? await fetchAllRecipe() : await fetchSelectedRecipe(title)
           }
         >
-          <Tag
-            px={4}
-            py={2}
-            backgroundColor={selectedCategory === category ? 'var(--black)' : 'none'}
-          >
+          <Tag px={4} py={2} backgroundColor={selectedCategory === title ? 'var(--black)' : 'none'}>
             <Text
               fontSize={'xs'}
-              color={selectedCategory === category ? 'var(--white)' : 'var(--text-color-main)'}
+              color={selectedCategory === title ? 'var(--white)' : 'var(--text-color-main)'}
             >
-              {category}
+              {title}
             </Text>
           </Tag>
         </Link>

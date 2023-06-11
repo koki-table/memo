@@ -57,9 +57,9 @@ export const CategoryListComponent: FC = memo(() => {
         {modifiedCategoryList?.map((category, index) => (
           <Box key={index} mb={3} mr={2}>
             {isEditing ? (
-              <TagPicker hasBadge={true} category={category} />
+              <TagPicker hasBadge={true} title={category} />
             ) : (
-              <TagPicker hasBadge={false} category={category} />
+              <TagPicker hasBadge={false} title={category} />
             )}
           </Box>
         ))}
