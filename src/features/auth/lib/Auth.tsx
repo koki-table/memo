@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signInWithEmailAndPassword,
+  signInWithPopup,
 } from 'firebase/auth'
 import {
   createContext,
@@ -17,6 +18,8 @@ import {
   FormEvent,
   useCallback,
 } from 'react'
+
+import { provider } from '@/main'
 
 export type AuthResponse = {
   success: boolean
@@ -33,6 +36,10 @@ export type UseAuth = {
   setEmail: (email: string) => void
   password: string
   setPassword: (password: string) => void
+  signInWithGoogle: () => Promise<{
+    success: boolean
+    message: string
+  }>
 }
 
 const authContext = createContext<UseAuth | undefined>(undefined)
@@ -161,5 +168,43 @@ const useAuthProvider = (): UseAuth => {
     }
   }, [toast])
 
-  return { user, isLoading, email, password, setEmail, setPassword, signUp, signIn, signOut }
+  const signInWithGoogle = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const auth = getAuth()
+      await signInWithPopup(auth, provider)
+      toast({
+        title: 'ログインしました。',
+        status: 'success',
+        position: 'top',
+      })
+      return { success: true, message: '' }
+      // TODO: ログイン後のページに遷移の処理を書く
+    } catch (e) {
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+      if (e instanceof FirebaseError) {
+        console.log(e)
+      }
+      return { success: true, message: 'エラーが発生しました' }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [toast])
+
+  return {
+    user,
+    isLoading,
+    email,
+    password,
+    setEmail,
+    setPassword,
+    signUp,
+    signIn,
+    signOut,
+    signInWithGoogle,
+  }
 }

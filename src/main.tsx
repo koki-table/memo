@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { GoogleAuthProvider } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -20,6 +21,8 @@ const app = initializeApp(firebaseConfig)
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const storage = getStorage(app)
+
+export const provider = new GoogleAuthProvider()
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
