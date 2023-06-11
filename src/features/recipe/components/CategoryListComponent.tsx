@@ -18,7 +18,7 @@ export const CategoryListComponent: FC = memo(() => {
 
   const [isEditing, setIsEditing] = useState(false)
 
-  const modifiedCategoryList = ['All', ...categoryList!] as const
+  const modifiedCategoryList = ['All', ...(categoryList ?? [])] as const
 
   return (
     <VStack
