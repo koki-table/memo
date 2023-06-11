@@ -11,10 +11,11 @@ import { useRecipe } from '../lib'
 type TagPickerProps = {
   title: string
   hasBadge?: boolean
+  onClick?: () => void
 }
 
 export const TagPicker: FC<TagPickerProps> = memo((props) => {
-  const { title, hasBadge } = props
+  const { title, hasBadge, onClick } = props
 
   const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipe()
 
@@ -22,7 +23,7 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
     <>
       {hasBadge ? (
         <Badge type={'icon'}>
-          <Link onClick={async () => await fetchSelectedRecipe(title)}>
+          <Link onClick={onClick}>
             <Tag
               px={4}
               py={2}

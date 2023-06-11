@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Flex, Link, Box } from '@chakra-ui/react'
+import { Text, VStack, Flex, Link, Box, useDisclosure } from '@chakra-ui/react'
 import { FC, memo, useEffect, useState } from 'react'
 
 import { Modal } from '@/components/Modal'
@@ -9,8 +9,15 @@ import { useRecipe } from '../lib'
 
 import { TagPicker } from './TagPicker'
 
-export const CategoryListComponent: FC = memo(() => {
+type CategoryListComponentProps = {
+  onClick?: () => void
+}
+
+export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props) => {
+  const { onClick } = props
   const { categoryList, fetchCategoryList } = useRecipe()
+
+  // const { onOpen } = useDisclosure()
 
   useEffect(() => {
     fetchCategoryList()
@@ -57,7 +64,7 @@ export const CategoryListComponent: FC = memo(() => {
         {modifiedCategoryList?.map((category, index) => (
           <Box key={index} mb={3} mr={2}>
             {isEditing ? (
-              <TagPicker hasBadge={true} title={category} />
+              <TagPicker hasBadge={true} title={category} onClick={onClick} />
             ) : (
               <TagPicker hasBadge={false} title={category} />
             )}
