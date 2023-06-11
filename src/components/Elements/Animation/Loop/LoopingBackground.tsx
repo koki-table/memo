@@ -7,10 +7,11 @@ export type LoopingBackgroundProps = {
   h: string | number
   animationDuration?: string
   backgroundPosition?: string
+  zIndex?: string | number
 }
 
 export const LoopingBackground: FC<LoopingBackgroundProps> = memo(
-  ({ source, w, h, animationDuration = '180s', backgroundPosition = '-6300px 0' }) => {
+  ({ source, w, h, animationDuration = '180s', backgroundPosition = '-6300px 0', zIndex }) => {
     const loop = keyframes`
     from { background-position: 0 0; }
   to { background-position: ${backgroundPosition}; }
@@ -24,6 +25,7 @@ export const LoopingBackground: FC<LoopingBackgroundProps> = memo(
         backgroundSize={'auto 100%'}
         backgroundRepeat={'repeat-x'}
         animation={`${loop} ${animationDuration} linear infinite`}
+        zIndex={zIndex}
       />
     )
   }

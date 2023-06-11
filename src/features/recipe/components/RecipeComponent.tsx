@@ -302,7 +302,7 @@ export const RecipeComponent: FC = () => {
           </Box>
           <Button type={'submit'} isLoading={isLoadingButton}>
             <Text fontSize={'sm'} fontWeight="700">
-              保存
+              登録
             </Text>
           </Button>
         </VStack>
