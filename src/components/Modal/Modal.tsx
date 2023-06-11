@@ -35,9 +35,9 @@ export const Modal: FC<ModalProps> = (props) => {
   return (
     <ChakraModal onClose={props.onClose} isOpen={props.isOpen} isCentered>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent mx={4} py={8}>
         <VStack>
-          <ModalHeader>{header}</ModalHeader>
+          <ModalHeader pt={0}>{header}</ModalHeader>
           <ModalBody>{body}</ModalBody>
         </VStack>
       </ModalContent>

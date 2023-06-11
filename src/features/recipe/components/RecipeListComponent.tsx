@@ -1,19 +1,27 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, Link, HStack, useDisclosure } from '@chakra-ui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
+import { l } from 'vitest/dist/index-220c1d70'
+import { z } from 'zod'
 
+import { EditModal } from '@/components/EditModal'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
-import { Modal } from '@/components/Modal'
 
 import { useRecipe } from '../lib/recipe'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'
+
+const schema = z.object({
+  category: z.string().min(1, 'カテゴリー名は必須です'),
+})
 
 export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
@@ -28,6 +36,28 @@ export const RecipeListComponent: FC = () => {
   useEffect(() => {
     fetchAllRecipe()
   }, [fetchAllRecipe])
+
+  const [updatingCategory, setUpdatingCategory] = useState<string>('')
+
+  const handleOpenModal = async (category: string) => {
+    setUpdatingCategory(category)
+    onOpen()
+  }
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+  })
+
+  const submitHandler = handleSubmit(async (data) => {
+    console.log('FORM SUBMIT DATA = ', data)
+    alert(JSON.stringify(data))
+    onClose()
+  })
 
   if (isLoading) return <Spinner variants="full" />
 
@@ -44,19 +74,23 @@ export const RecipeListComponent: FC = () => {
       minH={`calc(100vh - 69px)`}
     >
       <VStack>
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <p>Modal Title</p>
-          <div>
-            <p>Modal Content</p>
-            <p>Modal Content</p>
-            <p>Modal Content</p>
-            <p>Modal Content</p>
-          </div>
-        </Modal>
+        <EditModal
+          isOpen={isOpen}
+          submitHandler={submitHandler}
+          onClose={onClose}
+          reset={reset}
+          errors={errors}
+          isSubmitting={isSubmitting}
+          fields={[updatingCategory]}
+          register={register}
+          title={'カテゴリ編集'}
+          buttonText={'更新'}
+          inputName={['category']}
+        />
         <Heading w="100%" pb="8">
           料理リスト 🥘
         </Heading>
-        <CategoryListComponent onClick={onOpen} />
+        <CategoryListComponent onClick={handleOpenModal} />
         {/* currentPageが1から始まる為、-1している */}
         <Box pt={5}>
           {recipeList[currentPage - 1]?.map((recipe, index) => (
