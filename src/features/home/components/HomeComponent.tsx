@@ -27,7 +27,7 @@ export const HomeComponent: FC = () => {
         opacity={0.2}
         w={'100%'}
         h={'100%'}
-        zIndex={1}
+        zIndex={0}
       />
       <VStack zIndex={2}>
         <LinkItem text={'カレンダー'} path={'/calendar'} />
