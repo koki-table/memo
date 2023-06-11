@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, Link } from '@chakra-ui/react'
+import { Text, Link, Box } from '@chakra-ui/react'
 import { FC, memo } from 'react'
 
 import { Badge } from '@/components/Elements/Badge'
@@ -20,8 +20,8 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
   const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipe()
 
   return (
-    <>
-      {hasBadge ? (
+    <Box mb={hasBadge && title === 'All' ? 0 : 3} mr={hasBadge && title === 'All' ? 0 : 2}>
+      {hasBadge && title !== 'All' ? (
         <Badge type={'icon'}>
           <Link onClick={() => onClick!(title)}>
             <Tag
@@ -43,6 +43,7 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
           onClick={async () =>
             title === 'All' ? await fetchAllRecipe() : await fetchSelectedRecipe(title)
           }
+          display={hasBadge && title === 'All' ? 'none' : 'block'}
         >
           <Tag px={4} py={2} backgroundColor={selectedCategory === title ? 'var(--black)' : 'none'}>
             <Text
@@ -54,7 +55,7 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
           </Tag>
         </Link>
       )}
-    </>
+    </Box>
   )
 })
 

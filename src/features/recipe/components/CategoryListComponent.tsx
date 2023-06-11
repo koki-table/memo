@@ -30,7 +30,7 @@ export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props
       w={'100%'}
       spacing={4}
       borderBottom={'2px'}
-      borderColor={'var(--line-color-main)'}
+      borderColor={isEditing ? 'var(--secondary-color-main)' : 'var(--line-color-main)'}
       pb={3}
       mb={2}
     >
@@ -39,7 +39,9 @@ export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props
           カテゴリ
         </Text>
         <Link
-          borderBottomColor={'var(--secondary-color-main)'}
+          borderBottomColor={
+            isEditing ? 'var(--primary-color-main)' : 'var(--secondary-color-main)'
+          }
           borderBottomWidth={2}
           pr={2}
           pl={2}
@@ -60,7 +62,7 @@ export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props
       </Flex>
       <Flex flexWrap={'wrap'} w={'100%'}>
         {modifiedCategoryList?.map((category, index) => (
-          <Box key={index} mb={3} mr={2}>
+          <Box key={index}>
             {isEditing ? (
               <TagPicker hasBadge={true} title={category} onClick={onClick} />
             ) : (
