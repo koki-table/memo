@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Box, useToast, Link, keyframes, HStack } from '@chakra-ui/react'
+import { Text, VStack, Box, Link, HStack, useDisclosure } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import { FC, useEffect } from 'react'
 import { BsArrowRightShort } from 'react-icons/bs'
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
+import { Modal } from '@/components/Modal'
 
 import { useRecipe } from '../lib/recipe'
 
@@ -17,6 +18,7 @@ import { PaginationComponent } from './PaginationComponent'
 export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
+  const { onOpen, onClose, isOpen } = useDisclosure()
 
   const { fetchAllRecipe, recipeList, isLoading, handlePage, currentPage } = useRecipe()
 
@@ -42,10 +44,19 @@ export const RecipeListComponent: FC = () => {
       minH={`calc(100vh - 69px)`}
     >
       <VStack>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <p>Modal Title</p>
+          <div>
+            <p>Modal Content</p>
+            <p>Modal Content</p>
+            <p>Modal Content</p>
+            <p>Modal Content</p>
+          </div>
+        </Modal>
         <Heading w="100%" pb="8">
           料理リスト 🥘
         </Heading>
-        <CategoryListComponent />
+        <CategoryListComponent onClick={onOpen} />
         {/* currentPageが1から始まる為、-1している */}
         <Box pt={5}>
           {recipeList[currentPage - 1]?.map((recipe, index) => (

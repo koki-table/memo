@@ -1,20 +1,31 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Flex, Link } from '@chakra-ui/react'
+import { Text, VStack, Flex, Link, Box, useDisclosure } from '@chakra-ui/react'
 import { FC, memo, useEffect, useState } from 'react'
 
-import { Tag } from '@/components/Elements/Tag'
 import { Modal } from '@/components/Modal'
 
 import { useRecipe } from '../lib'
 
-export const CategoryListComponent: FC = memo(() => {
-  const { categoryList, fetchCategoryList, fetchSelectedRecipe, fetchAllRecipe, selectedCategory } =
-    useRecipe()
+import { TagPicker } from './TagPicker'
+
+type CategoryListComponentProps = {
+  onClick?: () => void
+}
+
+export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props) => {
+  const { onClick } = props
+  const { categoryList, fetchCategoryList } = useRecipe()
+
+  // const { onOpen } = useDisclosure()
 
   useEffect(() => {
     fetchCategoryList()
   }, [fetchCategoryList])
+
+  const [isEditing, setIsEditing] = useState(false)
+
+  const modifiedCategoryList = ['All', ...(categoryList ?? [])] as const
 
   return (
     <VStack
@@ -29,43 +40,35 @@ export const CategoryListComponent: FC = memo(() => {
         <Text fontSize={'xs'} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
           カテゴリ
         </Text>
-        <Link borderBottomColor={'var(--secondary-color-main)'} borderBottomWidth={2} pr={2} pl={2}>
+        <Link
+          borderBottomColor={'var(--secondary-color-main)'}
+          borderBottomWidth={2}
+          pr={2}
+          pl={2}
+          onClick={() => setIsEditing(!isEditing)}
+          _hover={{
+            textDecoration: 'none',
+          }}
+        >
           <Text
             fontSize={'xs'}
             color={'var(--text-color-sub)'}
             fontWeight={'semibold'}
             whiteSpace={'nowrap'}
           >
-            編集
+            {isEditing ? '完了' : '編集'}
           </Text>
         </Link>
       </Flex>
       <Flex flexWrap={'wrap'} w={'100%'}>
-        <Link mb={3} mr={2} onClick={async () => await fetchAllRecipe()}>
-          <Tag px={4} py={2} backgroundColor={selectedCategory === 'All' ? 'var(--black)' : 'none'}>
-            <Text
-              fontSize={'xs'}
-              color={selectedCategory === 'All' ? 'var(--white)' : 'var(--text-color-main)'}
-            >
-              All
-            </Text>
-          </Tag>
-        </Link>
-        {categoryList?.map((category, index) => (
-          <Link key={index} mb={3} mr={2} onClick={async () => await fetchSelectedRecipe(category)}>
-            <Tag
-              px={4}
-              py={2}
-              backgroundColor={selectedCategory === category ? 'var(--black)' : 'none'}
-            >
-              <Text
-                fontSize={'xs'}
-                color={selectedCategory === category ? 'var(--white)' : 'var(--text-color-main)'}
-              >
-                {category}
-              </Text>
-            </Tag>
-          </Link>
+        {modifiedCategoryList?.map((category, index) => (
+          <Box key={index} mb={3} mr={2}>
+            {isEditing ? (
+              <TagPicker hasBadge={true} title={category} onClick={onClick} />
+            ) : (
+              <TagPicker hasBadge={false} title={category} />
+            )}
+          </Box>
         ))}
       </Flex>
     </VStack>
