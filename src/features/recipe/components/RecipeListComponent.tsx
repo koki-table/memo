@@ -38,9 +38,6 @@ export const RecipeListComponent: FC = () => {
   }, [fetchAllRecipe])
 
   const [updatingCategory, setUpdatingCategory] = useState<string>('')
-  console.log(updatingCategory)
-
-  const fields = [updatingCategory]
 
   const handleOpenModal = async (category: string) => {
     setUpdatingCategory(category)
@@ -55,8 +52,6 @@ export const RecipeListComponent: FC = () => {
   } = useForm({
     resolver: zodResolver(schema),
   })
-
-  console.log(errors)
 
   const submitHandler = handleSubmit(async (data) => {
     console.log('FORM SUBMIT DATA = ', data)
@@ -86,7 +81,7 @@ export const RecipeListComponent: FC = () => {
           reset={reset}
           errors={errors}
           isSubmitting={isSubmitting}
-          fields={fields}
+          fields={[updatingCategory]}
           register={register}
           title={'カテゴリ編集'}
           buttonText={'更新'}
