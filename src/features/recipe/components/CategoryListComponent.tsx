@@ -17,8 +17,6 @@ export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props
   const { onClick } = props
   const { categoryList, fetchCategoryList } = useRecipe()
 
-  // const { onOpen } = useDisclosure()
-
   useEffect(() => {
     fetchCategoryList()
   }, [fetchCategoryList])

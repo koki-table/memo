@@ -1,5 +1,5 @@
 import { useToast } from '@chakra-ui/react'
-import { query, orderBy, getDocs, where, doc, getDoc } from 'firebase/firestore'
+import { query, orderBy, getDocs, where, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
@@ -16,6 +16,7 @@ export type UseRecipe = {
   selectedCategory: string
   currentPage: number
   handlePage: (index: number) => void
+  updateRecipeCategory: (prevCategoryValue: string, newCategoryValue: string) => Promise<void>
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -165,6 +166,28 @@ const useRecipeProvider = (): UseRecipe => {
     setCurrentPage(index)
   }, [])
 
+  const updateRecipeCategory = async (prevCategoryValue: string, newCategoryValue: string) => {
+    try {
+      const recipeCol = createCollection('recipes', user)
+      const categoryQuery = query(recipeCol, where('category', '==', prevCategoryValue))
+
+      const querySnapshot = await getDocs(categoryQuery)
+
+      querySnapshot.forEach((query) => {
+        const docRef = doc(recipeCol, query.id)
+        updateDoc(docRef, { category: newCategoryValue })
+      })
+    } catch (e: any) {
+      console.log(e.message)
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+      throw Error('Error in updateRecipeCategory')
+    }
+  }
+
   return {
     isLoading,
     fetchAllRecipe,
@@ -175,5 +198,6 @@ const useRecipeProvider = (): UseRecipe => {
     selectedCategory,
     currentPage,
     handlePage,
+    updateRecipeCategory,
   }
 }
