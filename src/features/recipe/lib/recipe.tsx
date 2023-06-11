@@ -1,5 +1,5 @@
 import { useToast } from '@chakra-ui/react'
-import { query, orderBy, getDocs, where, doc, getDoc } from 'firebase/firestore'
+import { query, orderBy, getDocs, where, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
@@ -16,6 +16,8 @@ export type UseRecipe = {
   selectedCategory: string
   currentPage: number
   handlePage: (index: number) => void
+  updateRecipeCategories: (prevCategoryValue: string, newCategoryValue: string) => Promise<void>
+  updateCategory: (prevCategoryValue: string, newCategoryValue: string) => Promise<void>
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -165,6 +167,56 @@ const useRecipeProvider = (): UseRecipe => {
     setCurrentPage(index)
   }, [])
 
+  const updateRecipeCategories = async (prevCategoryValue: string, newCategoryValue: string) => {
+    try {
+      const recipeCol = createCollection('recipes', user)
+      const categoryQuery = query(recipeCol, where('category', '==', prevCategoryValue))
+
+      const querySnapshot = await getDocs(categoryQuery)
+
+      querySnapshot.forEach((query) => {
+        const docRef = doc(recipeCol, query.id)
+        updateDoc(docRef, { category: newCategoryValue })
+      })
+    } catch (e: any) {
+      console.log(e.message)
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+      throw Error('Error in updateRecipeCategories')
+    }
+  }
+
+  const updateCategory = async (prevCategoryValue: string, newCategoryValue: string) => {
+    try {
+      const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+      const categorySnapshot = await getDoc(categoryDoc)
+
+      if (categorySnapshot.exists()) {
+        const categories = categorySnapshot.data().categories
+        const updatedCategories = categories.map((category: string) => {
+          if (category === prevCategoryValue) {
+            return newCategoryValue
+          }
+          return category
+        })
+        await updateDoc(categoryDoc, {
+          categories: updatedCategories,
+        })
+      }
+    } catch (e: any) {
+      console.log(e.message)
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+      throw Error('Error in updateCategory')
+    }
+  }
+
   return {
     isLoading,
     fetchAllRecipe,
@@ -175,5 +227,7 @@ const useRecipeProvider = (): UseRecipe => {
     selectedCategory,
     currentPage,
     handlePage,
+    updateRecipeCategories,
+    updateCategory,
   }
 }

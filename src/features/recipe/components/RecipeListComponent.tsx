@@ -28,7 +28,15 @@ export const RecipeListComponent: FC = () => {
   const viewWidth = window.innerWidth - 32
   const { onOpen, onClose, isOpen } = useDisclosure()
 
-  const { fetchAllRecipe, recipeList, isLoading, handlePage, currentPage } = useRecipe()
+  const {
+    fetchAllRecipe,
+    recipeList,
+    isLoading,
+    handlePage,
+    currentPage,
+    updateRecipeCategories,
+    updateCategory,
+  } = useRecipe()
 
   // recipeListが10個のオブジェクトを1つの配列に詰めているので、10倍にする
   const totalCount = recipeList?.length * 10
@@ -53,9 +61,11 @@ export const RecipeListComponent: FC = () => {
     resolver: zodResolver(schema),
   })
 
-  const submitHandler = handleSubmit(async (data) => {
-    console.log('FORM SUBMIT DATA = ', data)
-    alert(JSON.stringify(data))
+  const submitHandler = handleSubmit(async (updatedData) => {
+    await updateRecipeCategories(updatingCategory, updatedData.category)
+    await updateCategory(updatingCategory, updatedData.category)
+    await fetchAllRecipe()
+    reset()
     onClose()
   })
 
@@ -88,7 +98,7 @@ export const RecipeListComponent: FC = () => {
           inputName={['category']}
         />
         <Heading w="100%" pb="8">
-          料理リスト 🥘
+          料理リスト 🍙
         </Heading>
         <CategoryListComponent onClick={handleOpenModal} />
         {/* currentPageが1から始まる為、-1している */}

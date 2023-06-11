@@ -16,7 +16,7 @@ export const Badge: FC<BadgeProps> = ({ children, type }) => {
     const baseStyle = {
       content: '""',
       display: 'inline-block',
-      bg: 'var(--success-color-main)',
+      bg: 'var(--primary-color-main)',
       w: '2',
       h: '2',
       borderRadius: '50%',

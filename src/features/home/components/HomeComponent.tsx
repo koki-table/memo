@@ -3,7 +3,7 @@
 import { VStack } from '@chakra-ui/react'
 import { FC } from 'react'
 
-import gyoza from '@/assets/gyoza.png'
+import sushi from '@/assets/sushi.png'
 import { LoopingBackground } from '@/components/Elements/Animation/Loop'
 
 import { LinkItem } from './LinkItem'
@@ -17,13 +17,13 @@ export const HomeComponent: FC = () => {
       maxW={['100%', '400px']}
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
-      spacing={10}
+      spacing={16}
     >
       <VStack>
         <LinkItem text={'カレンダー'} path={'/calendar'} />
         <LinkItem text={'料理リスト'} path={'/recipe/list'} />
       </VStack>
-      <LoopingBackground source={gyoza} w="120%" h={'50px'} animationDuration={'380s'} />
+      <LoopingBackground source={sushi} w="120%" h={'50px'} animationDuration={'380s'} />
     </VStack>
   )
 }

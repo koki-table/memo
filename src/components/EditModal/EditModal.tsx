@@ -8,12 +8,13 @@ import {
   Stack,
   FormControl,
   Input,
-  Button,
   Text,
   VStack,
 } from '@chakra-ui/react'
 import { FC } from 'react'
 import { FieldValues, UseFormRegister } from 'react-hook-form'
+
+import { Button } from '@/components/Elements'
 
 type EditModalProps = {
   isOpen: boolean
