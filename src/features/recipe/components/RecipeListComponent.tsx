@@ -98,7 +98,7 @@ export const RecipeListComponent: FC = () => {
           inputName={['category']}
         />
         <Heading w="100%" pb="8">
-          料理リスト 🥘
+          料理リスト 🍙
         </Heading>
         <CategoryListComponent onClick={handleOpenModal} />
         {/* currentPageが1から始まる為、-1している */}
