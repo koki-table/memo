@@ -1,19 +1,26 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Box, Link, HStack, useDisclosure } from '@chakra-ui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { FC, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
+import { z } from 'zod'
 
+import { EditModal } from '@/components/EditModal'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
-import { Modal } from '@/components/Modal'
 
 import { useRecipe } from '../lib/recipe'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'
+
+const schema = z.object({
+  category: z.string().min(1, 'カテゴリー名は必須です'),
+})
 
 export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
@@ -28,6 +35,25 @@ export const RecipeListComponent: FC = () => {
   useEffect(() => {
     fetchAllRecipe()
   }, [fetchAllRecipe])
+
+  const fields = ['category']
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+  })
+
+  console.log(errors)
+
+  const submitHandler = handleSubmit(async (data) => {
+    console.log('FORM SUBMIT DATA = ', data)
+    alert(JSON.stringify(data))
+    onClose()
+  })
 
   if (isLoading) return <Spinner variants="full" />
 
@@ -44,15 +70,18 @@ export const RecipeListComponent: FC = () => {
       minH={`calc(100vh - 69px)`}
     >
       <VStack>
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <p>Modal Title</p>
-          <div>
-            <p>Modal Content</p>
-            <p>Modal Content</p>
-            <p>Modal Content</p>
-            <p>Modal Content</p>
-          </div>
-        </Modal>
+        <EditModal
+          isOpen={isOpen}
+          submitHandler={submitHandler}
+          onClose={onClose}
+          reset={reset}
+          errors={errors}
+          isSubmitting={isSubmitting}
+          fields={fields}
+          register={register}
+          title={'カテゴリー編集'}
+          buttonText={'更新'}
+        />
         <Heading w="100%" pb="8">
           料理リスト 🥘
         </Heading>
