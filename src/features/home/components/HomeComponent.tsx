@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { VStack, Box } from '@chakra-ui/react'
+import dayjs from 'dayjs'
 import { FC } from 'react'
 
 import bgFood from '@/assets/bgFood.png'
@@ -9,6 +10,8 @@ import { CustomRowLink } from '@/components/CustomRowLink'
 import { LoopingBackground } from '@/components/Elements/Animation/Loop'
 
 export const HomeComponent: FC = () => {
+  const today = dayjs().format('YYMMDD')
+
   return (
     <VStack
       px={'4'}
@@ -29,6 +32,7 @@ export const HomeComponent: FC = () => {
         zIndex={0}
       />
       <VStack zIndex={2}>
+        <CustomRowLink text={'本日の料理を登録'} path={`/recipe/${today}`} />
         <CustomRowLink text={'カレンダー'} path={'/calendar'} />
         <CustomRowLink text={'料理リスト'} path={'/recipe/list'} />
       </VStack>
