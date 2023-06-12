@@ -32,7 +32,7 @@ export const HomeComponent: FC = () => {
         zIndex={0}
       />
       <VStack zIndex={2}>
-        <CustomRowLink text={'本日の料理を登録'} path={`/recipe/${today}`} />
+        <CustomRowLink text={'本日の料理'} path={`/recipe/${today}`} />
         <CustomRowLink text={'カレンダー'} path={'/calendar'} />
         <CustomRowLink text={'料理リスト'} path={'/recipe/list'} />
       </VStack>

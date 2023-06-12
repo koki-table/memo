@@ -1,36 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import {
-  Avatar,
-  Button,
-  chakra,
-  Container,
-  Flex,
-  Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Image,
-  Box,
-} from '@chakra-ui/react'
+import { chakra, Container, Flex, Link, Image, Box } from '@chakra-ui/react'
 import { memo } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import gyoza from '@/assets/gyoza.png'
-import { useAuth } from '@/features/auth'
+
+import { HamburgerMenu } from './HamburgerMenu'
 
 export const Header = memo(() => {
-  const navigate = useNavigate()
-  const { user, signOut } = useAuth()
-
-  const onSubmit = async () => {
-    const { success, message } = await signOut()
-    if (success) {
-      console.log(message)
-      navigate('/auth/login')
-    }
-  }
-
   return (
     <chakra.header
       py={3}
@@ -62,22 +38,7 @@ export const Header = memo(() => {
               </Box>
             </chakra.a>
           </Link>
-          {user ? (
-            <Menu>
-              <MenuButton>
-                <Avatar flexShrink={0} width={7} height={7} />
-              </MenuButton>
-              <MenuList py={0}>
-                <MenuItem onClick={onSubmit}>サインアウト</MenuItem>
-              </MenuList>
-            </Menu>
-          ) : (
-            <Link href={'/auth/register'}>
-              <Button as={'a'} colorScheme={'teal'}>
-                サインイン
-              </Button>
-            </Link>
-          )}
+          <HamburgerMenu />
         </Flex>
       </Container>
     </chakra.header>
