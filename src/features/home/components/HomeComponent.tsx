@@ -5,9 +5,8 @@ import { FC } from 'react'
 
 import bgFood from '@/assets/bgFood.png'
 import sushi from '@/assets/sushi.png'
+import { CustomRowLink } from '@/components/CustomRowLink'
 import { LoopingBackground } from '@/components/Elements/Animation/Loop'
-
-import { LinkItem } from './LinkItem'
 
 export const HomeComponent: FC = () => {
   return (
@@ -30,8 +29,8 @@ export const HomeComponent: FC = () => {
         zIndex={0}
       />
       <VStack zIndex={2}>
-        <LinkItem text={'カレンダー'} path={'/calendar'} />
-        <LinkItem text={'料理リスト'} path={'/recipe/list'} />
+        <CustomRowLink text={'カレンダー'} path={'/calendar'} />
+        <CustomRowLink text={'料理リスト'} path={'/recipe/list'} />
       </VStack>
       <LoopingBackground source={sushi} w="120%" h={'50px'} animationDuration={'380s'} zIndex={2} />
     </VStack>

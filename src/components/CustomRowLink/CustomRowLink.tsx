@@ -5,12 +5,12 @@ import { FC } from 'react'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
 
-type LinkItemProps = {
+type CustomRowLinkProps = {
   text: string
   path: string
 }
 
-export const LinkItem: FC<LinkItemProps> = (props) => {
+export const CustomRowLink: FC<CustomRowLinkProps> = (props) => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
 

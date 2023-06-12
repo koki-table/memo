@@ -7,9 +7,9 @@ import { FC, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BsArrowRightShort } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom'
-import { l } from 'vitest/dist/index-220c1d70'
 import { z } from 'zod'
 
+import { CustomRowLink } from '@/components/CustomRowLink'
 import { EditModal } from '@/components/EditModal'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
@@ -27,6 +27,7 @@ export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
   const { onOpen, onClose, isOpen } = useDisclosure()
+  const today = dayjs().format('YYMMDD')
 
   const {
     fetchAllRecipe,
@@ -84,29 +85,36 @@ export const RecipeListComponent: FC = () => {
       minH={`calc(100vh - 69px)`}
     >
       <VStack w={'100%'}>
-        <EditModal
-          isOpen={isOpen}
-          submitHandler={submitHandler}
-          onClose={onClose}
-          reset={reset}
-          errors={errors}
-          isSubmitting={isSubmitting}
-          fields={[updatingCategory]}
-          register={register}
-          title={'カテゴリ編集'}
-          buttonText={'更新'}
-          inputName={['category']}
-        />
-        <Heading w="100%" pb="8">
-          料理リスト 🍙
-        </Heading>
-        <CategoryListComponent onClick={handleOpenModal} />
+        {recipeList.length === 0 ? null : (
+          <>
+            <EditModal
+              isOpen={isOpen}
+              submitHandler={submitHandler}
+              onClose={onClose}
+              reset={reset}
+              errors={errors}
+              isSubmitting={isSubmitting}
+              fields={[updatingCategory]}
+              register={register}
+              title={'カテゴリ編集'}
+              buttonText={'更新'}
+              inputName={['category']}
+            />
+            <Heading w="100%" pb="8">
+              料理リスト 🍙
+            </Heading>
+            <CategoryListComponent onClick={handleOpenModal} />
+          </>
+        )}
         {/* currentPageが1から始まる為、-1している */}
         <Box pt={5}>
           {recipeList.length === 0 ? (
-            <Text fontSize={'md'} pt={23} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
-              料理の登録がありません
-            </Text>
+            <VStack zIndex={2} spacing={8}>
+              <Text fontSize={'md'} pt={23} w={'100%'} lineHeight="1.6" fontWeight={'semibold'}>
+                料理の登録がありません
+              </Text>
+              <CustomRowLink text={'本日の料理を登録'} path={`/recipe/${today}`} />
+            </VStack>
           ) : (
             <>
               {recipeList[currentPage - 1]?.map((recipe, index) => (
