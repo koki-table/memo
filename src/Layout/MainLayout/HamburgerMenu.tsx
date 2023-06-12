@@ -15,7 +15,7 @@ import { useAuth } from '@/features/auth'
 export const HamburgerMenu: FC = () => {
   const navigate = useNavigate()
   const { signOut } = useAuth()
-  const today = dayjs().format('YYMMDD')
+  const today = dayjs().format('YYYYMMDD')
 
   const onSubmit = async () => {
     const { success, message } = await signOut()

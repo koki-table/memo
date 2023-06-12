@@ -10,7 +10,7 @@ import { CustomRowLink } from '@/components/CustomRowLink'
 import { LoopingBackground } from '@/components/Elements/Animation/Loop'
 
 export const HomeComponent: FC = () => {
-  const today = dayjs().format('YYMMDD')
+  const today = dayjs().format('YYYYMMDD')
 
   return (
     <VStack

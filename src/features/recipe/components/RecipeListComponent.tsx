@@ -27,7 +27,7 @@ export const RecipeListComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
   const { onOpen, onClose, isOpen } = useDisclosure()
-  const today = dayjs().format('YYMMDD')
+  const today = dayjs().format('YYYYMMDD')
 
   const {
     fetchAllRecipe,
