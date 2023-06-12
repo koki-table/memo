@@ -12,6 +12,7 @@ export const Header = memo(() => {
       py={3}
       bgColor={'var(--white)'}
       position={'relative'}
+      zIndex={999}
       _before={{
         content: "''",
         position: 'absolute',
@@ -26,7 +27,7 @@ export const Header = memo(() => {
       }}
     >
       <Container maxW={'container.lg'}>
-        <Flex justifyContent="space-between">
+        <Flex justifyContent="space-between" alignItems={'center'}>
           <Link href={'/'}>
             <chakra.a
               _hover={{

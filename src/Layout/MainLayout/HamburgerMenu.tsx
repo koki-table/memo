@@ -3,8 +3,11 @@
 import { IconButton, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import { FC } from 'react'
+import { BiHomeAlt2, BiBowlRice, BiRun } from 'react-icons/bi'
+import { BsBook } from 'react-icons/bs'
 import { FaHamburger } from 'react-icons/fa'
-import { RxCross2 } from 'react-icons/rx'
+import { GiKnifeFork } from 'react-icons/gi'
+import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '@/features/auth'
@@ -29,15 +32,25 @@ export const HamburgerMenu: FC = () => {
           <MenuButton
             as={IconButton}
             aria-label="Options"
-            icon={isOpen ? <RxCross2 /> : <FaHamburger />}
+            icon={isOpen ? <GiKnifeFork /> : <FaHamburger />}
             variant="outline"
           />
           <MenuList>
-            <MenuItem>ホーム</MenuItem>
-            <MenuItem onClick={() => navigate(`/recipe/${today}`)}>本日の料理</MenuItem>
-            <MenuItem onClick={() => navigate(`/calendar`)}>カレンダー</MenuItem>
-            <MenuItem onClick={() => navigate(`/recipe/list`)}>料理リスト</MenuItem>
-            <MenuItem onClick={onSubmit}>ログアウト</MenuItem>
+            <MenuItem onClick={() => navigate(`/`)} icon={<BiHomeAlt2 />}>
+              ホーム
+            </MenuItem>
+            <MenuItem onClick={() => navigate(`/recipe/${today}`)} icon={<BiBowlRice />}>
+              本日の料理
+            </MenuItem>
+            <MenuItem onClick={() => navigate(`/calendar`)} icon={<MdCalendarMonth />}>
+              カレンダー
+            </MenuItem>
+            <MenuItem onClick={() => navigate(`/recipe/list`)} icon={<BsBook />}>
+              料理リスト
+            </MenuItem>
+            <MenuItem onClick={onSubmit} icon={<BiRun />}>
+              ログアウト
+            </MenuItem>
           </MenuList>
         </>
       )}
