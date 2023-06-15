@@ -83,6 +83,7 @@ export const RecipeListComponent: FC = () => {
       maxW={['100%', '400px']}
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
+      spacing={4}
     >
       <VStack w={'100%'}>
         {recipeList.length === 0 ? null : (
