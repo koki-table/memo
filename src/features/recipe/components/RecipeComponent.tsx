@@ -176,11 +176,18 @@ export const RecipeComponent: FC = () => {
         date,
       })
 
-      // 新規でカテゴリーを追加した場合は、dbのカテゴリーを更新
-      if (!hasTargetValue(options!, data.category))
-        await updateDoc(categoryDoc, {
+      // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
+      if (options === undefined) {
+        await setDoc(categoryDoc, {
           categories: arrayUnion(data.category),
         })
+      } else {
+        // 既存のカテゴリーに新規追加した場合は、dbのカテゴリーを更新
+        if (!hasTargetValue(options, data.category))
+          await updateDoc(categoryDoc, {
+            categories: arrayUnion(data.category),
+          })
+      }
 
       setIsLoadingButton(false)
 
