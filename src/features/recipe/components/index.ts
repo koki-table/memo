@@ -1,4 +1,4 @@
-export * from './RecipeComponent'
+export * from './RecipeRegisterComponent'
 export * from './RecipeListComponent'
 export * from './PaginationComponent'
 export * from './CategoryListComponent'

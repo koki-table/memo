@@ -1,5 +1,5 @@
-import { RecipeComponent } from '../components/RecipeComponent'
+import { RecipeRegisterComponent } from '../components/RecipeRegisterComponent'
 
 export const Recipe = () => {
-  return <RecipeComponent />
+  return <RecipeRegisterComponent />
 }
