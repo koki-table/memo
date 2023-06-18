@@ -1,7 +1,7 @@
 import { Input as ChakraInput, Box, Image, Flex, Button as ChakraButton } from '@chakra-ui/react'
 import { FC, memo, useRef } from 'react'
 
-import gyoza from '@/assets/gyoza.png'
+import gyoza from '@/assets/gyoza-text.png'
 
 import { ImgInputProps } from './types'
 
