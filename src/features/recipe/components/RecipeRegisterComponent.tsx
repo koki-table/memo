@@ -45,7 +45,7 @@ const schema = z.object({
   img: z.string(),
 })
 
-export const RecipeComponent: FC = () => {
+export const RecipeRegisterComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
   const { date } = useParams()
