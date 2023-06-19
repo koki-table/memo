@@ -31,6 +31,8 @@ import { calculateBeforeDay, calculateNextDay } from '@/utils/calculateDay'
 import { createCollection, db } from '@/utils/database'
 import { hasTargetValue } from '@/utils/hasTargetValue'
 
+import { RecipeFormComponent } from './RecipeFormComponent'
+
 type option = [
   {
     value: string
@@ -227,93 +229,27 @@ export const RecipeRegisterComponent: FC = () => {
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
     >
-      <chakra.form onSubmit={handleSubmit(onSubmit)}>
-        <VStack spacing={6}>
-          <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
-            <HStack alignItems={'center'} spacing={3}>
-              <Text w={'100%'} fontSize={'sm'} fontWeight="700">
-                {formattedDate}
-              </Text>
-              <Link onClick={() => handleDateChange(false)}>
-                <IoIosArrowBack />
-              </Link>
-              <Link onClick={() => handleDateChange(true)}>
-                <IoIosArrowForward />
-              </Link>
-            </HStack>
-            <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
-              <MdCalendarMonth size={27} />
-            </Link>
-          </Flex>
-          <ImgInput
-            registration={register('img')}
-            onChange={onFileInputChange}
-            fileImg={fileImg()}
-          />
-          <VStack w="100%" alignItems={'flex-start'}>
-            <Input
-              {...register('name')}
-              placeholder={'料理名'}
-              _placeholder={{ color: 'var(--text-color-placeholder)' }}
-            />
-            {errors.name && (
-              <Text fontSize={'xs'} pl={2}>
-                {errors.name?.message}
-              </Text>
-            )}
-          </VStack>
-          <VStack w="100%" alignItems={'flex-start'}>
-            {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
-            <Controller
-              control={control}
-              name="category"
-              render={({ field }) => (
-                <CreatableSelect
-                  {...field}
-                  placeholder={'カテゴリ'}
-                  options={options}
-                  value={options?.find((v) => v.value === field.value)}
-                  onChange={(newValue) => {
-                    field.onChange(newValue?.value)
-                  }}
-                  styles={{
-                    control: (baseStyles) => ({
-                      ...baseStyles,
-                      borderColor: 'var(--line-color-light)',
-                      minWidth: viewWidth,
-                    }),
-                    placeholder: (baseStyles) => ({
-                      ...baseStyles,
-                      color: 'var(--text-color-placeholder)',
-                    }),
-                    indicatorSeparator: (baseStyles) => ({
-                      ...baseStyles,
-                      display: 'none',
-                    }),
-                    singleValue: (baseStyles) => ({
-                      ...baseStyles,
-                      color: 'var(--text-color)',
-                    }),
-                  }}
-                />
-              )}
-            />
-            {errors.category && (
-              <Text fontSize={'xs'} pl={2}>
-                {errors.category.message}
-              </Text>
-            )}
-          </VStack>
-          <Box minW={'100%'}>
-            <Textarea placeholder="メモ" minH={'180px'} registration={register('memo')} />
-          </Box>
-          <Button type={'submit'} isLoading={isLoadingButton}>
-            <Text fontSize={'sm'} fontWeight="700">
-              登録
+      {/* <chakra.form onSubmit={handleSubmit(onSubmit)}> */}
+      <VStack spacing={6}>
+        <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
+          <HStack alignItems={'center'} spacing={3}>
+            <Text w={'100%'} fontSize={'sm'} fontWeight="700">
+              {formattedDate}
             </Text>
-          </Button>
-        </VStack>
-      </chakra.form>
+            <Link onClick={() => handleDateChange(false)}>
+              <IoIosArrowBack />
+            </Link>
+            <Link onClick={() => handleDateChange(true)}>
+              <IoIosArrowForward />
+            </Link>
+          </HStack>
+          <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
+            <MdCalendarMonth size={27} />
+          </Link>
+        </Flex>
+      </VStack>
+      {/* </chakra.form> */}
+      <RecipeFormComponent recipe={recipeData} hasSubmit={true} onSubmit={onSubmit} />
     </VStack>
   )
 }
