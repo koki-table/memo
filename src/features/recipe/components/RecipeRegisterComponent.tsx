@@ -33,7 +33,7 @@ import { hasTargetValue } from '@/utils/hasTargetValue'
 
 import { RecipeFormComponent } from './RecipeFormComponent'
 
-type option = [
+export type option = [
   {
     value: string
     label: string
@@ -65,18 +65,12 @@ export const RecipeRegisterComponent: FC = () => {
     }
   }, [])
 
-  const [recipeData, setRecipeData] = useState<Recipe>(defaultRecipes)
+  const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipes])
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: recipeData,
-    resolver: zodResolver(schema),
-  })
+  // const { reset } = useForm({
+  //   defaultValues: recipeData,
+  //   resolver: zodResolver(schema),
+  // })
 
   const [options, setOptions] = useState<option>()
 
@@ -106,16 +100,16 @@ export const RecipeRegisterComponent: FC = () => {
 
         if (queryDateSnapshot.size === 0) {
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          reset(defaultRecipes)
-          setRecipeData(defaultRecipes)
+          // reset([defaultRecipes])
+          setRecipeData([defaultRecipes])
           return
         }
 
         queryDateSnapshot.forEach((doc) => {
-          setRecipeData(doc.data() as Recipe)
+          setRecipeData([doc.data()] as Recipe[])
 
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          reset(doc.data() as Recipe)
+          // reset([doc.data()] as Recipe[])
         })
       } catch (e: any) {
         console.log(e.message)
@@ -127,31 +121,36 @@ export const RecipeRegisterComponent: FC = () => {
       }
     }
     fetchDb()
-  }, [date, defaultRecipes, reset, toast, user])
+  }, [date, defaultRecipes, toast, user])
 
-  const [fileObject, setFileObject] = useState<File>()
+  const [fileObject, setFileObject] = useState<File[]>()
 
-  const fileImg = useCallback(() => {
-    if (fileObject != null) return window.URL.createObjectURL(fileObject)
-    if (recipeData.img) return recipeData.img
-    return null
-  }, [fileObject, recipeData.img])
-
-  const onFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
-
-    const fileData = e.target.files[0]
-    setFileObject(fileData)
-  }, [])
+  const onChangeFile = useCallback(
+    (newFileObject: File) => {
+      setFileObject((fileObject) => {
+        if (fileObject) {
+          return [...fileObject, newFileObject]
+        } else {
+          return [newFileObject]
+        }
+      })
+    },
+    [setFileObject]
+  )
 
   const handleStorage = useCallback(async () => {
-    // 画像をstorageにアップロード
-    const uploadStorage = ref(storage, fileObject!.name)
-    const imgData = await uploadBytes(uploadStorage, fileObject!)
+    const uploadPromises = fileObject!.map(async (file) => {
+      // 画像をstorageにアップロード
+      const uploadStorage = ref(storage, file.name)
+      const imgData = await uploadBytes(uploadStorage, file)
 
-    // アップロードした画像のURLを取得
-    const downloadURL = await getDownloadURL(imgData.ref)
-    return downloadURL
+      // アップロードした画像のURLを取得
+      const downloadURL = await getDownloadURL(imgData.ref)
+      return downloadURL
+    })
+
+    const downloadURLs = await Promise.all(uploadPromises)
+    return downloadURLs
   }, [fileObject])
 
   const handleImgData = useCallback(
@@ -167,6 +166,8 @@ export const RecipeRegisterComponent: FC = () => {
       const imgData = await handleImgData(data)
       const recipeDoc = doc(createCollection('recipes', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+
+      console.log('fgfffff')
 
       setIsLoadingButton(true)
       // db登録
@@ -229,7 +230,6 @@ export const RecipeRegisterComponent: FC = () => {
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
     >
-      {/* <chakra.form onSubmit={handleSubmit(onSubmit)}> */}
       <VStack spacing={6}>
         <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
           <HStack alignItems={'center'} spacing={3}>
@@ -248,8 +248,18 @@ export const RecipeRegisterComponent: FC = () => {
           </Link>
         </Flex>
       </VStack>
-      {/* </chakra.form> */}
-      <RecipeFormComponent recipe={recipeData} hasSubmit={true} onSubmit={onSubmit} />
+      {recipeData.map((v, i) => (
+        <RecipeFormComponent
+          key={i}
+          recipe={v}
+          hasSubmit={recipeData.length === i + 1}
+          onSubmit={onSubmit}
+          fileObject={fileObject ? fileObject[i] : undefined}
+          onChangeFile={onChangeFile}
+          options={options ?? undefined}
+          isLoadingButton={isLoadingButton}
+        />
+      ))}
     </VStack>
   )
 }

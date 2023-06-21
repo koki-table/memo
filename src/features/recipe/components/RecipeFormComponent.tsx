@@ -1,42 +1,18 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input, useToast, Flex, Link, HStack } from '@chakra-ui/react'
+import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  arrayUnion,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
-import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
-import { MdCalendarMonth } from 'react-icons/md'
-import { useNavigate, useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable'
 import { z } from 'zod'
 
-import { Button, Spinner } from '@/components/Elements'
+import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
-import { useAuth } from '@/features/auth'
-import { storage } from '@/main'
 import { Recipe } from '@/types/Recipe'
-import { calculateBeforeDay, calculateNextDay } from '@/utils/calculateDay'
-import { createCollection, db } from '@/utils/database'
-import { hasTargetValue } from '@/utils/hasTargetValue'
 
-type option = [
-  {
-    value: string
-    label: string
-  }
-]
+import { option } from './RecipeRegisterComponent'
 
 const schema = z.object({
   name: z.string().min(1, '料理名を入力は必須です。'),
@@ -49,58 +25,51 @@ type RecipeFormComponentProps = {
   recipe: Recipe
   onSubmit: (data: FieldValues) => Promise<void>
   hasSubmit: boolean
+  fileObject: File | undefined
+  onChangeFile: (fileObject: File) => void
+  options: option | undefined
+  isLoadingButton: boolean
 }
 
 export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
-  const { recipe, onSubmit, hasSubmit } = props
+  const { recipe, onSubmit, hasSubmit, fileObject, onChangeFile, options, isLoadingButton } = props
 
-  // const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
-  // const { date } = useParams()
-  // const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
-
-  const defaultRecipes = useMemo(() => {
-    return {
-      img: '',
-      name: '',
-      memo: '',
-      category: '',
-      date: '',
-    }
-  }, [])
 
   const {
     register,
     handleSubmit,
     control,
-    reset,
+    // reset,
     formState: { errors },
   } = useForm({
     defaultValues: recipe,
     resolver: zodResolver(schema),
   })
 
-  const [options, setOptions] = useState<option>()
+  // useEffect(() => {
+  //   reset(recipe)
+  // }, [reset, recipe])
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingButton, setIsLoadingButton] = useState(false)
+  const onFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files) return
 
-  const [fileObject, setFileObject] = useState<File>()
+      const fileData = e.target.files[0]
+      onChangeFile(fileData)
+    },
+    [onChangeFile]
+  )
 
-  const onFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
+  console.log(fileObject)
 
-    const fileData = e.target.files[0]
-    setFileObject(fileData)
-  }, [])
+  console.log(recipe)
 
   const fileImg = useCallback(() => {
     if (fileObject != null) return window.URL.createObjectURL(fileObject)
     if (recipe.img) return recipe.img
     return null
   }, [fileObject, recipe.img])
-
-  if (isLoading) return <Spinner variants="full" />
 
   return (
     <VStack
@@ -116,22 +85,6 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     >
       <chakra.form onSubmit={handleSubmit(onSubmit)}>
         <VStack spacing={6}>
-          {/* <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
-            <HStack alignItems={'center'} spacing={3}>
-              <Text w={'100%'} fontSize={'sm'} fontWeight="700">
-                {formattedDate}
-              </Text>
-              <Link onClick={() => handleDateChange(false)}>
-                <IoIosArrowBack />
-              </Link>
-              <Link onClick={() => handleDateChange(true)}>
-                <IoIosArrowForward />
-              </Link>
-            </HStack>
-            <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
-              <MdCalendarMonth size={27} />
-            </Link>
-          </Flex> */}
           <ImgInput
             registration={register('img')}
             onChange={onFileInputChange}
