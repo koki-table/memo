@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input, HStack } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useCallback } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -50,24 +50,13 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
 
   const viewWidth = window.innerWidth - 32
 
-  const defaultRecipe = useMemo(() => {
-    return {
-      img: '',
-      name: '',
-      memo: '',
-      category: '',
-      date: '',
-    }
-  }, [])
-
   const {
     register,
     handleSubmit,
     control,
-    reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors },
   } = useForm({
-    defaultValues: recipe ?? defaultRecipe,
+    defaultValues: recipe,
     resolver: zodResolver(schema),
   })
 
@@ -81,10 +70,6 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     },
     [onChangeFile]
   )
-
-  // if (isSubmitSuccessful) {
-  //   reset(defaultRecipe)
-  // }
 
   const fileImg = useCallback(() => {
     if (fileObject != null) return window.URL.createObjectURL(fileObject)
