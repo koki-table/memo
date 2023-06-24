@@ -51,7 +51,16 @@ export const RecipeRegisterComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  const [recipeData, setRecipeData] = useState<Recipe[]>()
+  const defaultRecipe = useMemo(() => {
+    return {
+      img: '',
+      name: '',
+      memo: '',
+      category: '',
+      date: '',
+    }
+  }, [])
+  const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
 
   const [options, setOptions] = useState<option>()
 
@@ -144,27 +153,32 @@ export const RecipeRegisterComponent: FC = () => {
     [fileObject, handleStorage]
   )
 
-  const addRecipeHandler = useCallback((newRecipe: Recipe) => {
-    setRecipeData((prevRecipe) => (prevRecipe != null ? [...prevRecipe, newRecipe] : [newRecipe]))
-  }, [])
+  const updateRecipeHandler = useCallback(
+    (newRecipe: Recipe, index: number) => {
+      setRecipeData((prevRecipes) =>
+        prevRecipes.map((prevRecipe, i) => (i === index ? newRecipe : prevRecipe))
+      )
+      setRecipeData((prevRecipes) => [...prevRecipes, defaultRecipe])
+    },
+    [defaultRecipe]
+  )
+
+  console.log(recipeData)
 
   const removeRecipeHandler = useCallback(
     (index: number) => {
       console.log(index)
-      setRecipeData((recipeData) => recipeData!.filter((_, i) => i + 1 !== index))
+      setRecipeData((recipeData) => recipeData.filter((_, i) => i + 1 !== index))
     },
     [setRecipeData]
   )
 
   const onSubmit = useCallback(
     async (data: FieldValues) => {
-      console.log('ffff')
 
       const imgData = await handleImgData(data)
       const recipeDoc = doc(createCollection('recipes', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-
-      console.log(imgData)
 
       setIsLoadingButton(true)
       // db登録
@@ -256,35 +270,21 @@ export const RecipeRegisterComponent: FC = () => {
           </Link>
         </Flex>
       </VStack>
-      {recipeData && (
-        <>
-          {recipeData.map((v, i) => (
-            <RecipeFormComponent
-              key={i}
-              index={i}
-              recipe={v}
-              hasSubmit={recipeData.length === i}
-              onSubmit={onSubmit}
-              fileObject={fileObject ? fileObject[i] : undefined}
-              onChangeFile={onChangeFile}
-              options={options ?? undefined}
-              isLoadingButton={isLoadingButton}
-              addRecipeHandler={addRecipeHandler}
-              removeRecipeHandler={removeRecipeHandler}
-            />
-          ))}
-        </>
-      )}
-      <RecipeFormComponent
-        hasSubmit={true}
-        onSubmit={onSubmit}
-        fileObject={undefined}
-        onChangeFile={onChangeFile}
-        options={options ?? undefined}
-        isLoadingButton={isLoadingButton}
-        addRecipeHandler={addRecipeHandler}
-        removeRecipeHandler={removeRecipeHandler}
-      />
+      {recipeData.map((v, i) => (
+        <RecipeFormComponent
+          key={i}
+          index={i}
+          recipe={v}
+          hasSubmit={recipeData.length === i + 1}
+          onSubmit={onSubmit}
+          fileObject={fileObject ? fileObject[i] : undefined}
+          onChangeFile={onChangeFile}
+          options={options ?? undefined}
+          isLoadingButton={isLoadingButton}
+          updateRecipeHandler={updateRecipeHandler}
+          removeRecipeHandler={removeRecipeHandler}
+        />
+      ))}
     </VStack>
   )
 }

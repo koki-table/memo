@@ -17,7 +17,6 @@ export const SelectBox: FC<SelectBoxProps> = memo((props) => {
   return (
     <CreatableSelect
       {...field}
-      isClearable={true}
       placeholder={'カテゴリ'}
       options={options}
       value={options?.find((v) => v.value === field.value)}

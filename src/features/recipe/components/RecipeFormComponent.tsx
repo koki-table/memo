@@ -22,7 +22,7 @@ const schema = z.object({
 })
 
 type RecipeFormComponentProps = {
-  index?: number
+  index: number
   recipe?: Recipe
   onSubmit: (data: FieldValues) => Promise<void>
   hasSubmit: boolean
@@ -30,7 +30,7 @@ type RecipeFormComponentProps = {
   onChangeFile: (fileObject: File) => void
   options: option | undefined
   isLoadingButton: boolean
-  addRecipeHandler: (newRecipe: Recipe) => void
+  updateRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number) => void
 }
 
@@ -44,7 +44,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     onChangeFile,
     options,
     isLoadingButton,
-    addRecipeHandler,
+    updateRecipeHandler,
     removeRecipeHandler,
   } = props
 
@@ -82,9 +82,9 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     [onChangeFile]
   )
 
-  if (isSubmitSuccessful) {
-    reset(defaultRecipe)
-  }
+  // if (isSubmitSuccessful) {
+  //   reset(defaultRecipe)
+  // }
 
   const fileImg = useCallback(() => {
     if (fileObject != null) return window.URL.createObjectURL(fileObject)
@@ -144,7 +144,10 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
           </Box>
           {hasSubmit ? (
             <HStack>
-              <Button onClick={handleSubmit(addRecipeHandler)} isLoading={isLoadingButton}>
+              <Button
+                onClick={handleSubmit((v) => updateRecipeHandler(v, index))}
+                isLoading={isLoadingButton}
+              >
                 <Text fontSize={'sm'} fontWeight="700">
                   追加
                 </Text>
@@ -156,7 +159,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
               </Button>
             </HStack>
           ) : (
-            <Button onClick={() => removeRecipeHandler(index!)} isLoading={isLoadingButton}>
+            <Button onClick={() => removeRecipeHandler(index)} isLoading={isLoadingButton}>
               <Text fontSize={'sm'} fontWeight="700">
                 削除
               </Text>
