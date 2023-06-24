@@ -168,14 +168,13 @@ export const RecipeRegisterComponent: FC = () => {
   const removeRecipeHandler = useCallback(
     (index: number) => {
       console.log(index)
-      setRecipeData((recipeData) => recipeData.filter((_, i) => i + 1 !== index))
+      setRecipeData((recipeData) => recipeData.filter((_, i) => i !== index))
     },
     [setRecipeData]
   )
 
   const onSubmit = useCallback(
     async (data: FieldValues) => {
-
       const imgData = await handleImgData(data)
       const recipeDoc = doc(createCollection('recipes', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
