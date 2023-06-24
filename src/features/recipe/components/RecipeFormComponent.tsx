@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input } from '@chakra-ui/react'
+import { Text, chakra, VStack, Box, Input, HStack } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, FieldValues, Controller } from 'react-hook-form'
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useForm, FieldValues, Controller, UseFormReset } from 'react-hook-form'
+import { PropsValue } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import { z } from 'zod'
+import { string, z } from 'zod'
 
 import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
@@ -13,6 +14,7 @@ import { Textarea } from '@/components/Form/Textarea'
 import { Recipe } from '@/types/Recipe'
 
 import { option } from './RecipeRegisterComponent'
+import { SelectBox } from './SelectBox'
 
 const schema = z.object({
   name: z.string().min(1, '料理名を入力は必須です。'),
@@ -22,54 +24,88 @@ const schema = z.object({
 })
 
 type RecipeFormComponentProps = {
-  recipe: Recipe
+  index?: number
+  recipe?: Recipe
   onSubmit: (data: FieldValues) => Promise<void>
   hasSubmit: boolean
   fileObject: File | undefined
   onChangeFile: (fileObject: File) => void
   options: option | undefined
   isLoadingButton: boolean
+  addRecipeHandler: (newRecipe: Recipe, reset: UseFormReset<Recipe>) => void
+  removeRecipeHandler: (index: number) => void
 }
 
 export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
-  const { recipe, onSubmit, hasSubmit, fileObject, onChangeFile, options, isLoadingButton } = props
+  const {
+    index,
+    recipe,
+    onSubmit,
+    hasSubmit,
+    fileObject,
+    onChangeFile,
+    options,
+    isLoadingButton,
+    addRecipeHandler,
+    removeRecipeHandler,
+  } = props
 
   const viewWidth = window.innerWidth - 32
+
+  const defaultRecipe = useMemo(() => {
+    return {
+      img: '',
+      name: '',
+      memo: '',
+      category: '',
+      date: '',
+    }
+  }, [])
 
   const {
     register,
     handleSubmit,
     control,
-    // reset,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitSuccessful },
   } = useForm({
-    defaultValues: recipe,
+    defaultValues: recipe ?? defaultRecipe,
     resolver: zodResolver(schema),
   })
 
-  // useEffect(() => {
-  //   reset(recipe)
-  // }, [reset, recipe])
+  useEffect(() => {
+    recipe === undefined && reset(defaultRecipe)
+  }, [reset, recipe, defaultRecipe])
 
   const onFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.target.files) return
 
       const fileData = e.target.files[0]
+
+      console.log(fileData)
+
       onChangeFile(fileData)
     },
     [onChangeFile]
   )
 
-  console.log(fileObject)
+  console.log(isSubmitSuccessful)
 
-  console.log(recipe)
+  if (isSubmitSuccessful) {
+    console.log('fffffffff')
+
+    reset(defaultRecipe)
+  }
+  // useEffect(() => {
+  // }, [defaultRecipe, isSubmitSuccessful, reset])
 
   const fileImg = useCallback(() => {
     if (fileObject != null) return window.URL.createObjectURL(fileObject)
+    if (recipe === undefined) return null
     if (recipe.img) return recipe.img
     return null
-  }, [fileObject, recipe.img])
+  }, [fileObject, recipe])
 
   return (
     <VStack
@@ -83,7 +119,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
     >
-      <chakra.form onSubmit={handleSubmit(onSubmit)}>
+      <chakra.form>
         <VStack spacing={6}>
           <ImgInput
             registration={register('img')}
@@ -108,34 +144,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
               control={control}
               name="category"
               render={({ field }) => (
-                <CreatableSelect
-                  {...field}
-                  placeholder={'カテゴリ'}
-                  options={options}
-                  value={options?.find((v) => v.value === field.value)}
-                  onChange={(newValue) => {
-                    field.onChange(newValue?.value)
-                  }}
-                  styles={{
-                    control: (baseStyles) => ({
-                      ...baseStyles,
-                      borderColor: 'var(--line-color-light)',
-                      minWidth: viewWidth,
-                    }),
-                    placeholder: (baseStyles) => ({
-                      ...baseStyles,
-                      color: 'var(--text-color-placeholder)',
-                    }),
-                    indicatorSeparator: (baseStyles) => ({
-                      ...baseStyles,
-                      display: 'none',
-                    }),
-                    singleValue: (baseStyles) => ({
-                      ...baseStyles,
-                      color: 'var(--text-color)',
-                    }),
-                  }}
-                />
+                <SelectBox viewWidth={viewWidth} field={field} options={options!} />
               )}
             />
             {errors.category && (
@@ -147,10 +156,26 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
           <Box minW={'100%'}>
             <Textarea placeholder="メモ" minH={'180px'} registration={register('memo')} />
           </Box>
-          {hasSubmit && (
-            <Button type={'submit'} isLoading={isLoadingButton}>
+          {hasSubmit ? (
+            <HStack>
+              <Button
+                onClick={handleSubmit((value) => addRecipeHandler(value, reset))}
+                isLoading={isLoadingButton}
+              >
+                <Text fontSize={'sm'} fontWeight="700">
+                  追加
+                </Text>
+              </Button>
+              <Button onClick={handleSubmit(onSubmit)} isLoading={isLoadingButton}>
+                <Text fontSize={'sm'} fontWeight="700">
+                  登録
+                </Text>
+              </Button>
+            </HStack>
+          ) : (
+            <Button onClick={() => removeRecipeHandler(index!)} isLoading={isLoadingButton}>
               <Text fontSize={'sm'} fontWeight="700">
-                登録
+                削除
               </Text>
             </Button>
           )}

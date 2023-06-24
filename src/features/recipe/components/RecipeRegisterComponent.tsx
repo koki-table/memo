@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, FieldValues, Controller } from 'react-hook-form'
+import { useForm, FieldValues, Controller, UseFormReset } from 'react-hook-form'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -55,17 +55,17 @@ export const RecipeRegisterComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  const defaultRecipes = useMemo(() => {
-    return {
-      img: '',
-      name: '',
-      memo: '',
-      category: '',
-      date: '',
-    }
-  }, [])
+  // const defaultRecipe = useMemo(() => {
+  //   return {
+  //     img: '',
+  //     name: '',
+  //     memo: '',
+  //     category: '',
+  //     date: '',
+  //   }
+  // }, [])
 
-  const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipes])
+  const [recipeData, setRecipeData] = useState<Recipe[]>()
 
   // const { reset } = useForm({
   //   defaultValues: recipeData,
@@ -100,8 +100,8 @@ export const RecipeRegisterComponent: FC = () => {
 
         if (queryDateSnapshot.size === 0) {
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          // reset([defaultRecipes])
-          setRecipeData([defaultRecipes])
+          // reset([defaultRecipe])
+          // setRecipeData([defaultRecipe])
           return
         }
 
@@ -121,7 +121,7 @@ export const RecipeRegisterComponent: FC = () => {
       }
     }
     fetchDb()
-  }, [date, defaultRecipes, toast, user])
+  }, [date, toast, user])
 
   const [fileObject, setFileObject] = useState<File[]>()
 
@@ -139,6 +139,8 @@ export const RecipeRegisterComponent: FC = () => {
   )
 
   const handleStorage = useCallback(async () => {
+    console.log(fileObject)
+
     const uploadPromises = fileObject!.map(async (file) => {
       // 画像をstorageにアップロード
       const uploadStorage = ref(storage, file.name)
@@ -161,22 +163,64 @@ export const RecipeRegisterComponent: FC = () => {
     [fileObject, handleStorage]
   )
 
+  console.log(recipeData)
+
+  const defaultRecipe = useMemo(() => {
+    return {
+      img: '',
+      name: '',
+      memo: '',
+      category: '',
+      date: '',
+    }
+  }, [])
+
+  const addRecipeHandler = useCallback(
+    (newRecipe: Recipe, reset: UseFormReset<Recipe>) => {
+      console.log(newRecipe)
+      reset(defaultRecipe)
+      setRecipeData((prevRecipe) => (prevRecipe != null ? [...prevRecipe, newRecipe] : [newRecipe]))
+    },
+    [defaultRecipe]
+  )
+
+  const removeRecipeHandler = useCallback(
+    (index: number) => {
+      console.log(index)
+      setRecipeData((recipeData) => recipeData!.filter((_, i) => i + 1 !== index))
+    },
+    [setRecipeData]
+  )
+
   const onSubmit = useCallback(
     async (data: FieldValues) => {
+      console.log('ffff')
+
       const imgData = await handleImgData(data)
       const recipeDoc = doc(createCollection('recipes', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
-      console.log('fgfffff')
+      console.log(imgData)
 
       setIsLoadingButton(true)
       // db登録
       await setDoc(recipeDoc, {
-        img: imgData,
-        name: data.name,
-        memo: data.memo,
-        category: data.category,
-        date,
+        recipes: arrayUnion(
+          {
+            img: imgData,
+            name: data.name,
+            memo: data.memo,
+            category: data.category,
+            date,
+          },
+          {
+            img: imgData,
+            name: data.name,
+            memo: data.name,
+            category: data.name,
+            date,
+          }
+        ),
       })
 
       // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
@@ -248,18 +292,35 @@ export const RecipeRegisterComponent: FC = () => {
           </Link>
         </Flex>
       </VStack>
-      {recipeData.map((v, i) => (
-        <RecipeFormComponent
-          key={i}
-          recipe={v}
-          hasSubmit={recipeData.length === i + 1}
-          onSubmit={onSubmit}
-          fileObject={fileObject ? fileObject[i] : undefined}
-          onChangeFile={onChangeFile}
-          options={options ?? undefined}
-          isLoadingButton={isLoadingButton}
-        />
-      ))}
+      {recipeData && (
+        <>
+          {recipeData.map((v, i) => (
+            <RecipeFormComponent
+              key={i}
+              index={i}
+              recipe={v}
+              hasSubmit={recipeData.length === i}
+              onSubmit={onSubmit}
+              fileObject={fileObject ? fileObject[i] : undefined}
+              onChangeFile={onChangeFile}
+              options={options ?? undefined}
+              isLoadingButton={isLoadingButton}
+              addRecipeHandler={addRecipeHandler}
+              removeRecipeHandler={removeRecipeHandler}
+            />
+          ))}
+        </>
+      )}
+      <RecipeFormComponent
+        hasSubmit={true}
+        onSubmit={onSubmit}
+        fileObject={undefined}
+        onChangeFile={onChangeFile}
+        options={options ?? undefined}
+        isLoadingButton={isLoadingButton}
+        addRecipeHandler={addRecipeHandler}
+        removeRecipeHandler={removeRecipeHandler}
+      />
     </VStack>
   )
 }
