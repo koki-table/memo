@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input, useToast, Flex, Link, HStack } from '@chakra-ui/react'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { Text, VStack, useToast, Flex, Link, HStack } from '@chakra-ui/react'
 import {
   arrayUnion,
   doc,
@@ -14,16 +13,13 @@ import {
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, FieldValues, Controller, UseFormReset } from 'react-hook-form'
+import { FieldValues } from 'react-hook-form'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
-import CreatableSelect from 'react-select/creatable'
 import { z } from 'zod'
 
-import { Button, Spinner } from '@/components/Elements'
-import { ImgInput } from '@/components/Form/ImgInput'
-import { Textarea } from '@/components/Form/Textarea'
+import { Spinner } from '@/components/Elements'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
 import { Recipe } from '@/types/Recipe'
@@ -55,22 +51,7 @@ export const RecipeRegisterComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  // const defaultRecipe = useMemo(() => {
-  //   return {
-  //     img: '',
-  //     name: '',
-  //     memo: '',
-  //     category: '',
-  //     date: '',
-  //   }
-  // }, [])
-
   const [recipeData, setRecipeData] = useState<Recipe[]>()
-
-  // const { reset } = useForm({
-  //   defaultValues: recipeData,
-  //   resolver: zodResolver(schema),
-  // })
 
   const [options, setOptions] = useState<option>()
 
@@ -163,26 +144,9 @@ export const RecipeRegisterComponent: FC = () => {
     [fileObject, handleStorage]
   )
 
-  console.log(recipeData)
-
-  const defaultRecipe = useMemo(() => {
-    return {
-      img: '',
-      name: '',
-      memo: '',
-      category: '',
-      date: '',
-    }
+  const addRecipeHandler = useCallback((newRecipe: Recipe) => {
+    setRecipeData((prevRecipe) => (prevRecipe != null ? [...prevRecipe, newRecipe] : [newRecipe]))
   }, [])
-
-  const addRecipeHandler = useCallback(
-    (newRecipe: Recipe, reset: UseFormReset<Recipe>) => {
-      console.log(newRecipe)
-      reset(defaultRecipe)
-      setRecipeData((prevRecipe) => (prevRecipe != null ? [...prevRecipe, newRecipe] : [newRecipe]))
-    },
-    [defaultRecipe]
-  )
 
   const removeRecipeHandler = useCallback(
     (index: number) => {

@@ -2,11 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, chakra, VStack, Box, Input, HStack } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useForm, FieldValues, Controller, UseFormReset } from 'react-hook-form'
-import { PropsValue } from 'react-select'
-import CreatableSelect from 'react-select/creatable'
-import { string, z } from 'zod'
+import { FC, useCallback, useMemo } from 'react'
+import { useForm, FieldValues, Controller } from 'react-hook-form'
+import { z } from 'zod'
 
 import { Button } from '@/components/Elements'
 import { ImgInput } from '@/components/Form/ImgInput'
@@ -32,7 +30,7 @@ type RecipeFormComponentProps = {
   onChangeFile: (fileObject: File) => void
   options: option | undefined
   isLoadingButton: boolean
-  addRecipeHandler: (newRecipe: Recipe, reset: UseFormReset<Recipe>) => void
+  addRecipeHandler: (newRecipe: Recipe) => void
   removeRecipeHandler: (index: number) => void
 }
 
@@ -73,32 +71,20 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     resolver: zodResolver(schema),
   })
 
-  useEffect(() => {
-    recipe === undefined && reset(defaultRecipe)
-  }, [reset, recipe, defaultRecipe])
-
   const onFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.target.files) return
 
       const fileData = e.target.files[0]
 
-      console.log(fileData)
-
       onChangeFile(fileData)
     },
     [onChangeFile]
   )
 
-  console.log(isSubmitSuccessful)
-
   if (isSubmitSuccessful) {
-    console.log('fffffffff')
-
     reset(defaultRecipe)
   }
-  // useEffect(() => {
-  // }, [defaultRecipe, isSubmitSuccessful, reset])
 
   const fileImg = useCallback(() => {
     if (fileObject != null) return window.URL.createObjectURL(fileObject)
@@ -158,10 +144,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
           </Box>
           {hasSubmit ? (
             <HStack>
-              <Button
-                onClick={handleSubmit((value) => addRecipeHandler(value, reset))}
-                isLoading={isLoadingButton}
-              >
+              <Button onClick={handleSubmit(addRecipeHandler)} isLoading={isLoadingButton}>
                 <Text fontSize={'sm'} fontWeight="700">
                   追加
                 </Text>
