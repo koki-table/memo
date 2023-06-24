@@ -26,8 +26,8 @@ type RecipeFormComponentProps = {
   recipe?: Recipe
   onSubmit: (data: FieldValues) => Promise<void>
   hasSubmit: boolean
-  fileObject: File | undefined
-  onChangeFile: (fileObject: File) => void
+  imgFiles: File | undefined
+  appendImgFile: (imgFiles: File) => void
   options: option | undefined
   isLoadingButton: boolean
   updateRecipeHandler: (newRecipe: Recipe, index: number) => void
@@ -40,8 +40,8 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     recipe,
     onSubmit,
     hasSubmit,
-    fileObject,
-    onChangeFile,
+    imgFiles,
+    appendImgFile,
     options,
     isLoadingButton,
     updateRecipeHandler,
@@ -66,17 +66,17 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
 
       const fileData = e.target.files[0]
 
-      onChangeFile(fileData)
+      appendImgFile(fileData)
     },
-    [onChangeFile]
+    [appendImgFile]
   )
 
   const fileImg = useCallback(() => {
-    if (fileObject != null) return window.URL.createObjectURL(fileObject)
+    if (imgFiles != null) return window.URL.createObjectURL(imgFiles)
     if (recipe === undefined) return null
     if (recipe.img) return recipe.img
     return null
-  }, [fileObject, recipe])
+  }, [imgFiles, recipe])
 
   return (
     <VStack

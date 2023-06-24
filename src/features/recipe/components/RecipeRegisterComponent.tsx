@@ -113,46 +113,6 @@ export const RecipeRegisterComponent: FC = () => {
     fetchDb()
   }, [date, toast, user])
 
-  const [fileObject, setFileObject] = useState<File[]>()
-
-  const onChangeFile = useCallback(
-    (newFileObject: File) => {
-      setFileObject((fileObject) => {
-        if (fileObject) {
-          return [...fileObject, newFileObject]
-        } else {
-          return [newFileObject]
-        }
-      })
-    },
-    [setFileObject]
-  )
-
-  const handleStorage = useCallback(async () => {
-    console.log(fileObject)
-
-    const uploadPromises = fileObject!.map(async (file) => {
-      // 画像をstorageにアップロード
-      const uploadStorage = ref(storage, file.name)
-      const imgData = await uploadBytes(uploadStorage, file)
-
-      // アップロードした画像のURLを取得
-      const downloadURL = await getDownloadURL(imgData.ref)
-      return downloadURL
-    })
-
-    const downloadURLs = await Promise.all(uploadPromises)
-    return downloadURLs
-  }, [fileObject])
-
-  const handleImgData = useCallback(
-    async (data: FieldValues) => {
-      if (fileObject != null) return await handleStorage()
-      return data.img
-    },
-    [fileObject, handleStorage]
-  )
-
   const updateRecipeHandler = useCallback(
     (newRecipe: Recipe, index: number) => {
       setRecipeData((prevRecipes) =>
@@ -173,6 +133,39 @@ export const RecipeRegisterComponent: FC = () => {
     [setRecipeData]
   )
 
+  const [imgFiles, setImgFiles] = useState<File[]>()
+
+  const appendImgFile = useCallback((newImgFile: File) => {
+    setImgFiles((imgFiles) => (imgFiles ? [...imgFiles, newImgFile] : [newImgFile]))
+  }, [])
+
+  console.log(imgFiles)
+
+  const handleStorage = useCallback(async () => {
+    console.log(imgFiles)
+
+    const uploadPromises = imgFiles!.map(async (file) => {
+      // 画像をstorageにアップロード
+      const uploadStorage = ref(storage, file.name)
+      const imgData = await uploadBytes(uploadStorage, file)
+
+      // アップロードした画像のURLを取得
+      const downloadURL = await getDownloadURL(imgData.ref)
+      return downloadURL
+    })
+
+    const downloadURLs = await Promise.all(uploadPromises)
+    return downloadURLs
+  }, [imgFiles])
+
+  const handleImgData = useCallback(
+    async (data: FieldValues) => {
+      if (imgFiles != null) return await handleStorage()
+      return data.img
+    },
+    [imgFiles, handleStorage]
+  )
+
   const onSubmit = useCallback(
     async (data: FieldValues) => {
       const imgData = await handleImgData(data)
@@ -181,23 +174,39 @@ export const RecipeRegisterComponent: FC = () => {
 
       setIsLoadingButton(true)
       // db登録
-      await setDoc(recipeDoc, {
-        recipes: arrayUnion(
+      console.log(recipeData)
+
+      // 画面描画用の最後のdefaultオブジェクトを削除
+      const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
+
+      console.log(formattedRecipes)
+
+      const connectedImgAndRecipe = () => {
+        const connectedData = formattedRecipes.map((recipe, i) => ({
+          img: imgData[i],
+          name: recipe.name,
+          memo: recipe.memo,
+          category: recipe.category,
+          date,
+        }))
+
+        const appendedData = [
+          ...connectedData,
           {
-            img: imgData,
+            img: imgData[imgData.length - 1],
             name: data.name,
             memo: data.memo,
             category: data.category,
             date,
           },
-          {
-            img: imgData,
-            name: data.name,
-            memo: data.name,
-            category: data.name,
-            date,
-          }
-        ),
+        ]
+        return appendedData
+      }
+
+      const registerValues = connectedImgAndRecipe()
+
+      await setDoc(recipeDoc, {
+        registerValues,
       })
 
       // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
@@ -222,12 +231,12 @@ export const RecipeRegisterComponent: FC = () => {
         duration: 1300,
       })
     },
-    [date, handleImgData, options, toast, user]
+    [date, handleImgData, options, recipeData, toast, user]
   )
 
   const handleDateChange = useCallback(
     (isNext: boolean) => {
-      setFileObject(undefined)
+      setImgFiles(undefined)
 
       if (isNext) {
         navigate(`/recipe/${calculateBeforeDay(date!)}`)
@@ -276,8 +285,8 @@ export const RecipeRegisterComponent: FC = () => {
           recipe={v}
           hasSubmit={recipeData.length === i + 1}
           onSubmit={onSubmit}
-          fileObject={fileObject ? fileObject[i] : undefined}
-          onChangeFile={onChangeFile}
+          imgFiles={imgFiles ? imgFiles[i] : undefined}
+          appendImgFile={appendImgFile}
           options={options ?? undefined}
           isLoadingButton={isLoadingButton}
           updateRecipeHandler={updateRecipeHandler}
