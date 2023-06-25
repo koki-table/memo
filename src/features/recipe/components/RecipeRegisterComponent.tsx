@@ -1,23 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, useToast, Flex, Link, HStack } from '@chakra-ui/react'
-import {
-  arrayUnion,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore'
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
-import { z } from 'zod'
 
 import { Spinner } from '@/components/Elements'
 import { useAuth } from '@/features/auth'
@@ -36,13 +26,6 @@ export type option = [
   }
 ]
 
-const schema = z.object({
-  name: z.string().min(1, '料理名を入力は必須です。'),
-  category: z.string().min(1, 'カテゴリー選択は必須です。'),
-  memo: z.string(),
-  img: z.string(),
-})
-
 export const RecipeRegisterComponent: FC = () => {
   const navigate = useNavigate()
   const viewWidth = window.innerWidth - 32
@@ -50,8 +33,6 @@ export const RecipeRegisterComponent: FC = () => {
   const { user } = useAuth()
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
-
-  console.log(date)
 
   const defaultRecipe = useMemo(() => {
     return {
@@ -72,13 +53,11 @@ export const RecipeRegisterComponent: FC = () => {
   useEffect(() => {
     const fetchDb = async () => {
       try {
-        const recipeCol = createCollection('recipes', user)
-        const dateQuery = query(recipeCol, where('date', '==', `${date!}`))
-
         const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+        const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date!}`)
 
         setIsLoading(true)
-        const queryDateSnapshot = await getDocs(dateQuery)
+        const queryDateSnapshot = await getDoc(recipeDoc)
         const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
 
@@ -90,19 +69,12 @@ export const RecipeRegisterComponent: FC = () => {
           console.log('categoryは未登録です。')
         }
 
-        if (queryDateSnapshot.size === 0) {
+        if (queryDateSnapshot.exists()) {
+          setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
           // reset([defaultRecipe])
-          // setRecipeData([defaultRecipe])
           return
         }
-
-        queryDateSnapshot.forEach((doc) => {
-          setRecipeData([doc.data()] as Recipe[])
-
-          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          // reset([doc.data()] as Recipe[])
-        })
       } catch (e: any) {
         console.log(e.message)
         toast({
@@ -113,7 +85,9 @@ export const RecipeRegisterComponent: FC = () => {
       }
     }
     fetchDb()
-  }, [date, toast, user])
+  }, [date, defaultRecipe, toast, user])
+
+  console.log(recipeData)
 
   const updateRecipeHandler = useCallback(
     (newRecipe: Recipe, index: number) => {
@@ -124,8 +98,6 @@ export const RecipeRegisterComponent: FC = () => {
     },
     [defaultRecipe]
   )
-
-  console.log(recipeData)
 
   const removeRecipeHandler = useCallback(
     (index: number) => {
@@ -140,8 +112,6 @@ export const RecipeRegisterComponent: FC = () => {
   const appendImgFile = useCallback((newImgFile: File) => {
     setImgFiles((imgFiles) => (imgFiles ? [...imgFiles, newImgFile] : [newImgFile]))
   }, [])
-
-  console.log(imgFiles)
 
   const handleStorage = useCallback(async () => {
     console.log(imgFiles)
@@ -171,10 +141,8 @@ export const RecipeRegisterComponent: FC = () => {
   const onSubmit = useCallback(
     async (data: FieldValues) => {
       const imgData = await handleImgData(data)
-      const recipeDoc = doc(createCollection('recipes', user), date)
+      const recipeDoc = doc(createCollection('dates', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-
-      console.log(imgData)
 
       setIsLoadingButton(true)
 
@@ -200,15 +168,13 @@ export const RecipeRegisterComponent: FC = () => {
             date,
           },
         ]
-        console.log(appendedData)
-
         return appendedData
       }
 
-      const registerValues = connectedImgAndRecipe()
+      const recipes = connectedImgAndRecipe()
 
       await setDoc(recipeDoc, {
-        registerValues,
+        recipes,
       })
 
       // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
@@ -233,7 +199,7 @@ export const RecipeRegisterComponent: FC = () => {
         duration: 1300,
       })
     },
-    [date, handleImgData, options, recipeData, toast, user]
+    [date, defaultRecipe.img, handleImgData, options, recipeData, toast, user]
   )
 
   if (isLoading) return <Spinner variants="full" />
