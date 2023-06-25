@@ -174,18 +174,16 @@ export const RecipeRegisterComponent: FC = () => {
       const recipeDoc = doc(createCollection('recipes', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
+      console.log(imgData)
+
       setIsLoadingButton(true)
-      // db登録
-      console.log(recipeData)
 
       // 画面描画用の最後のdefaultオブジェクトを削除
       const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
 
-      console.log(formattedRecipes)
-
       const connectedImgAndRecipe = () => {
         const connectedData = formattedRecipes.map((recipe, i) => ({
-          img: imgData[i],
+          img: imgData[i] ?? defaultRecipe.img,
           name: recipe.name,
           memo: recipe.memo,
           category: recipe.category,
@@ -195,13 +193,15 @@ export const RecipeRegisterComponent: FC = () => {
         const appendedData = [
           ...connectedData,
           {
-            img: imgData[imgData.length - 1],
+            img: imgData[imgData.length - 1] ?? defaultRecipe.img,
             name: data.name,
             memo: data.memo,
             category: data.category,
             date,
           },
         ]
+        console.log(appendedData)
+
         return appendedData
       }
 
