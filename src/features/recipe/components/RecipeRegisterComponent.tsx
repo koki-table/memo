@@ -23,7 +23,7 @@ import { Spinner } from '@/components/Elements'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
 import { Recipe } from '@/types/Recipe'
-import { calculateBeforeDay, calculateNextDay } from '@/utils/calculateDay'
+import { calculateDay } from '@/utils/calculateDay'
 import { createCollection, db } from '@/utils/database'
 import { hasTargetValue } from '@/utils/hasTargetValue'
 
@@ -50,6 +50,8 @@ export const RecipeRegisterComponent: FC = () => {
   const { user } = useAuth()
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
+
+  console.log(date)
 
   const defaultRecipe = useMemo(() => {
     return {
@@ -234,18 +236,6 @@ export const RecipeRegisterComponent: FC = () => {
     [date, handleImgData, options, recipeData, toast, user]
   )
 
-  const handleDateChange = useCallback(
-    (isNext: boolean) => {
-      setImgFiles(undefined)
-
-      if (isNext) {
-        navigate(`/recipe/${calculateBeforeDay(date!)}`)
-      }
-      navigate(`/recipe/${calculateNextDay(date!)}`)
-    },
-    [date, navigate]
-  )
-
   if (isLoading) return <Spinner variants="full" />
 
   return (
@@ -266,10 +256,10 @@ export const RecipeRegisterComponent: FC = () => {
             <Text w={'100%'} fontSize={'sm'} fontWeight="700">
               {formattedDate}
             </Text>
-            <Link onClick={() => handleDateChange(false)}>
+            <Link onClick={() => navigate(`/recipe/${calculateDay(date!, false)}`)}>
               <IoIosArrowBack />
             </Link>
-            <Link onClick={() => handleDateChange(true)}>
+            <Link onClick={() => navigate(`/recipe/${calculateDay(date!, true)}`)}>
               <IoIosArrowForward />
             </Link>
           </HStack>
