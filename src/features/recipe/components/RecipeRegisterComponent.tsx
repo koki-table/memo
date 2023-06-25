@@ -256,10 +256,14 @@ export const RecipeRegisterComponent: FC = () => {
             <Text w={'100%'} fontSize={'sm'} fontWeight="700">
               {formattedDate}
             </Text>
-            <Link onClick={() => navigate(`/recipe/${calculateDay(date!, false)}`)}>
+            <Link
+              onClick={() => navigate(`/recipe/${calculateDay({ date: date!, isNextDay: false })}`)}
+            >
               <IoIosArrowBack />
             </Link>
-            <Link onClick={() => navigate(`/recipe/${calculateDay(date!, true)}`)}>
+            <Link
+              onClick={() => navigate(`/recipe/${calculateDay({ date: date!, isNextDay: true })}`)}
+            >
               <IoIosArrowForward />
             </Link>
           </HStack>

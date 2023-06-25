@@ -6,10 +6,15 @@ import dayjs from 'dayjs'
  * @param isNextDay 翌日か前日を判定するフラグ
  * @returns 計算された前日または翌日の日付(20230626 or 20230624)
  */
-export const calculateDay = (date: string, isNextDay: boolean): number => {
-  const formattedDate = dayjs(date).format('YYYYMMDD')
 
-  if (isNextDay) {
+type dateInfo = {
+  date: string
+  isNextDay: boolean
+}
+export const calculateDay = (dateInfo: dateInfo): number => {
+  const formattedDate = dayjs(dateInfo.date).format('YYYYMMDD')
+
+  if (dateInfo.isNextDay) {
     const addDay = dayjs(formattedDate).add(1, 'day')
     return Number(addDay.format('YYYYMMDD'))
   } else {
