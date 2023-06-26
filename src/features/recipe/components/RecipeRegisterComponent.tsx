@@ -124,7 +124,7 @@ export const RecipeRegisterComponent: FC = () => {
 
     const uploadPromises = imgFiles!.map(async (file) => {
       // 画像をstorageにアップロード
-      const uploadStorage = ref(storage, file.name)
+      const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${file.name}`)
       const imgData = await uploadBytes(uploadStorage, file)
 
       // アップロードした画像のURLを取得
@@ -134,7 +134,7 @@ export const RecipeRegisterComponent: FC = () => {
 
     const downloadURLs = await Promise.all(uploadPromises)
     return downloadURLs
-  }, [imgFiles])
+  }, [imgFiles, user])
 
   const handleImgData = useCallback(
     async (data: FieldValues) => {
