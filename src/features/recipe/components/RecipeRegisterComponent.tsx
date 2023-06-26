@@ -34,6 +34,8 @@ export const RecipeRegisterComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
+  const recipeDoc = doc(createCollection('dates', user), date)
+
   const defaultRecipe = useMemo(() => {
     return {
       img: '',
@@ -100,11 +102,15 @@ export const RecipeRegisterComponent: FC = () => {
   )
 
   const removeRecipeHandler = useCallback(
-    (index: number) => {
-      console.log(index)
+    async (index: number) => {
       setRecipeData((recipeData) => recipeData.filter((_, i) => i !== index))
+
+      const removeRecipe = recipeData.filter((_, i) => i !== index)
+      await setDoc(recipeDoc, {
+        recipes: removeRecipe,
+      })
     },
-    [setRecipeData]
+    [recipeData, recipeDoc]
   )
 
   const [imgFiles, setImgFiles] = useState<File[]>()
@@ -141,7 +147,6 @@ export const RecipeRegisterComponent: FC = () => {
   const onSubmit = useCallback(
     async (data: FieldValues) => {
       const imgData = await handleImgData(data)
-      const recipeDoc = doc(createCollection('dates', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
       setIsLoadingButton(true)
@@ -199,7 +204,7 @@ export const RecipeRegisterComponent: FC = () => {
         duration: 1300,
       })
     },
-    [date, defaultRecipe.img, handleImgData, options, recipeData, toast, user]
+    [date, defaultRecipe.img, handleImgData, options, recipeData, recipeDoc, toast, user]
   )
 
   if (isLoading) return <Spinner variants="full" />
