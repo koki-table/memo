@@ -106,7 +106,7 @@ const useAuthProvider = (): UseAuth => {
         if (e instanceof FirebaseError) {
           console.log(e)
         }
-        return { success: true, message: 'エラーが発生しました' }
+        return { success: false, message: 'エラーが発生しました' }
       } finally {
         setIsLoading(false)
       }
@@ -139,7 +139,7 @@ const useAuthProvider = (): UseAuth => {
         if (e instanceof FirebaseError) {
           console.log(e)
         }
-        return { success: true, message: 'エラーが発生しました' }
+        return { success: false, message: 'エラーが発生しました' }
       } finally {
         setIsLoading(false)
       }
@@ -162,7 +162,7 @@ const useAuthProvider = (): UseAuth => {
       if (e instanceof FirebaseError) {
         console.log(e)
       }
-      return { success: true, message: 'エラーが発生しました' }
+      return { success: false, message: 'エラーが発生しました' }
     } finally {
       setIsLoading(false)
     }
@@ -179,7 +179,6 @@ const useAuthProvider = (): UseAuth => {
         position: 'top',
       })
       return { success: true, message: '' }
-      // TODO: ログイン後のページに遷移の処理を書く
     } catch (e) {
       toast({
         title: 'エラーが発生しました。',
@@ -189,7 +188,7 @@ const useAuthProvider = (): UseAuth => {
       if (e instanceof FirebaseError) {
         console.log(e)
       }
-      return { success: true, message: 'エラーが発生しました' }
+      return { success: false, message: 'エラーが発生しました' }
     } finally {
       setIsLoading(false)
     }

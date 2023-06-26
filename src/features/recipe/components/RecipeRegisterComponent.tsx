@@ -1,49 +1,30 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, chakra, VStack, Box, Input, useToast, Flex, Link, HStack } from '@chakra-ui/react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  arrayUnion,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore'
+import { Text, VStack, useToast, Flex, Link, HStack } from '@chakra-ui/react'
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, FieldValues, Controller } from 'react-hook-form'
+import { FieldValues } from 'react-hook-form'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
-import CreatableSelect from 'react-select/creatable'
-import { z } from 'zod'
 
-import { Button, Spinner } from '@/components/Elements'
-import { ImgInput } from '@/components/Form/ImgInput'
-import { Textarea } from '@/components/Form/Textarea'
+import { Spinner } from '@/components/Elements'
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
 import { Recipe } from '@/types/Recipe'
-import { calculateBeforeDay, calculateNextDay } from '@/utils/calculateDay'
+import { calculateDay } from '@/utils/calculateDay'
 import { createCollection, db } from '@/utils/database'
 import { hasTargetValue } from '@/utils/hasTargetValue'
 
-type option = [
+import { RecipeFormComponent } from './RecipeFormComponent'
+
+export type option = [
   {
     value: string
     label: string
   }
 ]
-
-const schema = z.object({
-  name: z.string().min(1, '料理名を入力は必須です。'),
-  category: z.string().min(1, 'カテゴリー選択は必須です。'),
-  memo: z.string(),
-  img: z.string(),
-})
 
 export const RecipeRegisterComponent: FC = () => {
   const navigate = useNavigate()
@@ -53,7 +34,7 @@ export const RecipeRegisterComponent: FC = () => {
   const toast = useToast()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
-  const defaultRecipes = useMemo(() => {
+  const defaultRecipe = useMemo(() => {
     return {
       img: '',
       name: '',
@@ -62,19 +43,7 @@ export const RecipeRegisterComponent: FC = () => {
       date: '',
     }
   }, [])
-
-  const [recipeData, setRecipeData] = useState<Recipe>(defaultRecipes)
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: recipeData,
-    resolver: zodResolver(schema),
-  })
+  const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
 
   const [options, setOptions] = useState<option>()
 
@@ -84,13 +53,11 @@ export const RecipeRegisterComponent: FC = () => {
   useEffect(() => {
     const fetchDb = async () => {
       try {
-        const recipeCol = createCollection('recipes', user)
-        const dateQuery = query(recipeCol, where('date', '==', `${date!}`))
-
         const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+        const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date!}`)
 
         setIsLoading(true)
-        const queryDateSnapshot = await getDocs(dateQuery)
+        const queryDateSnapshot = await getDoc(recipeDoc)
         const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
 
@@ -102,19 +69,12 @@ export const RecipeRegisterComponent: FC = () => {
           console.log('categoryは未登録です。')
         }
 
-        if (queryDateSnapshot.size === 0) {
+        if (queryDateSnapshot.exists()) {
+          setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          reset(defaultRecipes)
-          setRecipeData(defaultRecipes)
+          // reset([defaultRecipe])
           return
         }
-
-        queryDateSnapshot.forEach((doc) => {
-          setRecipeData(doc.data() as Recipe)
-
-          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          reset(doc.data() as Recipe)
-        })
       } catch (e: any) {
         console.log(e.message)
         toast({
@@ -125,55 +85,96 @@ export const RecipeRegisterComponent: FC = () => {
       }
     }
     fetchDb()
-  }, [date, defaultRecipes, reset, toast, user])
+  }, [date, defaultRecipe, toast, user])
 
-  const [fileObject, setFileObject] = useState<File>()
+  console.log(recipeData)
 
-  const fileImg = useCallback(() => {
-    if (fileObject != null) return window.URL.createObjectURL(fileObject)
-    if (recipeData.img) return recipeData.img
-    return null
-  }, [fileObject, recipeData.img])
+  const updateRecipeHandler = useCallback(
+    (newRecipe: Recipe, index: number) => {
+      setRecipeData((prevRecipes) =>
+        prevRecipes.map((prevRecipe, i) => (i === index ? newRecipe : prevRecipe))
+      )
+      setRecipeData((prevRecipes) => [...prevRecipes, defaultRecipe])
+    },
+    [defaultRecipe]
+  )
 
-  const onFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
+  const removeRecipeHandler = useCallback(
+    (index: number) => {
+      console.log(index)
+      setRecipeData((recipeData) => recipeData.filter((_, i) => i !== index))
+    },
+    [setRecipeData]
+  )
 
-    const fileData = e.target.files[0]
-    setFileObject(fileData)
+  const [imgFiles, setImgFiles] = useState<File[]>()
+
+  const appendImgFile = useCallback((newImgFile: File) => {
+    setImgFiles((imgFiles) => (imgFiles ? [...imgFiles, newImgFile] : [newImgFile]))
   }, [])
 
   const handleStorage = useCallback(async () => {
-    // 画像をstorageにアップロード
-    const uploadStorage = ref(storage, fileObject!.name)
-    const imgData = await uploadBytes(uploadStorage, fileObject!)
+    console.log(imgFiles)
 
-    // アップロードした画像のURLを取得
-    const downloadURL = await getDownloadURL(imgData.ref)
-    return downloadURL
-  }, [fileObject])
+    const uploadPromises = imgFiles!.map(async (file) => {
+      // 画像をstorageにアップロード
+      const uploadStorage = ref(storage, file.name)
+      const imgData = await uploadBytes(uploadStorage, file)
+
+      // アップロードした画像のURLを取得
+      const downloadURL = await getDownloadURL(imgData.ref)
+      return downloadURL
+    })
+
+    const downloadURLs = await Promise.all(uploadPromises)
+    return downloadURLs
+  }, [imgFiles])
 
   const handleImgData = useCallback(
     async (data: FieldValues) => {
-      if (fileObject != null) return await handleStorage()
+      if (imgFiles != null) return await handleStorage()
       return data.img
     },
-    [fileObject, handleStorage]
+    [imgFiles, handleStorage]
   )
 
   const onSubmit = useCallback(
     async (data: FieldValues) => {
       const imgData = await handleImgData(data)
-      const recipeDoc = doc(createCollection('recipes', user), date)
+      const recipeDoc = doc(createCollection('dates', user), date)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
       setIsLoadingButton(true)
-      // db登録
+
+      // 画面描画用の最後のdefaultオブジェクトを削除
+      const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
+
+      const connectedImgAndRecipe = () => {
+        const connectedData = formattedRecipes.map((recipe, i) => ({
+          img: imgData[i] ?? defaultRecipe.img,
+          name: recipe.name,
+          memo: recipe.memo,
+          category: recipe.category,
+          date,
+        }))
+
+        const appendedData = [
+          ...connectedData,
+          {
+            img: imgData[imgData.length - 1] ?? defaultRecipe.img,
+            name: data.name,
+            memo: data.memo,
+            category: data.category,
+            date,
+          },
+        ]
+        return appendedData
+      }
+
+      const recipes = connectedImgAndRecipe()
+
       await setDoc(recipeDoc, {
-        img: imgData,
-        name: data.name,
-        memo: data.memo,
-        category: data.category,
-        date,
+        recipes,
       })
 
       // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
@@ -198,19 +199,7 @@ export const RecipeRegisterComponent: FC = () => {
         duration: 1300,
       })
     },
-    [date, handleImgData, options, toast, user]
-  )
-
-  const handleDateChange = useCallback(
-    (isNext: boolean) => {
-      setFileObject(undefined)
-
-      if (isNext) {
-        navigate(`/recipe/${calculateBeforeDay(date!)}`)
-      }
-      navigate(`/recipe/${calculateNextDay(date!)}`)
-    },
-    [date, navigate]
+    [date, defaultRecipe.img, handleImgData, options, recipeData, toast, user]
   )
 
   if (isLoading) return <Spinner variants="full" />
@@ -227,93 +216,43 @@ export const RecipeRegisterComponent: FC = () => {
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
     >
-      <chakra.form onSubmit={handleSubmit(onSubmit)}>
-        <VStack spacing={6}>
-          <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
-            <HStack alignItems={'center'} spacing={3}>
-              <Text w={'100%'} fontSize={'sm'} fontWeight="700">
-                {formattedDate}
-              </Text>
-              <Link onClick={() => handleDateChange(false)}>
-                <IoIosArrowBack />
-              </Link>
-              <Link onClick={() => handleDateChange(true)}>
-                <IoIosArrowForward />
-              </Link>
-            </HStack>
-            <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
-              <MdCalendarMonth size={27} />
-            </Link>
-          </Flex>
-          <ImgInput
-            registration={register('img')}
-            onChange={onFileInputChange}
-            fileImg={fileImg()}
-          />
-          <VStack w="100%" alignItems={'flex-start'}>
-            <Input
-              {...register('name')}
-              placeholder={'料理名'}
-              _placeholder={{ color: 'var(--text-color-placeholder)' }}
-            />
-            {errors.name && (
-              <Text fontSize={'xs'} pl={2}>
-                {errors.name?.message}
-              </Text>
-            )}
-          </VStack>
-          <VStack w="100%" alignItems={'flex-start'}>
-            {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
-            <Controller
-              control={control}
-              name="category"
-              render={({ field }) => (
-                <CreatableSelect
-                  {...field}
-                  placeholder={'カテゴリ'}
-                  options={options}
-                  value={options?.find((v) => v.value === field.value)}
-                  onChange={(newValue) => {
-                    field.onChange(newValue?.value)
-                  }}
-                  styles={{
-                    control: (baseStyles) => ({
-                      ...baseStyles,
-                      borderColor: 'var(--line-color-light)',
-                      minWidth: viewWidth,
-                    }),
-                    placeholder: (baseStyles) => ({
-                      ...baseStyles,
-                      color: 'var(--text-color-placeholder)',
-                    }),
-                    indicatorSeparator: (baseStyles) => ({
-                      ...baseStyles,
-                      display: 'none',
-                    }),
-                    singleValue: (baseStyles) => ({
-                      ...baseStyles,
-                      color: 'var(--text-color)',
-                    }),
-                  }}
-                />
-              )}
-            />
-            {errors.category && (
-              <Text fontSize={'xs'} pl={2}>
-                {errors.category.message}
-              </Text>
-            )}
-          </VStack>
-          <Box minW={'100%'}>
-            <Textarea placeholder="メモ" minH={'180px'} registration={register('memo')} />
-          </Box>
-          <Button type={'submit'} isLoading={isLoadingButton}>
-            <Text fontSize={'sm'} fontWeight="700">
-              登録
+      <VStack spacing={6}>
+        <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
+          <HStack alignItems={'center'} spacing={3}>
+            <Text w={'100%'} fontSize={'sm'} fontWeight="700">
+              {formattedDate}
             </Text>
-          </Button>
-        </VStack>
-      </chakra.form>
+            <Link
+              onClick={() => navigate(`/recipe/${calculateDay({ date: date!, isNextDay: false })}`)}
+            >
+              <IoIosArrowBack />
+            </Link>
+            <Link
+              onClick={() => navigate(`/recipe/${calculateDay({ date: date!, isNextDay: true })}`)}
+            >
+              <IoIosArrowForward />
+            </Link>
+          </HStack>
+          <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
+            <MdCalendarMonth size={27} />
+          </Link>
+        </Flex>
+      </VStack>
+      {recipeData.map((v, i) => (
+        <RecipeFormComponent
+          key={i}
+          index={i}
+          recipe={v}
+          hasSubmit={recipeData.length === i + 1}
+          onSubmit={onSubmit}
+          imgFiles={imgFiles ? imgFiles[i] : undefined}
+          appendImgFile={appendImgFile}
+          options={options ?? undefined}
+          isLoadingButton={isLoadingButton}
+          updateRecipeHandler={updateRecipeHandler}
+          removeRecipeHandler={removeRecipeHandler}
+        />
+      ))}
     </VStack>
   )
 }

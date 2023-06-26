@@ -1,2 +1,1 @@
-export * from './calculateNextDay'
-export * from './calculateBeforeDay'
+export * from './calculateDay'
