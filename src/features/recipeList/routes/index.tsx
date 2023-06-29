@@ -7,12 +7,12 @@ import { RecipeProvider } from '../lib'
 
 const { RecipeList } = lazyImport(async () => await import('./RecipeList'), 'RecipeList')
 
-export const CategorizedRecipesRoutes = () => {
+export const RecipeListRoutes = () => {
   return (
     <RecipeProvider>
       <Suspense>
         <Routes>
-          <Route path="/list" element={<RecipeList />} />
+          <Route path="/" element={<RecipeList />} />
         </Routes>
       </Suspense>
     </RecipeProvider>
