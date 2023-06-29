@@ -5,9 +5,9 @@ import { lazyImport } from '@/utils/lazyImport'
 
 import { RecipeProvider } from '../lib'
 
-const { Recipe } = lazyImport(async () => await import('./DailyRecipe'), 'Recipe')
+const { Recipe } = lazyImport(async () => await import('./Recipe'), 'Recipe')
 
-export const DailyRecipeRoutes = () => {
+export const RecipeRoutes = () => {
   return (
     <RecipeProvider>
       <Suspense>
