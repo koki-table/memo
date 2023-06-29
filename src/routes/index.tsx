@@ -22,6 +22,10 @@ const { CalendarRoutes } = lazyImport(
   async () => await import('@/features/calendar'),
   'CalendarRoutes'
 )
+const { RecipeListRoutes } = lazyImport(
+  async () => await import('@/features/recipeList'),
+  'RecipeListRoutes'
+)
 const { RecipeRoutes } = lazyImport(async () => await import('@/features/recipe'), 'RecipeRoutes')
 const { HomeRoutes } = lazyImport(async () => await import('@/features/home'), 'HomeRoutes')
 
@@ -38,6 +42,7 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/" element={handleAuth()}>
         <Route index element={<HomeRoutes />} />
+        <Route path="/recipe-list/*" element={<RecipeListRoutes />} />
         <Route path="/recipe/*" element={<RecipeRoutes />} />
         <Route path="/calendar/*" element={<CalendarRoutes />} />
       </Route>
