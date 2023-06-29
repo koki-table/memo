@@ -14,7 +14,7 @@ import { EditModal } from '@/components/EditModal'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
 
-import { useRecipe } from '../lib/recipe'
+import { useRecipe } from '../lib/categorizedRecipes'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'

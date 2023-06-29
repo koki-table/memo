@@ -1,7 +1,4 @@
-export * from './RecipeRegisterComponent'
 export * from './RecipeListComponent'
 export * from './PaginationComponent'
 export * from './CategoryListComponent'
 export * from './TagPicker'
-export * from './RecipeFormComponent'
-export * from './SelectBox'
