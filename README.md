@@ -11,5 +11,5 @@ firebaseにて、stagingとprod環境を用意している。
 
 `main.tsx`の firebaseConfig は dev と prod で切り替える必要がある。
 
-# 公開ページ
+# 公開ページ（スマホのみ対応、現在開発中）
 https://memo-develop.web.app/auth/login
