@@ -3,5 +3,5 @@ import { useRecipe } from '../lib'
 
 export const Recipe = () => {
   const { recipeData } = useRecipe()
-  return recipeData ? <RecipeUpdateComponent /> : <RecipeRegisterComponent />
+  return recipeData[0].name === '' ? <RecipeRegisterComponent /> : <RecipeUpdateComponent />
 }

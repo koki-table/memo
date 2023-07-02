@@ -26,7 +26,7 @@ export const RecipeUpdateComponent: FC = () => {
     appendImgFile,
     isLoadingButton,
     options,
-    updateRecipeHandler,
+    updateLocalRecipeHandler,
     removeRecipeHandler,
   } = useRecipe()
 
@@ -77,7 +77,7 @@ export const RecipeUpdateComponent: FC = () => {
           appendImgFile={appendImgFile}
           options={options ?? undefined}
           isLoadingButton={isLoadingButton}
-          updateRecipeHandler={updateRecipeHandler}
+          updateLocalRecipeHandler={updateLocalRecipeHandler}
           removeRecipeHandler={removeRecipeHandler}
         />
       ))}

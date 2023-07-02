@@ -1,18 +1,8 @@
 import { useToast } from '@chakra-ui/react'
 import { doc, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  FC,
-  useState,
-  useCallback,
-  useMemo,
-  useEffect,
-} from 'react'
+import { createContext, ReactNode, useContext, FC, useState, useCallback, useMemo } from 'react'
 import { FieldValues } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
 
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
@@ -30,13 +20,14 @@ export type option = [
 export type UseRecipe = {
   isLoading: boolean
   recipeData: Recipe[]
-  updateRecipeHandler: (newRecipe: Recipe, index: number) => void
-  removeRecipeHandler: (index: number) => Promise<void>
+  updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
+  removeRecipeHandler: (index: number, date: string) => Promise<void>
   imgFiles: File[] | undefined
   appendImgFile: (newImgFile: File) => void
-  registerRecipeHandler: (data: FieldValues) => Promise<void>
+  registerRecipeHandler: (data: FieldValues, date: string) => Promise<void>
   options: option | undefined
   isLoadingButton: boolean
+  fetchRecipe: (date: string) => Promise<void>
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -61,7 +52,7 @@ const useRecipeProvider = (): UseRecipe => {
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
   const { user } = useAuth()
-  const { date } = useParams()
+  // const { date } = useParams()
 
   const defaultRecipe = useMemo(() => {
     return {
@@ -83,11 +74,13 @@ const useRecipeProvider = (): UseRecipe => {
     ]
   >()
 
-  useEffect(() => {
-    const fetchRecipe = async () => {
+  const fetchRecipe = useCallback(
+    async (date: string) => {
       try {
         const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-        const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date!}`)
+        const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date}`)
+
+        console.log(recipeDoc)
 
         setIsLoading(true)
         const queryDateSnapshot = await getDoc(recipeDoc)
@@ -102,10 +95,15 @@ const useRecipeProvider = (): UseRecipe => {
           console.log('categoryは未登録です。')
         }
 
+        console.log(queryDateSnapshot.exists())
+
         if (queryDateSnapshot.exists()) {
           setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
           // reset([defaultRecipe])
+
+          console.log(queryDateSnapshot.data().recipes as Recipe[])
+
           return
         }
       } catch (e: any) {
@@ -116,13 +114,13 @@ const useRecipeProvider = (): UseRecipe => {
           position: 'top',
         })
       }
-    }
-    fetchRecipe()
-  }, [date, defaultRecipe, setIsLoading, setOptions, setRecipeData, toast, user])
+    },
+    [defaultRecipe, toast, user]
+  )
 
   const [isLoadingButton, setIsLoadingButton] = useState(false)
 
-  const updateRecipeHandler = useCallback(
+  const updateLocalRecipeHandler = useCallback(
     (newRecipe: Recipe, index: number) => {
       setRecipeData((prevRecipes) =>
         prevRecipes.map((prevRecipe, i) => (i === index ? newRecipe : prevRecipe))
@@ -133,7 +131,7 @@ const useRecipeProvider = (): UseRecipe => {
   )
 
   const removeRecipeHandler = useCallback(
-    async (index: number) => {
+    async (index: number, date: string) => {
       setRecipeData((recipeData) => recipeData.filter((_, i) => i !== index))
       const recipeDoc = doc(createCollection('dates', user), date)
 
@@ -142,7 +140,7 @@ const useRecipeProvider = (): UseRecipe => {
         recipes: removeRecipe,
       })
     },
-    [date, recipeData, user]
+    [recipeData, user]
   )
 
   const [imgFiles, setImgFiles] = useState<File[]>()
@@ -177,7 +175,7 @@ const useRecipeProvider = (): UseRecipe => {
   )
 
   const registerRecipeHandler = useCallback(
-    async (data: FieldValues) => {
+    async (data: FieldValues, date: string) => {
       const imgData = await handleImgData(data)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
 
@@ -237,18 +235,19 @@ const useRecipeProvider = (): UseRecipe => {
         duration: 1300,
       })
     },
-    [date, defaultRecipe.img, handleImgData, options, recipeData, toast, user]
+    [defaultRecipe.img, handleImgData, options, recipeData, toast, user]
   )
 
   return {
     isLoading,
     recipeData,
-    updateRecipeHandler,
+    updateLocalRecipeHandler,
     removeRecipeHandler,
     imgFiles,
     appendImgFile,
     registerRecipeHandler,
     options,
     isLoadingButton,
+    fetchRecipe,
   }
 }

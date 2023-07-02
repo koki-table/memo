@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Flex, Link, HStack } from '@chakra-ui/react'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { Spinner } from '@/components/Elements'
+import { useAuth } from '@/features/auth'
 import { calculateDay } from '@/utils/calculateDay'
 
 import { useRecipe } from '../lib'
@@ -16,6 +17,7 @@ import { RecipeFormComponent } from './RecipeFormComponent'
 export const RecipeRegisterComponent: FC = () => {
   const navigate = useNavigate()
   const { date } = useParams()
+
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const {
@@ -26,9 +28,14 @@ export const RecipeRegisterComponent: FC = () => {
     appendImgFile,
     isLoadingButton,
     options,
-    updateRecipeHandler,
+    updateLocalRecipeHandler,
     removeRecipeHandler,
+    fetchRecipe,
   } = useRecipe()
+
+  useEffect(() => {
+    fetchRecipe(date!)
+  }, [date, fetchRecipe])
 
   if (isLoading) return <Spinner variants="full" />
 
@@ -77,7 +84,7 @@ export const RecipeRegisterComponent: FC = () => {
           appendImgFile={appendImgFile}
           options={options ?? undefined}
           isLoadingButton={isLoadingButton}
-          updateRecipeHandler={updateRecipeHandler}
+          updateLocalRecipeHandler={updateLocalRecipeHandler}
           removeRecipeHandler={removeRecipeHandler}
         />
       ))}
