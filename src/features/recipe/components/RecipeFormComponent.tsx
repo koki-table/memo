@@ -152,7 +152,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
             </HStack>
           ) : (
             <Button
-              onClick={() => removeRecipeHandler(index + 1, date)}
+              onClick={() => removeRecipeHandler(index + 1, date!)}
               isLoading={isLoadingButton}
             >
               <Text fontSize={'sm'} fontWeight="700">

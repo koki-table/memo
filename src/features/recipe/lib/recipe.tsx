@@ -52,7 +52,6 @@ const useRecipeProvider = (): UseRecipe => {
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
   const { user } = useAuth()
-  // const { date } = useParams()
 
   const defaultRecipe = useMemo(() => {
     return {
@@ -101,9 +100,6 @@ const useRecipeProvider = (): UseRecipe => {
           setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
           // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
           // reset([defaultRecipe])
-
-          console.log(queryDateSnapshot.data().recipes as Recipe[])
-
           return
         }
       } catch (e: any) {
@@ -150,8 +146,6 @@ const useRecipeProvider = (): UseRecipe => {
   }, [])
 
   const handleStorage = useCallback(async () => {
-    console.log(imgFiles)
-
     const uploadPromises = imgFiles!.map(async (file) => {
       // 画像をstorageにアップロード
       const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${file.name}`)
