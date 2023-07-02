@@ -21,7 +21,7 @@ export const RecipeRegisterComponent: FC = () => {
   const {
     isLoading,
     recipeData,
-    registerHandler,
+    registerRecipeHandler,
     imgFiles,
     appendImgFile,
     isLoadingButton,
@@ -72,7 +72,7 @@ export const RecipeRegisterComponent: FC = () => {
           index={i}
           recipe={v}
           hasSubmit={recipeData.length === i + 1}
-          onSubmit={registerHandler}
+          onSubmit={registerRecipeHandler}
           imgFiles={imgFiles ? imgFiles[i] : undefined}
           appendImgFile={appendImgFile}
           options={options ?? undefined}

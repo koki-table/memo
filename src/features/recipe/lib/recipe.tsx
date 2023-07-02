@@ -34,7 +34,7 @@ export type UseRecipe = {
   removeRecipeHandler: (index: number) => Promise<void>
   imgFiles: File[] | undefined
   appendImgFile: (newImgFile: File) => void
-  registerHandler: (data: FieldValues) => Promise<void>
+  registerRecipeHandler: (data: FieldValues) => Promise<void>
   options: option | undefined
   isLoadingButton: boolean
 }
@@ -176,7 +176,7 @@ const useRecipeProvider = (): UseRecipe => {
     [imgFiles, handleStorage]
   )
 
-  const registerHandler = useCallback(
+  const registerRecipeHandler = useCallback(
     async (data: FieldValues) => {
       const imgData = await handleImgData(data)
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
@@ -247,7 +247,7 @@ const useRecipeProvider = (): UseRecipe => {
     removeRecipeHandler,
     imgFiles,
     appendImgFile,
-    registerHandler,
+    registerRecipeHandler,
     options,
     isLoadingButton,
   }
