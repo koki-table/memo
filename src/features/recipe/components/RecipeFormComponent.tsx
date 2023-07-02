@@ -11,7 +11,8 @@ import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { Recipe } from '@/types/Recipe'
 
-import { option } from './RecipeRegisterComponent'
+import { option } from '../lib'
+
 import { SelectBox } from './SelectBox'
 
 const schema = z.object({
@@ -30,7 +31,7 @@ type RecipeFormComponentProps = {
   appendImgFile: (imgFiles: File) => void
   options: option | undefined
   isLoadingButton: boolean
-  updateRecipeHandler: (newRecipe: Recipe, index: number) => void
+  updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number) => void
 }
 
@@ -44,7 +45,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     appendImgFile,
     options,
     isLoadingButton,
-    updateRecipeHandler,
+    updateLocalRecipeHandler,
     removeRecipeHandler,
   } = props
 
@@ -130,7 +131,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
           {hasSubmit ? (
             <HStack>
               <Button
-                onClick={handleSubmit((v) => updateRecipeHandler(v, index))}
+                onClick={handleSubmit((v) => updateLocalRecipeHandler(v, index))}
                 isLoading={isLoadingButton}
               >
                 <Text fontSize={'sm'} fontWeight="700">
