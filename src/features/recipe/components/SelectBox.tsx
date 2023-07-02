@@ -4,7 +4,7 @@ import CreatableSelect from 'react-select/creatable'
 
 import { Recipe } from '@/types/Recipe'
 
-import { option } from './RecipeRegisterComponent'
+import { option } from '../lib'
 
 type SelectBoxProps = {
   field: ControllerRenderProps<Recipe, 'category'>
