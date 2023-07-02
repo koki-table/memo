@@ -6,7 +6,7 @@ import { FC, memo } from 'react'
 import { Badge } from '@/components/Elements/Badge'
 import { Tag } from '@/components/Elements/Tag'
 
-import { useRecipe } from '../lib'
+import { useRecipeList } from '../lib'
 
 type TagPickerProps = {
   title: string
@@ -17,7 +17,7 @@ type TagPickerProps = {
 export const TagPicker: FC<TagPickerProps> = memo((props) => {
   const { title, hasBadge, onClick } = props
 
-  const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipe()
+  const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipeList()
 
   return (
     <Box mb={hasBadge && title === 'All' ? 0 : 3} mr={hasBadge && title === 'All' ? 0 : 2}>

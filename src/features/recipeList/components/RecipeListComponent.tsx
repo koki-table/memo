@@ -14,7 +14,7 @@ import { EditModal } from '@/components/EditModal'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
 
-import { useRecipe } from '../lib/RecipeList'
+import { useRecipeList } from '../lib'
 
 import { CategoryListComponent } from './CategoryListComponent'
 import { PaginationComponent } from './PaginationComponent'
@@ -37,7 +37,7 @@ export const RecipeListComponent: FC = () => {
     currentPage,
     updateRecipeCategories,
     updateCategory,
-  } = useRecipe()
+  } = useRecipeList()
 
   // recipeListが10個のオブジェクトを1つの配列に詰めているので、10倍にする
   const totalCount = recipeList?.length * 10

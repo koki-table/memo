@@ -34,7 +34,7 @@ export const HomeComponent: FC = () => {
       <VStack zIndex={2}>
         <CustomRowLink text={'本日の料理'} path={`/recipe/${today}`} />
         <CustomRowLink text={'カレンダー'} path={'/calendar'} />
-        <CustomRowLink text={'料理リスト'} path={'/recipe/list'} />
+        <CustomRowLink text={'料理リスト'} path={'/recipe-list'} />
       </VStack>
       <LoopingBackground source={sushi} w="120%" h={'50px'} animationDuration={'380s'} zIndex={2} />
     </VStack>
