@@ -1,5 +1,7 @@
-import { RecipeRegisterComponent } from '../components/RecipeRegisterComponent'
+import { RecipeUpdateComponent, RecipeRegisterComponent } from '../components'
+import { useRecipe } from '../lib'
 
 export const Recipe = () => {
-  return <RecipeRegisterComponent />
+  const { recipeData } = useRecipe()
+  return recipeData ? <RecipeUpdateComponent /> : <RecipeRegisterComponent />
 }

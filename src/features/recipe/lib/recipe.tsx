@@ -1,7 +1,16 @@
 import { useToast } from '@chakra-ui/react'
-import { doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore'
+import { doc, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { createContext, ReactNode, useContext, FC, useState, useCallback, useMemo } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  FC,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 
@@ -20,20 +29,14 @@ export type option = [
 
 export type UseRecipe = {
   isLoading: boolean
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   recipeData: Recipe[]
-  setRecipeData: React.Dispatch<React.SetStateAction<Recipe[]>>
   updateRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number) => Promise<void>
   imgFiles: File[] | undefined
-  setImgFiles: React.Dispatch<React.SetStateAction<File[] | undefined>>
   appendImgFile: (newImgFile: File) => void
   registerHandler: (data: FieldValues) => Promise<void>
   options: option | undefined
-  setOptions: React.Dispatch<React.SetStateAction<option | undefined>>
   isLoadingButton: boolean
-  setIsLoadingButton: React.Dispatch<React.SetStateAction<boolean>>
-  defaultRecipe: Recipe
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -79,6 +82,44 @@ const useRecipeProvider = (): UseRecipe => {
       }
     ]
   >()
+
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+        const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date!}`)
+
+        setIsLoading(true)
+        const queryDateSnapshot = await getDoc(recipeDoc)
+        const queryCategorySnapshot = await getDoc(categoryDoc)
+        setIsLoading(false)
+
+        if (queryCategorySnapshot.exists()) {
+          setOptions(
+            queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
+          )
+        } else {
+          console.log('categoryは未登録です。')
+        }
+
+        if (queryDateSnapshot.exists()) {
+          setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
+          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
+          // reset([defaultRecipe])
+          return
+        }
+      } catch (e: any) {
+        console.log(e.message)
+        toast({
+          title: 'エラーが発生しました。',
+          status: 'error',
+          position: 'top',
+        })
+      }
+    }
+    fetchRecipe()
+  }, [date, defaultRecipe, setIsLoading, setOptions, setRecipeData, toast, user])
+
   const [isLoadingButton, setIsLoadingButton] = useState(false)
 
   const updateRecipeHandler = useCallback(
@@ -201,19 +242,13 @@ const useRecipeProvider = (): UseRecipe => {
 
   return {
     isLoading,
-    setIsLoading,
     recipeData,
-    setRecipeData,
     updateRecipeHandler,
     removeRecipeHandler,
     imgFiles,
-    setImgFiles,
     appendImgFile,
     registerHandler,
     options,
-    setOptions,
     isLoadingButton,
-    setIsLoadingButton,
-    defaultRecipe,
   }
 }

@@ -13,7 +13,7 @@ import { useRecipe } from '../lib'
 
 import { RecipeFormComponent } from './RecipeFormComponent'
 
-export const RecipeRegisterComponent: FC = () => {
+export const RecipeUpdateComponent: FC = () => {
   const navigate = useNavigate()
   const { date } = useParams()
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
