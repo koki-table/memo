@@ -29,7 +29,7 @@ type RecipeFormComponentProps = {
   onSubmit: (data: FieldValues, date: string) => Promise<void>
   hasSubmit: boolean
   imgFiles: File | undefined
-  appendImgFile: (imgFiles: File) => void
+  appendImgFile: (imgFiles: File, index: number) => void
   options: option | undefined
   isLoadingButton: boolean
   updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
@@ -70,9 +70,9 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
 
       const fileData = e.target.files[0]
 
-      appendImgFile(fileData)
+      appendImgFile(fileData, index)
     },
-    [appendImgFile]
+    [appendImgFile, index]
   )
 
   const fileImg = useCallback(() => {

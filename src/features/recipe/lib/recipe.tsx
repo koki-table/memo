@@ -23,7 +23,7 @@ export type UseRecipe = {
   updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number, date: string) => Promise<void>
   imgFiles: File[] | undefined
-  appendImgFile: (newImgFile: File) => void
+  appendImgFile: (newImgFile: File, index: number) => void
   registerRecipeHandler: (data: FieldValues, date: string) => Promise<void>
   options: option | undefined
   isLoadingButton: boolean
@@ -63,6 +63,8 @@ const useRecipeProvider = (): UseRecipe => {
     }
   }, [])
   const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
+
+  const [imgFiles, setImgFiles] = useState<File[]>()
 
   const [options, setOptions] = useState<
     [
@@ -122,6 +124,10 @@ const useRecipeProvider = (): UseRecipe => {
         prevRecipes.map((prevRecipe, i) => (i === index ? newRecipe : prevRecipe))
       )
       setRecipeData((prevRecipes) => [...prevRecipes, defaultRecipe])
+
+      // if (newRecipe.name === '') {
+      //   setImgFiles((prevImgFiles) => prevImgFiles?.map((file, i) => (i === index ? '' : file)))
+      // }
     },
     [defaultRecipe]
   )
@@ -139,10 +145,19 @@ const useRecipeProvider = (): UseRecipe => {
     [recipeData, user]
   )
 
-  const [imgFiles, setImgFiles] = useState<File[]>()
+  console.log(imgFiles)
 
-  const appendImgFile = useCallback((newImgFile: File) => {
-    setImgFiles((imgFiles) => (imgFiles ? [...imgFiles, newImgFile] : [newImgFile]))
+  const appendImgFile = useCallback((newImgFile: File, index: number) => {
+    setImgFiles((imgFiles) => {
+      if (imgFiles?.[index]) {
+        // 既存のimgFilesが登録済みの場合は更新する
+        const updatedImgFiles = imgFiles.map((file, i) => (i === index ? newImgFile : file))
+        return updatedImgFiles
+      } else {
+        // 新しい値を配列に追加する
+        return imgFiles ? [...imgFiles, newImgFile] : [newImgFile]
+      }
+    })
   }, [])
 
   const handleStorage = useCallback(async () => {
