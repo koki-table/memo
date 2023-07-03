@@ -22,7 +22,7 @@ export type UseRecipe = {
   recipeData: Recipe[]
   updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number, date: string) => Promise<void>
-  imgFiles: File[] | undefined
+  imgFiles: { [index: number]: File } | undefined
   appendImgFile: (newImgFile: File, index: number) => void
   registerRecipeHandler: (data: FieldValues, date: string) => Promise<void>
   options: option | undefined
@@ -64,7 +64,7 @@ const useRecipeProvider = (): UseRecipe => {
   }, [])
   const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
 
-  const [imgFiles, setImgFiles] = useState<File[]>()
+  const [imgFiles, setImgFiles] = useState<{ [index: number]: File }>()
 
   const [options, setOptions] = useState<
     [
@@ -124,10 +124,6 @@ const useRecipeProvider = (): UseRecipe => {
         prevRecipes.map((prevRecipe, i) => (i === index ? newRecipe : prevRecipe))
       )
       setRecipeData((prevRecipes) => [...prevRecipes, defaultRecipe])
-
-      // if (newRecipe.name === '') {
-      //   setImgFiles((prevImgFiles) => prevImgFiles?.map((file, i) => (i === index ? '' : file)))
-      // }
     },
     [defaultRecipe]
   )
@@ -151,28 +147,49 @@ const useRecipeProvider = (): UseRecipe => {
     setImgFiles((imgFiles) => {
       if (imgFiles?.[index]) {
         // 既存のimgFilesが登録済みの場合は更新する
-        const updatedImgFiles = imgFiles.map((file, i) => (i === index ? newImgFile : file))
+        const updatedImgFiles = { ...imgFiles, [index]: newImgFile }
         return updatedImgFiles
       } else {
-        // 新しい値を配列に追加する
-        return imgFiles ? [...imgFiles, newImgFile] : [newImgFile]
+        // 新しい値を連想配列に追加する
+        return { ...imgFiles, [index]: newImgFile }
       }
     })
   }, [])
 
+  // const handleStorage = useCallback(async () => {
+  //   const uploadPromises = Object.values(imgFiles!).map(async (file, index) => {
+  //     // 画像をstorageにアップロード
+  //     const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${file.name}`)
+  //     const imgData = await uploadBytes(uploadStorage, file)
+
+  //     // アップロードした画像のURLを取得
+  //     const downloadURL = await getDownloadURL(imgData.ref)
+  //     return [index, downloadURL] // [index, downloadURL]の形式で返り値を設定
+  //   })
+
+  //   const downloadURLs = await Promise.all(uploadPromises)
+  //   const result = Object.fromEntries(downloadURLs) // 返り値を連想配列に変換
+  //   console.log(result)
+
+  //   return result
+  // }, [imgFiles, user])
+
   const handleStorage = useCallback(async () => {
-    const uploadPromises = imgFiles!.map(async (file) => {
+    const uploadPromises = Object.entries(imgFiles!).map(async ([index, file]) => {
       // 画像をstorageにアップロード
       const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${file.name}`)
       const imgData = await uploadBytes(uploadStorage, file)
 
       // アップロードした画像のURLを取得
       const downloadURL = await getDownloadURL(imgData.ref)
-      return downloadURL
+      return [Number(index), downloadURL] // [index, downloadURL]の形式で返り値を設定
     })
 
     const downloadURLs = await Promise.all(uploadPromises)
-    return downloadURLs
+    const result = Object.fromEntries(downloadURLs) // 返り値を連想配列に変換
+    console.log(result)
+
+    return result
   }, [imgFiles, user])
 
   const handleImgData = useCallback(
@@ -205,7 +222,7 @@ const useRecipeProvider = (): UseRecipe => {
         const appendedData = [
           ...connectedData,
           {
-            img: imgData[imgData.length - 1] ?? defaultRecipe.img,
+            img: imgData[imgData.length] ?? defaultRecipe.img,
             name: data.name,
             memo: data.memo,
             category: data.category,
