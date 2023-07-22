@@ -141,8 +141,6 @@ const useRecipeProvider = (): UseRecipe => {
     [recipeData, user]
   )
 
-  console.log(imgFiles)
-
   const appendImgFile = useCallback((newImgFile: File, index: number) => {
     setImgFiles((imgFiles) => {
       if (imgFiles?.[index]) {
@@ -155,24 +153,6 @@ const useRecipeProvider = (): UseRecipe => {
       }
     })
   }, [])
-
-  // const handleStorage = useCallback(async () => {
-  //   const uploadPromises = Object.values(imgFiles!).map(async (file, index) => {
-  //     // 画像をstorageにアップロード
-  //     const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${file.name}`)
-  //     const imgData = await uploadBytes(uploadStorage, file)
-
-  //     // アップロードした画像のURLを取得
-  //     const downloadURL = await getDownloadURL(imgData.ref)
-  //     return [index, downloadURL] // [index, downloadURL]の形式で返り値を設定
-  //   })
-
-  //   const downloadURLs = await Promise.all(uploadPromises)
-  //   const result = Object.fromEntries(downloadURLs) // 返り値を連想配列に変換
-  //   console.log(result)
-
-  //   return result
-  // }, [imgFiles, user])
 
   const handleStorage = useCallback(async () => {
     const uploadPromises = Object.entries(imgFiles!).map(async ([index, file]) => {
@@ -210,6 +190,16 @@ const useRecipeProvider = (): UseRecipe => {
       // 画面描画用の最後のdefaultオブジェクトを削除
       const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
 
+      const newRecipe = [
+        {
+          img: imgData[0] ?? defaultRecipe.img,
+          name: data.name,
+          memo: data.memo,
+          category: data.category,
+          date,
+        },
+      ]
+
       const connectedImgAndRecipe = () => {
         const connectedData = formattedRecipes.map((recipe, i) => ({
           img: imgData[i] ?? defaultRecipe.img,
@@ -222,7 +212,7 @@ const useRecipeProvider = (): UseRecipe => {
         const appendedData = [
           ...connectedData,
           {
-            img: imgData[imgData.length] ?? defaultRecipe.img,
+            img: imgData[Object.keys(imgData).length - 1] ?? defaultRecipe.img,
             name: data.name,
             memo: data.memo,
             category: data.category,
@@ -232,7 +222,7 @@ const useRecipeProvider = (): UseRecipe => {
         return appendedData
       }
 
-      const recipes = connectedImgAndRecipe()
+      const recipes = recipeData.length === 1 ? newRecipe : connectedImgAndRecipe()
       const recipeDoc = doc(createCollection('dates', user), date)
 
       await setDoc(recipeDoc, {
