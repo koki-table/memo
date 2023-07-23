@@ -3,6 +3,7 @@ import { doc, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { createContext, ReactNode, useContext, FC, useState, useCallback, useMemo } from 'react'
 import { FieldValues } from 'react-hook-form'
+import { v4 as uuidv4 } from 'uuid'
 
 import { useAuth } from '@/features/auth'
 import { storage } from '@/main'
@@ -53,6 +54,7 @@ const useRecipeProvider = (): UseRecipe => {
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
   const { user } = useAuth()
+  const uniqueId: string = uuidv4()
 
   const defaultRecipe = useMemo(() => {
     return {
@@ -162,7 +164,7 @@ const useRecipeProvider = (): UseRecipe => {
     if (imgFiles != null) {
       const uploadPromises = Object.entries(imgFiles).map(async ([index, file]) => {
         // 画像をstorageにアップロード
-        const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${file.name}`)
+        const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${uniqueId}_${file.name}`)
         const imgData = await uploadBytes(uploadStorage, file)
 
         // アップロードした画像のURLを取得
@@ -176,7 +178,7 @@ const useRecipeProvider = (): UseRecipe => {
       return result
     }
     return null
-  }, [imgFiles, user])
+  }, [imgFiles, uniqueId, user])
 
   const updateRecipeHandler = useCallback(
     async (data: FieldValues, date: string) => {
