@@ -21,9 +21,9 @@ export const RecipeUpdateComponent: FC = () => {
   const {
     isLoading,
     recipeData,
-    registerRecipeHandler,
+    updateRecipeHandler,
     imgFiles,
-    appendImgFile,
+    updateImgFile,
     isLoadingButton,
     options,
     updateLocalRecipeHandler,
@@ -72,9 +72,9 @@ export const RecipeUpdateComponent: FC = () => {
           index={i}
           recipe={v}
           hasSubmit={recipeData.length === i + 1}
-          onSubmit={registerRecipeHandler}
+          onSubmit={updateRecipeHandler}
           imgFiles={imgFiles ? imgFiles[i] : undefined}
-          appendImgFile={appendImgFile}
+          updateImgFile={updateImgFile}
           options={options ?? undefined}
           isLoadingButton={isLoadingButton}
           updateLocalRecipeHandler={updateLocalRecipeHandler}
