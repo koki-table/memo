@@ -35,7 +35,6 @@ export const RecipeRegisterComponent: FC = () => {
 
   return (
     <VStack
-      px={'4'}
       pb={8}
       pt={4}
       display="flex"
@@ -51,6 +50,7 @@ export const RecipeRegisterComponent: FC = () => {
           key={i}
           index={i}
           recipe={v}
+          hasDelete={recipeData.length > 1}
           hasSubmit={recipeData.length === i + 1}
           onSubmit={recipeData[0].name === '' ? registerRecipeHandler : updateRecipeHandler}
           imgFiles={imgFiles ? imgFiles[i] : undefined}

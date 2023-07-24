@@ -33,6 +33,7 @@ type RecipeFormComponentProps = {
   isLoadingButton: boolean
   updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number, date: string) => void
+  hasDelete?: boolean
 }
 
 export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
@@ -47,6 +48,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     isLoadingButton,
     updateLocalRecipeHandler,
     removeRecipeHandler,
+    hasDelete,
   } = props
 
   const { date } = useParams()
@@ -82,55 +84,58 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
   }, [imgFiles, recipe])
 
   return (
-    <VStack
-      px={'4'}
-      pb={8}
-      pt={4}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      maxW={['100%', '400px']}
-      margin="0 auto"
-      minH={`calc(100vh - 69px)`}
-    >
-      <chakra.form>
-        <VStack spacing={6}>
-          <ImgInput
-            registration={register('img')}
-            onChange={onFileInputChange}
-            fileImg={fileImg()}
+    <chakra.form w="92%">
+      <VStack
+        spacing={6}
+        mt={3}
+        mb={5}
+        borderBottom={hasSubmit ? 'none' : 'solid 1px var(--text-color-placeholder)'}
+        pb={10}
+      >
+        <ImgInput registration={register('img')} onChange={onFileInputChange} fileImg={fileImg()} />
+        <VStack w="100%" alignItems={'flex-start'}>
+          <Input
+            {...register('name')}
+            placeholder={'料理名'}
+            _placeholder={{ color: 'var(--text-color-placeholder)' }}
           />
-          <VStack w="100%" alignItems={'flex-start'}>
-            <Input
-              {...register('name')}
-              placeholder={'料理名'}
-              _placeholder={{ color: 'var(--text-color-placeholder)' }}
-            />
-            {errors.name && (
-              <Text fontSize={'xs'} pl={2}>
-                {errors.name?.message}
-              </Text>
+          {errors.name && (
+            <Text fontSize={'xs'} pl={2}>
+              {errors.name?.message}
+            </Text>
+          )}
+        </VStack>
+        <VStack w="100%" alignItems={'flex-start'}>
+          {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
+          <Controller
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <SelectBox viewWidth={viewWidth} field={field} options={options!} />
             )}
-          </VStack>
-          <VStack w="100%" alignItems={'flex-start'}>
-            {/* 外部ライブラリの場合は、unControlな要素では無いのでregisterの代わりにControllerを使う */}
-            <Controller
-              control={control}
-              name="category"
-              render={({ field }) => (
-                <SelectBox viewWidth={viewWidth} field={field} options={options!} />
-              )}
-            />
-            {errors.category && (
-              <Text fontSize={'xs'} pl={2}>
-                {errors.category.message}
-              </Text>
+          />
+          {errors.category && (
+            <Text fontSize={'xs'} pl={2}>
+              {errors.category.message}
+            </Text>
+          )}
+        </VStack>
+        <Box minW={'100%'}>
+          <Textarea placeholder="メモ" minH={'180px'} registration={register('memo')} />
+        </Box>
+        {hasSubmit && (
+          <VStack spacing={14}>
+            {hasDelete && (
+              <Button
+                onClick={() => removeRecipeHandler(index + 1, date!)}
+                isLoading={isLoadingButton}
+                backgroundColor={'var(--warning-color-main)'}
+              >
+                <Text fontSize={'sm'} fontWeight="700">
+                  削除
+                </Text>
+              </Button>
             )}
-          </VStack>
-          <Box minW={'100%'}>
-            <Textarea placeholder="メモ" minH={'180px'} registration={register('memo')} />
-          </Box>
-          {hasSubmit ? (
             <HStack>
               <Button
                 onClick={handleSubmit((v) => updateLocalRecipeHandler(v, index))}
@@ -149,18 +154,9 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
                 </Text>
               </Button>
             </HStack>
-          ) : (
-            <Button
-              onClick={() => removeRecipeHandler(index + 1, date!)}
-              isLoading={isLoadingButton}
-            >
-              <Text fontSize={'sm'} fontWeight="700">
-                削除
-              </Text>
-            </Button>
-          )}
-        </VStack>
-      </chakra.form>
-    </VStack>
+          </VStack>
+        )}
+      </VStack>
+    </chakra.form>
   )
 }
