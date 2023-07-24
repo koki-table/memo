@@ -1,24 +1,17 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Flex, Link, HStack } from '@chakra-ui/react'
+import { VStack } from '@chakra-ui/react'
 import { FC, useEffect } from 'react'
-import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
-import { MdCalendarMonth } from 'react-icons/md'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { Spinner } from '@/components/Elements'
-import { useAuth } from '@/features/auth'
-import { calculateDay } from '@/utils/calculateDay'
 
 import { useRecipe } from '../lib'
 
+import { MoveDayHeader } from './MoveDayHeader'
 import { RecipeFormComponent } from './RecipeFormComponent'
 
 export const RecipeRegisterComponent: FC = () => {
-  const navigate = useNavigate()
   const { date } = useParams()
-
-  const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const {
     isLoading,
@@ -30,6 +23,7 @@ export const RecipeRegisterComponent: FC = () => {
     options,
     updateLocalRecipeHandler,
     removeRecipeHandler,
+    updateRecipeHandler,
     fetchRecipe,
   } = useRecipe()
 
@@ -51,35 +45,14 @@ export const RecipeRegisterComponent: FC = () => {
       margin="0 auto"
       minH={`calc(100vh - 69px)`}
     >
-      <VStack spacing={6}>
-        <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
-          <HStack alignItems={'center'} spacing={3}>
-            <Text w={'100%'} fontSize={'sm'} fontWeight="700">
-              {formattedDate}
-            </Text>
-            <Link
-              onClick={() => navigate(`/recipe/${calculateDay({ date: date!, isNextDay: false })}`)}
-            >
-              <IoIosArrowBack />
-            </Link>
-            <Link
-              onClick={() => navigate(`/recipe/${calculateDay({ date: date!, isNextDay: true })}`)}
-            >
-              <IoIosArrowForward />
-            </Link>
-          </HStack>
-          <Link onClick={() => navigate(`/calendar`)} mr={'2'}>
-            <MdCalendarMonth size={27} />
-          </Link>
-        </Flex>
-      </VStack>
+      <MoveDayHeader />
       {recipeData.map((v, i) => (
         <RecipeFormComponent
           key={i}
           index={i}
           recipe={v}
           hasSubmit={recipeData.length === i + 1}
-          onSubmit={registerRecipeHandler}
+          onSubmit={recipeData[0].name === '' ? registerRecipeHandler : updateRecipeHandler}
           imgFiles={imgFiles ? imgFiles[i] : undefined}
           updateImgFile={updateImgFile}
           options={options ?? undefined}
