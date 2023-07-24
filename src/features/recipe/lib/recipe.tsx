@@ -1,23 +1,35 @@
 import { useToast } from '@chakra-ui/react'
-import { query, orderBy, getDocs, where, doc, getDoc, updateDoc } from 'firebase/firestore'
-import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
+import { doc, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { createContext, ReactNode, useContext, FC, useState, useCallback, useMemo } from 'react'
+import { FieldValues } from 'react-hook-form'
+import { v4 as uuidv4 } from 'uuid'
 
 import { useAuth } from '@/features/auth'
-import { RecipeList } from '@/types/RecipeList'
+import { storage } from '@/main'
+import { Recipe } from '@/types/Recipe'
 import { createCollection, db } from '@/utils/database'
+import { hasTargetValue } from '@/utils/hasTargetValue'
+
+export type option = [
+  {
+    value: string
+    label: string
+  }
+]
 
 export type UseRecipe = {
   isLoading: boolean
-  fetchAllRecipe: () => Promise<void>
-  recipeList: RecipeList[]
-  fetchSelectedRecipe: (selectedCategory: string) => Promise<void>
-  fetchCategoryList: () => Promise<void>
-  categoryList: string[] | undefined
-  selectedCategory: string
-  currentPage: number
-  handlePage: (index: number) => void
-  updateRecipeCategories: (prevCategoryValue: string, newCategoryValue: string) => Promise<void>
-  updateCategory: (prevCategoryValue: string, newCategoryValue: string) => Promise<void>
+  recipeData: Recipe[]
+  updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
+  removeRecipeHandler: (index: number, date: string) => Promise<void>
+  imgFiles: { [index: number]: File } | undefined
+  updateImgFile: (newImgFile: File, index: number) => void
+  registerRecipeHandler: (data: FieldValues, date: string) => Promise<void>
+  updateRecipeHandler: (data: FieldValues, date: string) => Promise<void>
+  options: option | undefined
+  isLoadingButton: boolean
+  fetchRecipe: (date: string) => Promise<void>
 }
 
 const recipeContext = createContext<UseRecipe | undefined>(undefined)
@@ -42,91 +54,61 @@ const useRecipeProvider = (): UseRecipe => {
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
   const { user } = useAuth()
+  const uniqueId: string = uuidv4()
 
-  const [recipeList, setRecipeList] = useState<RecipeList[]>([])
-  const [categoryList, setCategoryList] = useState<string[]>()
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
-  const [currentPage, setCurrentPage] = useState(1)
-
-  const fetchAllRecipe = useCallback(async () => {
-    try {
-      const recipeCol = createCollection('recipes', user)
-      const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
-
-      setIsLoading(true)
-      const queryDateSnapshot = await getDocs(recipeQuery)
-      setIsLoading(false)
-
-      if (queryDateSnapshot.size > 0) {
-        const recipes = queryDateSnapshot.docs.map((doc) => ({
-          name: doc.data().name,
-          category: doc.data().category,
-          date: doc.data().date,
-        })) as RecipeList
-
-        // RecipeListを10個ずつの配列に分割
-        const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
-          const chunkIndex = Math.floor(index / 10)
-          if (!acc[chunkIndex]) {
-            acc[chunkIndex] = []
-          }
-          acc[chunkIndex].push(recipe)
-          return acc
-        }, [])
-
-        setRecipeList(chunkedRecipes)
-        setSelectedCategory('All')
-        setCurrentPage(1)
-      } else {
-        console.log('recipeは未登録です。')
-      }
-    } catch (e: any) {
-      console.log(e.message)
-      toast({
-        title: 'エラーが発生しました。',
-        status: 'error',
-        position: 'top',
-      })
-      throw Error('Error in fetchUserAPI')
+  const defaultRecipe = useMemo(() => {
+    return {
+      img: '',
+      name: '',
+      memo: '',
+      category: '',
+      date: '',
     }
-  }, [toast, user])
+  }, [])
+  const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
 
-  const fetchSelectedRecipe = useCallback(
-    async (selectedValue: string) => {
+  console.log(recipeData)
+
+  const [imgFiles, setImgFiles] = useState<{ [index: number]: File }>()
+  console.log(imgFiles)
+
+  const [options, setOptions] = useState<
+    [
+      {
+        value: string
+        label: string
+      }
+    ]
+  >()
+
+  const fetchRecipe = useCallback(
+    async (date: string) => {
       try {
-        const recipeCol = createCollection('recipes', user)
-        const recipeQuery = query(
-          recipeCol,
-          orderBy('date', 'desc'),
-          where('category', '==', selectedValue)
-        )
+        const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+        const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date}`)
+
+        console.log(recipeDoc)
 
         setIsLoading(true)
-        const queryDateSnapshot = await getDocs(recipeQuery)
+        const queryDateSnapshot = await getDoc(recipeDoc)
+        const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
 
-        if (queryDateSnapshot.size > 0) {
-          const recipes = queryDateSnapshot.docs.map((doc) => ({
-            name: doc.data().name,
-            category: doc.data().category,
-            date: doc.data().date,
-          })) as RecipeList
-
-          // RecipeListを10個ずつの配列に分割
-          const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
-            const chunkIndex = Math.floor(index / 10)
-            if (!acc[chunkIndex]) {
-              acc[chunkIndex] = []
-            }
-            acc[chunkIndex].push(recipe)
-            return acc
-          }, [])
-
-          setRecipeList(chunkedRecipes)
-          setSelectedCategory(selectedValue)
-          setCurrentPage(1)
+        if (queryCategorySnapshot.exists()) {
+          setOptions(
+            queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
+          )
         } else {
-          console.log('recipeは未登録です。')
+          console.log('categoryは未登録です。')
+        }
+
+        console.log(queryDateSnapshot.exists())
+
+        if (queryDateSnapshot.exists()) {
+          setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
+          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
+          // reset([defaultRecipe])
+          return
         }
       } catch (e: any) {
         console.log(e.message)
@@ -135,99 +117,248 @@ const useRecipeProvider = (): UseRecipe => {
           status: 'error',
           position: 'top',
         })
-        throw Error('Error in fetchUserAPI')
       }
     },
-    [toast, user]
+    [defaultRecipe, toast, user]
   )
 
-  const fetchCategoryList = useCallback(async () => {
-    try {
-      const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+  const [isLoadingButton, setIsLoadingButton] = useState(false)
 
-      const queryCategorySnapshot = await getDoc(categoryDoc)
+  const updateLocalRecipeHandler = useCallback(
+    (newRecipe: Recipe, index: number) => {
+      setRecipeData((prevRecipes) =>
+        prevRecipes.map((prevRecipe, i) => (i === index ? newRecipe : prevRecipe))
+      )
+      setRecipeData((prevRecipes) => [...prevRecipes, defaultRecipe])
+    },
+    [defaultRecipe]
+  )
 
-      if (queryCategorySnapshot.exists()) {
-        setCategoryList(queryCategorySnapshot.data()!.categories)
-      } else {
-        console.log('categoryは未登録です。')
-      }
-    } catch (e: any) {
-      console.log(e.message)
-      toast({
-        title: 'エラーが発生しました。',
-        status: 'error',
-        position: 'top',
+  const removeRecipeHandler = useCallback(
+    async (index: number, date: string) => {
+      setRecipeData((recipeData) => recipeData.filter((_, i) => i !== index))
+      const recipeDoc = doc(createCollection('dates', user), date)
+
+      const removeRecipe = recipeData.filter((_, i) => i !== index)
+      await setDoc(recipeDoc, {
+        recipes: removeRecipe,
       })
-      throw Error('Error in fetchUserAPI')
-    }
-  }, [toast, user])
+    },
+    [recipeData, user]
+  )
 
-  const handlePage = useCallback((index: number) => {
-    setCurrentPage(index)
+  const updateImgFile = useCallback((newImgFile: File, index: number) => {
+    setImgFiles((imgFiles) => {
+      if (imgFiles?.[index]) {
+        // 既存のimgFilesが登録済みの場合は更新する
+        const updatedImgFiles = { ...imgFiles, [index]: newImgFile }
+        return updatedImgFiles
+      } else {
+        // 新しい値を連想配列に追加する
+        return { ...imgFiles, [index]: newImgFile }
+      }
+    })
   }, [])
 
-  const updateRecipeCategories = async (prevCategoryValue: string, newCategoryValue: string) => {
-    try {
-      const recipeCol = createCollection('recipes', user)
-      const categoryQuery = query(recipeCol, where('category', '==', prevCategoryValue))
+  const handleStorage = useCallback(async () => {
+    if (imgFiles != null) {
+      const uploadPromises = Object.entries(imgFiles).map(async ([index, file]) => {
+        // 画像をstorageにアップロード
+        const uploadStorage = ref(storage, `users/${user!.uid.toString()}/${uniqueId}_${file.name}`)
+        const imgData = await uploadBytes(uploadStorage, file)
 
-      const querySnapshot = await getDocs(categoryQuery)
+        // アップロードした画像のURLを取得
+        const downloadURL = await getDownloadURL(imgData.ref)
+        return [Number(index), downloadURL] // [index, downloadURL]の形式で返り値を設定
+      })
 
-      querySnapshot.forEach((query) => {
-        const docRef = doc(recipeCol, query.id)
-        updateDoc(docRef, { category: newCategoryValue })
-      })
-    } catch (e: any) {
-      console.log(e.message)
-      toast({
-        title: 'エラーが発生しました。',
-        status: 'error',
-        position: 'top',
-      })
-      throw Error('Error in updateRecipeCategories')
+      const downloadURLs = await Promise.all(uploadPromises)
+      const result = Object.fromEntries(downloadURLs) // 返り値を連想配列に変換
+
+      return result
     }
-  }
+    return null
+  }, [imgFiles, uniqueId, user])
 
-  const updateCategory = async (prevCategoryValue: string, newCategoryValue: string) => {
-    try {
+  const updateRecipeHandler = useCallback(
+    async (data: FieldValues, date: string) => {
+      const imgPath = await handleStorage()
       const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
-      const categorySnapshot = await getDoc(categoryDoc)
 
-      if (categorySnapshot.exists()) {
-        const categories = categorySnapshot.data().categories
-        const updatedCategories = categories.map((category: string) => {
-          if (category === prevCategoryValue) {
-            return newCategoryValue
+      setIsLoadingButton(true)
+
+      const firstRecipe = [
+        {
+          img: imgPath != null ? imgPath[0] : data.img,
+          name: data.name,
+          memo: data.memo,
+          category: data.category,
+          date,
+        },
+      ]
+
+      console.log(firstRecipe)
+
+      // 画面描画用の最後のdefaultオブジェクトを削除
+      const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
+
+      const imgPathFilter = (index: number) => {
+        if (imgPath != null) {
+          if (imgPath[index] != null) {
+            return imgPath[index]
           }
-          return category
-        })
-        await updateDoc(categoryDoc, {
-          categories: updatedCategories,
-        })
+          return null
+        }
       }
-    } catch (e: any) {
-      console.log(e.message)
-      toast({
-        title: 'エラーが発生しました。',
-        status: 'error',
-        position: 'top',
+
+      const connectedImgWithRecipe = () => {
+        const connectedData = formattedRecipes.map((recipe, i) => ({
+          img: imgPathFilter(i) ?? recipe.img ?? defaultRecipe.img,
+          name: recipe.name,
+          memo: recipe.memo,
+          category: recipe.category,
+          date,
+        }))
+
+        console.log(imgPath)
+
+        console.log(data.name)
+
+        if (data.name !== defaultRecipe.name) {
+          const appendedLastData = [
+            ...connectedData,
+            {
+              img:
+                imgPathFilter(recipeData.length - 1) ??
+                recipeData[recipeData.length - 1].img ??
+                defaultRecipe.img,
+              name: data.name,
+              memo: data.memo,
+              category: data.category,
+              date,
+            },
+          ]
+          return appendedLastData
+        }
+      }
+
+      const recipes = recipeData.length === 1 ? firstRecipe : connectedImgWithRecipe()
+      const recipeDoc = doc(createCollection('dates', user), date)
+
+      await setDoc(recipeDoc, {
+        recipes,
       })
-      throw Error('Error in updateCategory')
-    }
-  }
+
+      // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
+      if (options === undefined) {
+        await setDoc(categoryDoc, {
+          categories: arrayUnion(data.category),
+        })
+      } else {
+        // 既存のカテゴリーに新規追加した場合は、dbのカテゴリーを更新
+        if (!hasTargetValue(options, data.category))
+          await updateDoc(categoryDoc, {
+            categories: arrayUnion(data.category),
+          })
+      }
+
+      setIsLoadingButton(false)
+
+      toast({
+        title: '保存しました。',
+        status: 'success',
+        position: 'top',
+        duration: 1300,
+      })
+    },
+    [defaultRecipe.img, defaultRecipe.name, handleStorage, options, recipeData, toast, user]
+  )
+
+  const registerRecipeHandler = useCallback(
+    async (data: FieldValues, date: string) => {
+      const imgPath = await handleStorage()
+      const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
+
+      setIsLoadingButton(true)
+
+      const firstRecipe = [
+        {
+          img: imgFiles != null ? imgPath[0] : data.img,
+          name: data.name,
+          memo: data.memo,
+          category: data.category,
+          date,
+        },
+      ]
+
+      // 画面描画用の最後のdefaultオブジェクトを削除
+      const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
+
+      const connectedImgWithRecipe = () => {
+        const connectedData = formattedRecipes.map((recipe, i) => ({
+          img: imgPath[i] ?? defaultRecipe.img,
+          name: recipe.name,
+          memo: recipe.memo,
+          category: recipe.category,
+          date,
+        }))
+
+        const appendedLastData = [
+          ...connectedData,
+          {
+            img: imgPath[Object.keys(imgPath).length - 1] ?? defaultRecipe.img,
+            name: data.name,
+            memo: data.memo,
+            category: data.category,
+            date,
+          },
+        ]
+        return appendedLastData
+      }
+
+      const recipes = recipeData.length === 1 ? firstRecipe : connectedImgWithRecipe()
+      const recipeDoc = doc(createCollection('dates', user), date)
+
+      await setDoc(recipeDoc, {
+        recipes,
+      })
+
+      // 新規でカテゴリーを追加した場合は、dbのカテゴリーを追加
+      if (options === undefined) {
+        await setDoc(categoryDoc, {
+          categories: arrayUnion(data.category),
+        })
+      } else {
+        // 既存のカテゴリーに新規追加した場合は、dbのカテゴリーを更新
+        if (!hasTargetValue(options, data.category))
+          await updateDoc(categoryDoc, {
+            categories: arrayUnion(data.category),
+          })
+      }
+
+      setIsLoadingButton(false)
+
+      toast({
+        title: '保存しました。',
+        status: 'success',
+        position: 'top',
+        duration: 1300,
+      })
+    },
+    [defaultRecipe.img, handleStorage, imgFiles, options, recipeData, toast, user]
+  )
 
   return {
     isLoading,
-    fetchAllRecipe,
-    recipeList,
-    fetchSelectedRecipe,
-    categoryList,
-    fetchCategoryList,
-    selectedCategory,
-    currentPage,
-    handlePage,
-    updateRecipeCategories,
-    updateCategory,
+    recipeData,
+    updateLocalRecipeHandler,
+    removeRecipeHandler,
+    imgFiles,
+    updateImgFile,
+    registerRecipeHandler,
+    options,
+    isLoadingButton,
+    fetchRecipe,
+    updateRecipeHandler,
   }
 }

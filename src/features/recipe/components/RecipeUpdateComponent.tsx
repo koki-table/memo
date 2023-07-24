@@ -1,41 +1,34 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, VStack, Flex, Link, HStack } from '@chakra-ui/react'
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io'
 import { MdCalendarMonth } from 'react-icons/md'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { Spinner } from '@/components/Elements'
-import { useAuth } from '@/features/auth'
 import { calculateDay } from '@/utils/calculateDay'
 
 import { useRecipe } from '../lib'
 
 import { RecipeFormComponent } from './RecipeFormComponent'
 
-export const RecipeRegisterComponent: FC = () => {
+export const RecipeUpdateComponent: FC = () => {
   const navigate = useNavigate()
   const { date } = useParams()
-
   const formattedDate = `${date!.slice(0, 4)}/${date!.slice(4, 6)}/${date!.slice(6)}`
 
   const {
     isLoading,
     recipeData,
-    registerRecipeHandler,
+    updateRecipeHandler,
     imgFiles,
     updateImgFile,
     isLoadingButton,
     options,
     updateLocalRecipeHandler,
     removeRecipeHandler,
-    fetchRecipe,
   } = useRecipe()
-
-  useEffect(() => {
-    fetchRecipe(date!)
-  }, [date, fetchRecipe])
 
   if (isLoading) return <Spinner variants="full" />
 
@@ -79,7 +72,7 @@ export const RecipeRegisterComponent: FC = () => {
           index={i}
           recipe={v}
           hasSubmit={recipeData.length === i + 1}
-          onSubmit={registerRecipeHandler}
+          onSubmit={updateRecipeHandler}
           imgFiles={imgFiles ? imgFiles[i] : undefined}
           updateImgFile={updateImgFile}
           options={options ?? undefined}

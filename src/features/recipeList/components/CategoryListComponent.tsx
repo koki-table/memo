@@ -3,9 +3,7 @@
 import { Text, VStack, Flex, Link, Box, useDisclosure } from '@chakra-ui/react'
 import { FC, memo, useEffect, useState } from 'react'
 
-import { Modal } from '@/components/Modal'
-
-import { useRecipe } from '../lib'
+import { useRecipeList } from '../lib'
 
 import { TagPicker } from './TagPicker'
 
@@ -15,7 +13,7 @@ type CategoryListComponentProps = {
 
 export const CategoryListComponent: FC<CategoryListComponentProps> = memo((props) => {
   const { onClick } = props
-  const { categoryList, fetchCategoryList } = useRecipe()
+  const { categoryList, fetchCategoryList } = useRecipeList()
 
   useEffect(() => {
     fetchCategoryList()

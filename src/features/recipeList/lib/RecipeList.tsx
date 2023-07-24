@@ -6,7 +6,7 @@ import { useAuth } from '@/features/auth'
 import { RecipeList } from '@/types/RecipeList'
 import { createCollection, db } from '@/utils/database'
 
-export type UseRecipe = {
+export type UseRecipeList = {
   isLoading: boolean
   fetchAllRecipe: () => Promise<void>
   recipeList: RecipeList[]
@@ -20,25 +20,25 @@ export type UseRecipe = {
   updateCategory: (prevCategoryValue: string, newCategoryValue: string) => Promise<void>
 }
 
-const recipeContext = createContext<UseRecipe | undefined>(undefined)
+const recipeListContext = createContext<UseRecipeList | undefined>(undefined)
 
 type Props = { children: ReactNode }
 
-export const useRecipe = () => {
-  const context = useContext(recipeContext)
+export const useRecipeList = () => {
+  const context = useContext(recipeListContext)
 
   if (context === undefined) {
-    throw new Error('useRecipeがRecipeProvider内で利用されていません')
+    throw new Error('useRecipeListがRecipeListProvider内で利用されていません')
   }
   return context
 }
 
-export const RecipeProvider: FC<{ children: ReactNode }> = ({ children }: Props) => {
-  const recipe = useRecipeProvider()
-  return <recipeContext.Provider value={recipe}>{children}</recipeContext.Provider>
+export const RecipeListProvider: FC<{ children: ReactNode }> = ({ children }: Props) => {
+  const recipeList = useRecipeListProvider()
+  return <recipeListContext.Provider value={recipeList}>{children}</recipeListContext.Provider>
 }
 
-const useRecipeProvider = (): UseRecipe => {
+const useRecipeListProvider = (): UseRecipeList => {
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
   const { user } = useAuth()

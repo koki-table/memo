@@ -4,6 +4,7 @@ import { Text, chakra, VStack, Box, Input, HStack } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FC, useCallback } from 'react'
 import { useForm, FieldValues, Controller } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { Button } from '@/components/Elements'
@@ -11,7 +12,8 @@ import { ImgInput } from '@/components/Form/ImgInput'
 import { Textarea } from '@/components/Form/Textarea'
 import { Recipe } from '@/types/Recipe'
 
-import { option } from './RecipeRegisterComponent'
+import { option } from '../lib'
+
 import { SelectBox } from './SelectBox'
 
 const schema = z.object({
@@ -24,14 +26,14 @@ const schema = z.object({
 type RecipeFormComponentProps = {
   index: number
   recipe?: Recipe
-  onSubmit: (data: FieldValues) => Promise<void>
+  onSubmit: (data: FieldValues, date: string) => Promise<void>
   hasSubmit: boolean
   imgFiles: File | undefined
-  appendImgFile: (imgFiles: File) => void
+  updateImgFile: (imgFiles: File, index: number) => void
   options: option | undefined
   isLoadingButton: boolean
-  updateRecipeHandler: (newRecipe: Recipe, index: number) => void
-  removeRecipeHandler: (index: number) => void
+  updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
+  removeRecipeHandler: (index: number, date: string) => void
 }
 
 export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
@@ -41,12 +43,14 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
     onSubmit,
     hasSubmit,
     imgFiles,
-    appendImgFile,
+    updateImgFile,
     options,
     isLoadingButton,
-    updateRecipeHandler,
+    updateLocalRecipeHandler,
     removeRecipeHandler,
   } = props
+
+  const { date } = useParams()
 
   const viewWidth = window.innerWidth - 32
 
@@ -66,9 +70,9 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
 
       const fileData = e.target.files[0]
 
-      appendImgFile(fileData)
+      updateImgFile(fileData, index)
     },
-    [appendImgFile]
+    [updateImgFile, index]
   )
 
   const fileImg = useCallback(() => {
@@ -130,21 +134,27 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
           {hasSubmit ? (
             <HStack>
               <Button
-                onClick={handleSubmit((v) => updateRecipeHandler(v, index))}
+                onClick={handleSubmit((v) => updateLocalRecipeHandler(v, index))}
                 isLoading={isLoadingButton}
               >
                 <Text fontSize={'sm'} fontWeight="700">
                   追加
                 </Text>
               </Button>
-              <Button onClick={handleSubmit(onSubmit)} isLoading={isLoadingButton}>
+              <Button
+                onClick={handleSubmit(async (v) => await onSubmit(v, date!))}
+                isLoading={isLoadingButton}
+              >
                 <Text fontSize={'sm'} fontWeight="700">
                   登録
                 </Text>
               </Button>
             </HStack>
           ) : (
-            <Button onClick={() => removeRecipeHandler(index + 1)} isLoading={isLoadingButton}>
+            <Button
+              onClick={() => removeRecipeHandler(index + 1, date!)}
+              isLoading={isLoadingButton}
+            >
               <Text fontSize={'sm'} fontWeight="700">
                 削除
               </Text>

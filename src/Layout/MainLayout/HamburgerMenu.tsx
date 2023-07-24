@@ -45,7 +45,7 @@ export const HamburgerMenu: FC = () => {
             <MenuItem onClick={() => navigate(`/calendar`)} icon={<MdCalendarMonth />}>
               カレンダー
             </MenuItem>
-            <MenuItem onClick={() => navigate(`/recipe/list`)} icon={<BsBook />}>
+            <MenuItem onClick={() => navigate(`/recipe-list`)} icon={<BsBook />}>
               料理リスト
             </MenuItem>
             <MenuItem onClick={onSubmit} icon={<BiRun />}>
