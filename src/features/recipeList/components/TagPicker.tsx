@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Text, Link, Box } from '@chakra-ui/react'
 import { FC, memo } from 'react'
 
@@ -40,6 +38,7 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
         </Badge>
       ) : (
         <Link
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={async () =>
             title === 'All' ? await fetchAllRecipe() : await fetchSelectedRecipe(title)
           }

@@ -67,10 +67,7 @@ const useRecipeProvider = (): UseRecipe => {
   }, [])
   const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
 
-  console.log(recipeData)
-
   const [imgFiles, setImgFiles] = useState<{ [index: number]: File }>()
-  console.log(imgFiles)
 
   const [options, setOptions] = useState<
     [
@@ -106,9 +103,9 @@ const useRecipeProvider = (): UseRecipe => {
 
         if (queryDateSnapshot.exists()) {
           setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
-          // フォームの初期値をreact-hook-formのresetでキャッシュしてしまうので、resetを使う
-          // reset([defaultRecipe])
           return
+        } else {
+          setRecipeData([defaultRecipe])
         }
       } catch (e: any) {
         console.log(e.message)

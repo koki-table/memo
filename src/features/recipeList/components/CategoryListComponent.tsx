@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Text, VStack, Flex, Link, Box, useDisclosure } from '@chakra-ui/react'
+import { Text, VStack, Flex, Link, Box } from '@chakra-ui/react'
 import { FC, memo, useEffect, useState } from 'react'
 
 import { useRecipeList } from '../lib'

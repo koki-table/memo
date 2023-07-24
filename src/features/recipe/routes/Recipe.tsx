@@ -1,7 +1,5 @@
-import { RecipeUpdateComponent, RecipeRegisterComponent } from '../components'
-import { useRecipe } from '../lib'
+import { RecipeRegisterComponent } from '../components'
 
 export const Recipe = () => {
-  const { recipeData } = useRecipe()
-  return recipeData[0].name === '' ? <RecipeRegisterComponent /> : <RecipeUpdateComponent />
+  return <RecipeRegisterComponent />
 }
