@@ -10,3 +10,7 @@ Firebase Hostiong にて、stagingとprod環境を用意している。
 [memo・・・production](https://console.firebase.google.com/project/memo-3c2c7/overview?consoleUI=FIREBASE&hl=ja)
 
 `main.tsx`の firebaseConfig は dev と prod で切り替える必要がある。
+
+### 対応デバイス
+- スマートフォン
+（PCは現状未対応）
