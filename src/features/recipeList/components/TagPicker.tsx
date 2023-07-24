@@ -4,7 +4,7 @@ import { FC, memo } from 'react'
 import { Badge } from '@/components/Elements/Badge'
 import { Tag } from '@/components/Elements/Tag'
 
-import { useRecipeList } from '../lib'
+import { useRecipeList } from '../lib/recipeList'
 
 type TagPickerProps = {
   title: string

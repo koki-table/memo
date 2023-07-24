@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { Suspense } from '@/providers'
 import { lazyImport } from '@/utils/lazyImport'
 
-import { RecipeListProvider } from '../lib'
+import { RecipeListProvider } from '../lib/recipeList'
 
 const { RecipeList } = lazyImport(async () => await import('./RecipeList'), 'RecipeList')
 

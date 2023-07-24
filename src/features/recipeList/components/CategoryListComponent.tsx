@@ -1,7 +1,7 @@
 import { Text, VStack, Flex, Link, Box } from '@chakra-ui/react'
 import { FC, memo, useEffect, useState } from 'react'
 
-import { useRecipeList } from '../lib'
+import { useRecipeList } from '../lib/recipeList'
 
 import { TagPicker } from './TagPicker'
 
