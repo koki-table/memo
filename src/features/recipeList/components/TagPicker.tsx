@@ -4,7 +4,7 @@ import { FC, memo } from 'react'
 import { Badge } from '@/components/Elements/Badge'
 import { Tag } from '@/components/Elements/Tag'
 
-import { useRecipeList } from '../lib/recipeList'
+import { useRecipeList } from '../lib'
 
 type TagPickerProps = {
   title: string
@@ -38,7 +38,6 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
         </Badge>
       ) : (
         <Link
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={async () =>
             title === 'All' ? await fetchAllRecipe() : await fetchSelectedRecipe(title)
           }
