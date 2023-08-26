@@ -13,6 +13,7 @@ import { CustomRowLink } from '@/components/CustomRowLink'
 import { EditModal } from '@/components/EditModal'
 import { Heading, Spinner } from '@/components/Elements'
 import { Tag } from '@/components/Elements/Tag'
+import { Recipe } from '@/types/Recipe'
 
 import { useRecipeList } from '../lib'
 
@@ -118,41 +119,43 @@ export const RecipeListComponent: FC = () => {
             </VStack>
           ) : (
             <>
-              {recipeList[currentPage - 1]?.map((recipe, index) => (
-                <Link
-                  key={index}
-                  onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
-                >
-                  <HStack
-                    width={viewWidth}
-                    pt="6"
-                    pb="6"
-                    borderBottom={'1px'}
-                    borderColor={'var(--line-color-main)'}
-                    justifyContent={'space-between'}
+              {recipeList[currentPage - 1]?.map(
+                (recipe: Pick<Recipe, 'name' | 'category' | 'date'>, index: number) => (
+                  <Link
+                    key={index}
+                    onClick={() => navigate(`/recipe/${dayjs(recipe.date).format('YYYYMMDD')}`)}
                   >
-                    <VStack alignItems={'flex-start'} spacing={2}>
-                      <Text
-                        fontSize={'md'}
-                        pl={2}
-                        w={'100%'}
-                        lineHeight="1.6"
-                        fontWeight={'semibold'}
-                      >
-                        {recipe.name}
-                      </Text>
-                      <Box pl="2">
-                        <Tag>
-                          <Text fontSize={'xs'}>{recipe.category}</Text>
-                        </Tag>
+                    <HStack
+                      width={viewWidth}
+                      pt="6"
+                      pb="6"
+                      borderBottom={'1px'}
+                      borderColor={'var(--line-color-main)'}
+                      justifyContent={'space-between'}
+                    >
+                      <VStack alignItems={'flex-start'} spacing={2}>
+                        <Text
+                          fontSize={'md'}
+                          pl={2}
+                          w={'100%'}
+                          lineHeight="1.6"
+                          fontWeight={'semibold'}
+                        >
+                          {recipe.name}
+                        </Text>
+                        <Box pl="2">
+                          <Tag>
+                            <Text fontSize={'xs'}>{recipe.category}</Text>
+                          </Tag>
+                        </Box>
+                      </VStack>
+                      <Box pr={3}>
+                        <BsArrowRightShort size={23} />
                       </Box>
-                    </VStack>
-                    <Box pr={3}>
-                      <BsArrowRightShort size={23} />
-                    </Box>
-                  </HStack>
-                </Link>
-              ))}
+                    </HStack>
+                  </Link>
+                )
+              )}
             </>
           )}
         </Box>
