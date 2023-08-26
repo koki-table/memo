@@ -100,15 +100,6 @@ module.exports = {
           },
         ],
         'import/no-unresolved': 'off',
-        '@typescript-eslint/no-misused-promises': [
-          'error',
-          {
-            checksVoidReturn: {
-              arguments: false,
-              attributes: false,
-            },
-          },
-        ],
       },
     },
   ],
