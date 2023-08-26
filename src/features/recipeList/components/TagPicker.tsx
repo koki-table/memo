@@ -17,19 +17,23 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
 
   const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipeList()
 
-  const onClickHandler = async () => {
+  const onClickHandler = () => {
     if (title === 'All') {
-      try {
-        await fetchAllRecipe()
-      } catch (e) {
-        console.error(e)
-      }
+      fetchAllRecipe()
+        .then(() => {
+          console.log('success')
+        })
+        .catch((e) => {
+          console.error(e)
+        })
     } else {
-      try {
-        await fetchSelectedRecipe(title)
-      } catch (e) {
-        console.error(e)
-      }
+      fetchSelectedRecipe(title)
+        .then(() => {
+          console.log('success')
+        })
+        .catch((e) => {
+          console.error(e)
+        })
     }
   }
 
