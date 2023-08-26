@@ -13,10 +13,10 @@ export const MoveDayHeader: FC = memo(() => {
   const navigate = useNavigate()
 
   return (
-    <VStack spacing={6}>
+    <VStack spacing={6} w="92%">
       <Flex w="100%" whiteSpace={'nowrap'} alignItems={'center'} justifyContent="space-between">
         <HStack alignItems={'center'} spacing={3}>
-          <Text w={'100%'} fontSize={'sm'} fontWeight="700">
+          <Text w={'100%'} fontSize={'sm'} fontWeight="600">
             {formattedDate}
           </Text>
           <Link

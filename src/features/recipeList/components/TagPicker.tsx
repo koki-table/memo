@@ -17,6 +17,26 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
 
   const { fetchSelectedRecipe, selectedCategory, fetchAllRecipe } = useRecipeList()
 
+  const onClickHandler = () => {
+    if (title === 'All') {
+      fetchAllRecipe()
+        .then(() => {
+          console.log('success')
+        })
+        .catch((e) => {
+          console.error(e)
+        })
+    } else {
+      fetchSelectedRecipe(title)
+        .then(() => {
+          console.log('success')
+        })
+        .catch((e) => {
+          console.error(e)
+        })
+    }
+  }
+
   return (
     <Box mb={hasBadge && title === 'All' ? 0 : 3} mr={hasBadge && title === 'All' ? 0 : 2}>
       {hasBadge && title !== 'All' ? (
@@ -37,13 +57,7 @@ export const TagPicker: FC<TagPickerProps> = memo((props) => {
           </Link>
         </Badge>
       ) : (
-        <Link
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={async () =>
-            title === 'All' ? await fetchAllRecipe() : await fetchSelectedRecipe(title)
-          }
-          display={hasBadge && title === 'All' ? 'none' : 'block'}
-        >
+        <Link onClick={onClickHandler} display={hasBadge && title === 'All' ? 'none' : 'block'}>
           <Tag px={4} py={2} backgroundColor={selectedCategory === title ? 'var(--black)' : 'none'}>
             <Text
               fontSize={'xs'}

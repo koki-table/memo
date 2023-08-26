@@ -84,8 +84,6 @@ const useRecipeProvider = (): UseRecipe => {
         const categoryDoc = doc(db, `users/${user!.uid.toString()}`)
         const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date}`)
 
-        console.log(recipeDoc)
-
         setIsLoading(true)
         const queryDateSnapshot = await getDoc(recipeDoc)
         const queryCategorySnapshot = await getDoc(categoryDoc)
@@ -98,8 +96,6 @@ const useRecipeProvider = (): UseRecipe => {
         } else {
           console.log('categoryは未登録です。')
         }
-
-        console.log(queryDateSnapshot.exists())
 
         if (queryDateSnapshot.exists()) {
           setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
@@ -194,8 +190,6 @@ const useRecipeProvider = (): UseRecipe => {
         },
       ]
 
-      console.log(firstRecipe)
-
       // 画面描画用の最後のdefaultオブジェクトを削除
       const formattedRecipes = recipeData.filter((_, i) => i !== recipeData.length - 1)
 
@@ -216,10 +210,6 @@ const useRecipeProvider = (): UseRecipe => {
           category: recipe.category,
           date,
         }))
-
-        console.log(imgPath)
-
-        console.log(data.name)
 
         if (data.name !== defaultRecipe.name) {
           const appendedLastData = [

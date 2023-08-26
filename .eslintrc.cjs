@@ -99,6 +99,7 @@ module.exports = {
             usePrettierrc: true,
           },
         ],
+        'import/no-unresolved': 'off',
       },
     },
   ],
