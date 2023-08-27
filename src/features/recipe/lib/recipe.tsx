@@ -136,8 +136,19 @@ const useRecipeProvider = (): UseRecipe => {
       await setDoc(recipeDoc, {
         recipes: removeRecipe,
       })
+      if (imgFiles != null) {
+        setImgFiles((prevImgFiles) => {
+          const updatedImgFiles = Object.keys(prevImgFiles!)
+            .filter((key) => parseInt(key) !== index)
+            .reduce<{ [key: number]: File }>((acc, key) => {
+              acc[parseInt(key)] = prevImgFiles![parseInt(key)]
+              return acc
+            }, {})
+          return updatedImgFiles
+        })
+      }
     },
-    [recipeData, user]
+    [imgFiles, recipeData, user]
   )
 
   const updateImgFile = useCallback((newImgFile: File, index: number) => {
