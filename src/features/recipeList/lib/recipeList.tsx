@@ -1,5 +1,5 @@
 import { useToast } from '@chakra-ui/react'
-import { query, orderBy, getDocs, where, doc, getDoc, updateDoc } from 'firebase/firestore'
+import { query, getDocs, where, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
@@ -97,26 +97,29 @@ const useRecipeListProvider = (): UseRecipeList => {
   const fetchSelectedRecipe = useCallback(
     async (selectedValue: string) => {
       try {
-        const recipeCol = createCollection('recipes', user)
-        const recipeQuery = query(
-          recipeCol,
-          orderBy('date', 'desc'),
-          where('category', '==', selectedValue)
-        )
+        const recipeCol = createCollection('dates', user)
+        // const recipeQuery = query(recipeCol, where('recipes', '==', selectedValue))
+        const recipeQuery = query(recipeCol)
 
         setIsLoading(true)
         const queryDateSnapshot = await getDocs(recipeQuery)
         setIsLoading(false)
 
         if (queryDateSnapshot.size > 0) {
-          const recipes = queryDateSnapshot.docs.map((doc) => ({
-            name: doc.data().name,
-            category: doc.data().category,
-            date: doc.data().date,
-          })) as RecipeList
+          const flattenRecipes = queryDateSnapshot.docs.flatMap((doc) =>
+            doc.data().recipes.map((recipe: Pick<Recipe, 'category' | 'name'>) => ({
+              name: recipe.name,
+              category: recipe.category,
+              date: doc.data().date,
+            }))
+          ) as RecipeList
+
+          const filteredRecipes = flattenRecipes.filter(
+            (recipe) => recipe.category === selectedValue
+          )
 
           // RecipeListを10個ずつの配列に分割
-          const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
+          const chunkedRecipes = filteredRecipes.reduce((acc: RecipeList[], recipe, index) => {
             const chunkIndex = Math.floor(index / 10)
             if (!acc[chunkIndex]) {
               acc[chunkIndex] = []
