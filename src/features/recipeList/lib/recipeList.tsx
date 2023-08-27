@@ -3,6 +3,7 @@ import { query, orderBy, getDocs, where, doc, getDoc, updateDoc } from 'firebase
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
+import { Recipe } from '@/types/Recipe'
 import { RecipeList } from '@/types/RecipeList'
 import { createCollection, db } from '@/utils/database'
 
@@ -50,22 +51,24 @@ const useRecipeListProvider = (): UseRecipeList => {
 
   const fetchAllRecipe = useCallback(async () => {
     try {
-      const recipeCol = createCollection('recipes', user)
-      const recipeQuery = query(recipeCol, orderBy('date', 'desc'))
+      const recipeCol = createCollection('dates', user)
+      const recipeQuery = query(recipeCol)
 
       setIsLoading(true)
       const queryDateSnapshot = await getDocs(recipeQuery)
       setIsLoading(false)
 
       if (queryDateSnapshot.size > 0) {
-        const recipes = queryDateSnapshot.docs.map((doc) => ({
-          name: doc.data().name,
-          category: doc.data().category,
-          date: doc.data().date,
-        })) as RecipeList
+        const flattenRecipes = queryDateSnapshot.docs.flatMap((doc) =>
+          doc.data().recipes.map((recipe: Pick<Recipe, 'category' | 'name'>) => ({
+            name: recipe.name,
+            category: recipe.category,
+            date: doc.data().date,
+          }))
+        ) as RecipeList
 
         // RecipeListを10個ずつの配列に分割
-        const chunkedRecipes = recipes.reduce((acc: RecipeList[], recipe, index) => {
+        const chunkedRecipes = flattenRecipes.reduce((acc: RecipeList[], recipe, index) => {
           const chunkIndex = Math.floor(index / 10)
           if (!acc[chunkIndex]) {
             acc[chunkIndex] = []
