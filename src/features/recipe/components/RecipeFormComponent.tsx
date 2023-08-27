@@ -127,7 +127,7 @@ export const RecipeFormComponent: FC<RecipeFormComponentProps> = (props) => {
           <VStack spacing={14}>
             {hasDelete && (
               <Button
-                onClick={() => removeRecipeHandler(index + 1, date!)}
+                onClick={() => removeRecipeHandler(index, date!)}
                 isLoading={isLoadingButton}
                 backgroundColor={'var(--warning-color-main)'}
               >
