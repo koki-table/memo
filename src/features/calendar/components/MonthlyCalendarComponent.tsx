@@ -1,11 +1,12 @@
 import { VStack, Flex, useToast } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import ja from 'dayjs/locale/ja'
-import { query, where, getDocs } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
+import { query, getDocs } from 'firebase/firestore'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Spinner } from '@/components/Elements'
 import { useAuth } from '@/features/auth'
+import { Recipe } from '@/types/Recipe'
 import { createCollection } from '@/utils/database'
 import { getMonth } from '@/utils/getMonth'
 
@@ -24,21 +25,24 @@ export const MonthlyCalendarComponent = () => {
 
   const { dayInit: currentMonthData } = getMonth(currentMonth)
 
-  const [activeDate, setActiveDate] = useState([''])
+  const [activeDate, setActiveDate] = useState<Array<Pick<Recipe, 'img' | 'date'>>>([])
 
-  const hasActiveDate = (day: dayjs.Dayjs) => activeDate.includes(day.format('YYYYMMDD'))
+  const toImgUrl = useCallback(
+    (date: dayjs.Dayjs) => {
+      const matchedItem = activeDate.filter((item) => item.date === date.format('YYYYMMDD'))
+      if (matchedItem.length === 0) return null
+      return matchedItem[0].img
+    },
+    [activeDate]
+  )
 
   useEffect(() => {
     const { firstDate, lastDate } = getMonth(currentMonth)
 
     const fetchAccount = async () => {
       try {
-        const recipeCol = createCollection('recipes', user)
-        const dateQuery = query(
-          recipeCol,
-          where('date', '>=', firstDate.format('YYYYMMDD')),
-          where('date', '<=', lastDate.format('YYYYMMDD'))
-        )
+        const recipeCol = createCollection('dates', user)
+        const dateQuery = query(recipeCol)
 
         if (dateQuery === null) return
 
@@ -46,9 +50,19 @@ export const MonthlyCalendarComponent = () => {
         const queryDateSnapshot = await getDocs(dateQuery)
         setIsLoading(false)
 
-        queryDateSnapshot.forEach((doc) => {
-          setActiveDate((prev) => [...prev, doc.data().date])
+        const flattenRecipes = queryDateSnapshot.docs.flatMap((doc) =>
+          doc.data().recipes.map((recipe: Pick<Recipe, 'img' | 'date'>) => ({
+            img: recipe.img,
+            date: recipe.date,
+          }))
+        )
+
+        const filteredRecipes = flattenRecipes.filter((recipe: Pick<Recipe, 'img' | 'date'>) => {
+          const recipeDate = dayjs(recipe.date)
+          return recipeDate.isAfter(dayjs(firstDate)) && recipeDate.isBefore(dayjs(lastDate))
         })
+
+        setActiveDate(filteredRecipes)
       } catch (e: any) {
         console.log(e.message)
         toast({
@@ -85,7 +99,7 @@ export const MonthlyCalendarComponent = () => {
             _last={{ borderBottom: 'solid 1px var(--line-color-light)' }}
           >
             {row.map((day, idx) => (
-              <Day day={day} key={idx} rowIndex={i} hasActiveDate={hasActiveDate(day)} />
+              <Day day={day} key={idx} rowIndex={i} imgUrl={toImgUrl(day)} />
             ))}
           </Flex>
         ))}

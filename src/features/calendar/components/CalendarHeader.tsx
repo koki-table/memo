@@ -20,7 +20,7 @@ export const CalendarHeader: FC = () => {
       alignItems={'center'}
     >
       <Text fontSize="sm" fontWeight="700">
-        {dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MMMM')}
+        {dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MM')}
       </Text>
       <MonthMoveButton />
     </HStack>
