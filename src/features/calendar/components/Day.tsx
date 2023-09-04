@@ -13,7 +13,7 @@ export const Day: FC<DayProps> = (props) => {
   const { day, rowIndex, imgUrl } = props
   const navigate = useNavigate()
 
-  // 今日の日付を色付けする
+  // 今日の日付を色付け
   const getTodayStyle =
     day.format('D-MM-YY') === dayjs().format('D-MM-YY') ? 'var(--secondary-color-main)' : ''
 
