@@ -1,4 +1,4 @@
-import { Box, Text, Link } from '@chakra-ui/react'
+import { Box, Text, Link, Image } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -6,14 +6,14 @@ import { useNavigate } from 'react-router-dom'
 type DayProps = {
   day: dayjs.Dayjs
   rowIndex: number
-  hasActiveDate: boolean
+  imgUrl: string | null
 }
 
 export const Day: FC<DayProps> = (props) => {
-  const { day, rowIndex, hasActiveDate } = props
+  const { day, rowIndex, imgUrl } = props
   const navigate = useNavigate()
 
-  // 今日の日付を色付けする
+  // 今日の日付を色付け
   const getTodayStyle =
     day.format('D-MM-YY') === dayjs().format('D-MM-YY') ? 'var(--secondary-color-main)' : ''
 
@@ -39,6 +39,7 @@ export const Day: FC<DayProps> = (props) => {
         placeItems="center"
         textAlign={'center'}
         onClick={() => navigate(`/recipe/${day.format('YYYYMMDD')}`)}
+        position="relative"
       >
         {/* 1行目に曜日を表示 */}
         <Text
@@ -46,6 +47,8 @@ export const Day: FC<DayProps> = (props) => {
           paddingY="5"
           zIndex={2}
           position="relative"
+          color={imgUrl ? 'var(--white)' : 'var(--text-color-main)'}
+          fontWeight={imgUrl ? 600 : 400}
           _before={{
             content: '""',
             position: 'absolute',
@@ -58,21 +61,20 @@ export const Day: FC<DayProps> = (props) => {
             zIndex: 1,
             opacity: 0.6,
           }}
-          _after={{
-            content: '""',
-            position: 'absolute',
-            w: '5px',
-            h: '5px',
-            top: '18px',
-            right: '10px',
-            borderRadius: '20px',
-            backgroundColor: hasActiveDate ? 'var(--warning-color-main)' : '',
-            zIndex: 1,
-            opacity: 0.6,
-          }}
         >
           {day.format('D')}
         </Text>
+        {imgUrl && (
+          <Image
+            src={imgUrl}
+            w={'100%'}
+            position={'absolute'}
+            inset={0}
+            m={'auto'}
+            objectFit={'contain'}
+            maxHeight={'100%'}
+          />
+        )}
       </Link>
     </Box>
   )
