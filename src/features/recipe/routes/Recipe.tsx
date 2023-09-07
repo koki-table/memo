@@ -1,5 +1,8 @@
+import { useParams } from 'react-router-dom'
+
 import { RecipeRegisterComponent } from '../components'
 
 export const Recipe = () => {
-  return <RecipeRegisterComponent />
+  const { date } = useParams()
+  return <RecipeRegisterComponent key={date} />
 }

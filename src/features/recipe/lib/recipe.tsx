@@ -23,7 +23,7 @@ export type UseRecipe = {
   recipeData: Recipe[]
   updateLocalRecipeHandler: (newRecipe: Recipe, index: number) => void
   removeRecipeHandler: (index: number, date: string) => Promise<void>
-  imgFiles: { [index: number]: File } | undefined
+  imgFiles: { [index: number]: File } | null
   updateImgFile: (newImgFile: File, index: number) => void
   registerRecipeHandler: (data: FieldValues, date: string) => Promise<void>
   updateRecipeHandler: (data: FieldValues, date: string) => Promise<void>
@@ -67,7 +67,7 @@ const useRecipeProvider = (): UseRecipe => {
   }, [])
   const [recipeData, setRecipeData] = useState<Recipe[]>([defaultRecipe])
 
-  const [imgFiles, setImgFiles] = useState<{ [index: number]: File }>()
+  const [imgFiles, setImgFiles] = useState<{ [index: number]: File } | null>(null)
 
   const [options, setOptions] = useState<
     [
@@ -102,6 +102,7 @@ const useRecipeProvider = (): UseRecipe => {
           return
         } else {
           setRecipeData([defaultRecipe])
+          setImgFiles(null)
         }
       } catch (e: any) {
         console.log(e.message)
