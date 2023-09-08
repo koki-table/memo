@@ -85,20 +85,18 @@ const useRecipeProvider = (): UseRecipe => {
         const recipeDoc = doc(db, `users/${user!.uid.toString()}/dates/${date}`)
 
         setIsLoading(true)
-        const queryDateSnapshot = await getDoc(recipeDoc)
-        const queryCategorySnapshot = await getDoc(categoryDoc)
+        const queryRecipe = await getDoc(recipeDoc)
+        const queryCategory = await getDoc(categoryDoc)
         setIsLoading(false)
 
-        if (queryCategorySnapshot.exists()) {
-          setOptions(
-            queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
-          )
+        if (queryCategory.data()!.categories != null) {
+          setOptions(queryCategory.data()!.categories.map((v: string) => ({ value: v, label: v })))
         } else {
           console.log('categoryは未登録です。')
         }
 
-        if (queryDateSnapshot.exists()) {
-          setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
+        if (queryRecipe.exists()) {
+          setRecipeData((queryRecipe.data().recipes as Recipe[]) ?? [defaultRecipe])
           return
         } else {
           setRecipeData([defaultRecipe])

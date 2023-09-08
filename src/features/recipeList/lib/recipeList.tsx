@@ -60,10 +60,10 @@ const useRecipeListProvider = (): UseRecipeList => {
 
       if (queryDateSnapshot.size > 0) {
         const flattenRecipes = queryDateSnapshot.docs.flatMap((doc) =>
-          doc.data().recipes.map((recipe: Pick<Recipe, 'category' | 'name'>) => ({
+          doc.data().recipes.map((recipe: Pick<Recipe, 'category' | 'name' | 'date'>) => ({
             name: recipe.name,
             category: recipe.category,
-            date: doc.data().date,
+            date: recipe.date,
           }))
         ) as RecipeList
 
@@ -98,7 +98,6 @@ const useRecipeListProvider = (): UseRecipeList => {
     async (selectedValue: string) => {
       try {
         const recipeCol = createCollection('dates', user)
-        // const recipeQuery = query(recipeCol, where('recipes', '==', selectedValue))
         const recipeQuery = query(recipeCol)
 
         setIsLoading(true)
@@ -107,10 +106,10 @@ const useRecipeListProvider = (): UseRecipeList => {
 
         if (queryDateSnapshot.size > 0) {
           const flattenRecipes = queryDateSnapshot.docs.flatMap((doc) =>
-            doc.data().recipes.map((recipe: Pick<Recipe, 'category' | 'name'>) => ({
+            doc.data().recipes.map((recipe: Pick<Recipe, 'category' | 'name' | 'date'>) => ({
               name: recipe.name,
               category: recipe.category,
-              date: doc.data().date,
+              date: recipe.date,
             }))
           ) as RecipeList
 
