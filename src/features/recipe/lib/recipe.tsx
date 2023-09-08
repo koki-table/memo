@@ -89,7 +89,9 @@ const useRecipeProvider = (): UseRecipe => {
         const queryCategorySnapshot = await getDoc(categoryDoc)
         setIsLoading(false)
 
-        if (queryCategorySnapshot.exists()) {
+        if (queryCategorySnapshot.data()!.categories != null) {
+          console.log('fffff')
+
           setOptions(
             queryCategorySnapshot.data()!.categories.map((v: string) => ({ value: v, label: v }))
           )
@@ -97,8 +99,8 @@ const useRecipeProvider = (): UseRecipe => {
           console.log('categoryは未登録です。')
         }
 
-        if (queryDateSnapshot.exists()) {
-          setRecipeData((queryDateSnapshot.data().recipes as Recipe[]) ?? [defaultRecipe])
+        if (queryDateSnapshot.data()!.recipes != null) {
+          setRecipeData((queryDateSnapshot.data()!.recipes as Recipe[]) ?? [defaultRecipe])
           return
         } else {
           setRecipeData([defaultRecipe])
