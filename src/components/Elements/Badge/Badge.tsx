@@ -16,7 +16,7 @@ export const Badge: FC<BadgeProps> = ({ children, type }) => {
     const baseStyle = {
       content: '""',
       display: 'inline-block',
-      bg: 'var(--badge-color-red)',
+      bg: 'var(--primary-color-main)',
       w: '2',
       h: '2',
       borderRadius: '50%',
@@ -37,7 +37,7 @@ export const Badge: FC<BadgeProps> = ({ children, type }) => {
 
   const typeStatus = {
     text: <WrapperBadge m="0 0 0 4px">{children}</WrapperBadge>,
-    icon: <WrapperBadge m="8px 0 0 -18px">{children}</WrapperBadge>,
+    icon: <WrapperBadge m="3px 0 0 -8px">{children}</WrapperBadge>,
   }[type]
 
   return <>{typeStatus}</>

@@ -55,12 +55,12 @@
 
 a {
   font-weight: 500;
-  text-decoration: inherit;
+  text-decoration: none;
 }
 
 a:hover,
 a:focus {
-  color: var(--primary-color-heavy);
+  opacity: 0.8;
 }
 
 body {
@@ -68,10 +68,6 @@ body {
   place-items: center;
   min-height: 100vh;
   margin: 0;
-}
-
-select.hasValue {
-  color: var(--text-color-main);
 }
 
 input::-webkit-calendar-picker-indicator {

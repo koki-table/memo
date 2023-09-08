@@ -1,64 +1,49 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import {
-  Avatar,
-  Button,
-  chakra,
-  Container,
-  Flex,
-  Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-} from '@chakra-ui/react'
-import { useNavigate } from 'react-router-dom'
+import { chakra, Container, Flex, Link, Image, Box } from '@chakra-ui/react'
+import { memo } from 'react'
 
-import { Heading } from '@/components/Elements/'
-import { useAuth } from '@/features/auth'
+import gyoza from '@/assets/gyoza.png'
 
-export const Header = () => {
-  const navigate = useNavigate()
-  const { user, signOut } = useAuth()
+import { HamburgerMenu } from './HamburgerMenu'
 
-  const onSubmit = async () => {
-    const { success, message } = await signOut()
-    if (success) {
-      console.log(message)
-      navigate('/auth/login')
-    }
-  }
-
+export const Header = memo(() => {
   return (
-    <chakra.header py={6} bgColor={'var(--white)'}>
+    <chakra.header
+      py={3}
+      bgColor={'var(--white)'}
+      position={'relative'}
+      zIndex={999}
+      _before={{
+        content: "''",
+        position: 'absolute',
+        display: 'block',
+        height: '1px',
+        width: '90%',
+        inset: 0,
+        margin: 'auto auto 0',
+        bottom: 0,
+        zIndex: 1,
+        backgroundColor: 'var(--line-color-main)',
+      }}
+    >
       <Container maxW={'container.lg'}>
-        <Flex justifyContent="space-between">
+        <Flex justifyContent="space-between" alignItems={'center'}>
           <Link href={'/'}>
             <chakra.a
               _hover={{
                 opacity: 0.8,
               }}
             >
-              <Heading variant="h3">memo</Heading>
+              <Box w={'60px'}>
+                <Image src={gyoza} />
+              </Box>
             </chakra.a>
           </Link>
-          {user ? (
-            <Menu>
-              <MenuButton>
-                <Avatar flexShrink={0} width={10} height={10} />
-              </MenuButton>
-              <MenuList py={0}>
-                <MenuItem onClick={onSubmit}>サインアウト</MenuItem>
-              </MenuList>
-            </Menu>
-          ) : (
-            <Link href={'/auth/register'}>
-              <Button as={'a'} colorScheme={'teal'}>
-                サインイン
-              </Button>
-            </Link>
-          )}
+          <HamburgerMenu />
         </Flex>
       </Container>
     </chakra.header>
   )
-}
+})
+
+Header.displayName = 'Header'

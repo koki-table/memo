@@ -22,11 +22,15 @@ const { CalendarRoutes } = lazyImport(
   async () => await import('@/features/calendar'),
   'CalendarRoutes'
 )
-const { App } = lazyImport(async () => await import('@/App'), 'App')
+const { RecipeListRoutes } = lazyImport(
+  async () => await import('@/features/recipeList'),
+  'RecipeListRoutes'
+)
+const { RecipeRoutes } = lazyImport(async () => await import('@/features/recipe'), 'RecipeRoutes')
+const { HomeRoutes } = lazyImport(async () => await import('@/features/home'), 'HomeRoutes')
 
 export const AppRoutes = () => {
   const { user } = useAuth()
-  console.log(user)
 
   const handleAuth = () => {
     if (typeof user === 'undefined') return <Spinner variants="full" />
@@ -37,7 +41,9 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={handleAuth()}>
-        <Route index element={<App />} />
+        <Route index element={<HomeRoutes />} />
+        <Route path="/recipe-list/*" element={<RecipeListRoutes />} />
+        <Route path="/recipe/*" element={<RecipeRoutes />} />
         <Route path="/calendar/*" element={<CalendarRoutes />} />
       </Route>
       <Route path="/auth/*" element={<AuthRoutes />} />

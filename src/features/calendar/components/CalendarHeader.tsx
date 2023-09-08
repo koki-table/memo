@@ -6,11 +6,9 @@ import { useCalendar } from '../lib'
 
 import { MonthMoveButton } from './MonthMoveButton'
 
-// type CalendarHeaderProps = {
-// }
-
 export const CalendarHeader: FC = () => {
   const { currentMonth } = useCalendar()
+
   return (
     <HStack
       spacing={5}
@@ -18,9 +16,12 @@ export const CalendarHeader: FC = () => {
       top="100px"
       right="20px"
       justifyContent={'space-between'}
-      width={'85%'}
+      width={'90%'}
+      alignItems={'center'}
     >
-      <Text fontSize="sm">{dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MMMM')}</Text>
+      <Text fontSize="sm" fontWeight="700">
+        {dayjs(new Date(dayjs().year(), currentMonth)).format('YYYY/MM')}
+      </Text>
       <MonthMoveButton />
     </HStack>
   )

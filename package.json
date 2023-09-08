@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "test": "firebase emulators:exec --only firestore 'vitest run'",
+    "test": "npx vitest run",
     "format": "prettier --write \"**/*.+(js|json|yml|ts|tsx|css)\" --ignore-path .prettierignore",
     "lint": "eslint --ext .cjs,.ts,.tsx ./src --ignore-path .gitignore"
   },
@@ -19,14 +19,23 @@
     "@chakra-ui/react": "^2.5.1",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@hookform/resolvers": "^3.1.0",
+    "@types/uuid": "^9.0.2",
     "dayjs": "^1.11.7",
     "eslint-plugin-prettier": "^4.2.1",
-    "firebase": "^9.17.1",
+    "firebase": "^9.23.0",
     "framer-motion": "^10.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
+    "react-icons": "^4.8.0",
     "react-router-dom": "^6.8.2",
-    "vite-tsconfig-paths": "^4.0.5"
+    "react-select": "^5.7.2",
+    "react-tag-input": "^6.8.1",
+    "react-textarea-autosize": "^8.4.1",
+    "uuid": "^9.0.0",
+    "vite-tsconfig-paths": "^4.0.5",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.19.6",
@@ -102,5 +111,8 @@
     "*.md": [
       "bash -c 'yarn stylelint:fix'"
     ]
+  },
+  "resolutions": {
+    "stylelint/postcss": "8.4.14"
   }
 }

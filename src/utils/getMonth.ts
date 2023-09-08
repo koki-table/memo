@@ -18,5 +18,9 @@ export const getMonth = (monthIndex: number) => {
       return dayjs(new Date(year, Number(monthIndex), currentMonthCount))
     })
   })
-  return dayInit
+
+  const firstDate = dayInit[0][0] // 最初の日付
+  const lastDate = dayInit[num - 1][6] // 最後の日付
+
+  return { dayInit, firstDate, lastDate }
 }
