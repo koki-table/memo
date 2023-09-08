@@ -89,7 +89,7 @@ const useRecipeProvider = (): UseRecipe => {
         const queryCategory = await getDoc(categoryDoc)
         setIsLoading(false)
 
-        if (queryCategory.data()!.categories != null) {
+        if (queryCategory.data() != null) {
           setOptions(queryCategory.data()!.categories.map((v: string) => ({ value: v, label: v })))
         } else {
           console.log('categoryは未登録です。')
