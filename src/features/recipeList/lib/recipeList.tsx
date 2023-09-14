@@ -1,5 +1,5 @@
 import { useToast } from '@chakra-ui/react'
-import { query, getDocs, where, doc, getDoc, updateDoc } from 'firebase/firestore'
+import { query, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
@@ -174,15 +174,27 @@ const useRecipeListProvider = (): UseRecipeList => {
 
   const updateRecipeCategories = async (prevCategoryValue: string, newCategoryValue: string) => {
     try {
-      const recipeCol = createCollection('recipes', user)
-      const categoryQuery = query(recipeCol, where('category', '==', prevCategoryValue))
+      const recipeCol = createCollection('dates', user)
+      const recipeQuery = query(recipeCol)
 
-      const querySnapshot = await getDocs(categoryQuery)
+      setIsLoading(true)
+      const queryDateSnapshot = await getDocs(recipeQuery)
+      setIsLoading(false)
 
-      querySnapshot.forEach((query) => {
-        const docRef = doc(recipeCol, query.id)
-        updateDoc(docRef, { category: newCategoryValue })
-      })
+      if (queryDateSnapshot.size > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        queryDateSnapshot.forEach(async (docSnapshot) => {
+          const recipes = docSnapshot.data().recipes
+          for (const recipe of recipes) {
+            if (recipe.category === prevCategoryValue) {
+              const docRef = doc(recipeCol, docSnapshot.id)
+              await updateDoc(docRef, {
+                recipes: [{ ...recipe, category: newCategoryValue }],
+              })
+            }
+          }
+        })
+      }
     } catch (e: any) {
       console.log(e.message)
       toast({
