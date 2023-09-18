@@ -1,5 +1,5 @@
 import { useToast } from '@chakra-ui/react'
-import { query, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'
+import { query, getDocs, doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import { createContext, ReactNode, useContext, FC, useState, useCallback } from 'react'
 
 import { useAuth } from '@/features/auth'
@@ -182,18 +182,23 @@ const useRecipeListProvider = (): UseRecipeList => {
       setIsLoading(false)
 
       if (queryDateSnapshot.size > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        queryDateSnapshot.forEach(async (docSnapshot) => {
+        const batch = writeBatch(db)
+
+        queryDateSnapshot.forEach((docSnapshot) => {
           const recipes = docSnapshot.data().recipes
-          for (const recipe of recipes) {
+
+          const updatedRecipes = recipes.map((recipe: Recipe) => {
             if (recipe.category === prevCategoryValue) {
-              const docRef = doc(recipeCol, docSnapshot.id)
-              await updateDoc(docRef, {
-                recipes: [{ ...recipe, category: newCategoryValue }],
-              })
+              return { ...recipe, category: newCategoryValue }
             }
-          }
+            return recipe
+          })
+
+          const docRef = doc(recipeCol, docSnapshot.id)
+          batch.update(docRef, { recipes: updatedRecipes })
         })
+
+        await batch.commit()
       }
     } catch (e: any) {
       console.log(e.message)
